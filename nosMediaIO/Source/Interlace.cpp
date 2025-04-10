@@ -22,15 +22,6 @@ struct InterlaceNode : NodeContext
 {
 	nosTextureFieldType Field;
 
-	InterlaceNode(nosFbNodePtr node)
-		: NodeContext(node)
-	{
-	}
-
-	~InterlaceNode()
-	{
-	}
-
 	nosResult CopyFrom(nosCopyInfo* copyInfo) override
 	{
 		vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, Field);
@@ -80,11 +71,6 @@ struct FieldJugglerNode : NodeContext
 {
 	nosTextureFieldType Field;
 
-	FieldJugglerNode(nosFbNodePtr node)
-		: NodeContext(node)
-	{
-	}
-
 	void OnPathStart() override
 	{
 		Field = NOS_TEXTURE_FIELD_TYPE_EVEN;
@@ -109,15 +95,6 @@ struct FieldJugglerNode : NodeContext
 
 struct DeinterlaceNode : NodeContext
 {
-	DeinterlaceNode(nosFbNodePtr node)
-		: NodeContext(node)
-	{
-	}
-
-	~DeinterlaceNode()
-	{
-	}
-
 	nosResult CopyFrom(nosCopyInfo* copyInfo) override
 	{
 		vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);

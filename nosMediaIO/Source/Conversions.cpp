@@ -76,10 +76,6 @@ nosVec2u GetYCbCrBufferResolution(nosVec2u res, YCbCrPixelFormat fmt, bool inter
 
 struct RGB2YCbCrNodeContext : NodeContext
 {
-	RGB2YCbCrNodeContext(nosFbNodePtr node) : NodeContext(node)
-	{
-	}
-
 	nosTextureFieldType FieldType = NOS_TEXTURE_FIELD_TYPE_EVEN;
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
@@ -142,13 +138,13 @@ NOS_REGISTER_NAME(Resolution);
 
 struct YCbCr2RGBNodeContext : NodeContext
 {
-	YCbCr2RGBNodeContext(nosFbNodePtr node) : NodeContext(node)
+	nosResult OnCreate(nosFbNodePtr node) override
 	{
 		AddPinValueWatcher(NSN_Resolution, [this](const nos::Buffer& newVal, std::optional<nos::Buffer> oldVal) {
 			auto newDispatchSize = nosVec2u(120, 120);
 			nosEngine.SetPinValueByName(NodeId, NOS_NAME_STATIC("DispatchSize"), Buffer::From(newDispatchSize));
 		});
-
+		return NOS_RESULT_SUCCESS;
 	}
 
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
@@ -201,10 +197,6 @@ nosResult RegisterYCbCr2RGB(nosNodeFunctions* funcs)
 
 struct YUVBufferSizeCalculator : NodeContext
 {
-	YUVBufferSizeCalculator(nosFbNodePtr node) : NodeContext(node)
-	{
-	}
-
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
@@ -229,8 +221,9 @@ struct GammaLUTNodeContext : NodeContext
 {
 	vkss::Resource StagingBuffer;
 	static constexpr auto SSBO_SIZE = 10; // Can have a better name.
-	GammaLUTNodeContext(nosFbNodePtr node)
-		: NodeContext(node), StagingBuffer(*vkss::Resource::Create(
+	
+	GammaLUTNodeContext()
+		: NodeContext(), StagingBuffer(*vkss::Resource::Create(
 								 {.Info = {.Type = NOS_RESOURCE_TYPE_BUFFER,
 										   .Buffer = {.Size = (1 << (SSBO_SIZE)) * sizeof(uint16_t),
 													  .Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC),
@@ -370,10 +363,6 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 			glm::vec<4, T>(0, 0, 0, 1)));
 	}
 
-	ColorSpaceMatrixNodeContext(nosFbNodePtr node) : NodeContext(node)
-	{
-
-	}
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
@@ -397,8 +386,6 @@ nosResult RegisterColorSpaceMatrix(nosNodeFunctions* funcs)
 
 struct YUY2ToRGBANodeContext : NodeContext
 {
-	using NodeContext::NodeContext;
-
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
@@ -482,10 +469,6 @@ nosResult RegisterNV12ToRGBA(nosNodeFunctions* funcs)
 
 struct RGBA2BGR24BufferNodeContext : NodeContext
 {
-	RGBA2BGR24BufferNodeContext(nosFbNodePtr node) : NodeContext(node)
-	{
-	}
-
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);

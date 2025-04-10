@@ -50,23 +50,17 @@ struct TextureFormatConverter : nos::NodeContext
 {
 	nosResourceShareInfo InputTexture = {};
 	std::optional<vkss::Resource> OutputTexture = std::nullopt;
-	uuid NodeUUID = {}, InputUUID = {}, OutputUUID = {}, FormatUUID = {};
+	uuid FormatUUID = {};
 	nos::sys::vulkan::Format OutputFormat = {};
 	nosResourceShareInfo outBuf = {};
 	nosResourceShareInfo inBuf = {};
 
 	bool IsSavedNode = false;
-	TextureFormatConverter(nosFbNodePtr node) : NodeContext(node)
+	nosResult OnCreate(nosFbNodePtr node) override
 	{
-		NodeUUID = *node->id();
-
 		for (const auto& pin : *node->pins()) {
 			if (NSN_Input.Compare(pin->name()->c_str()) == 0) {
-				InputUUID = *pin->id();
 				InputTexture = nos::vkss::DeserializeTextureInfo((void*)pin->data()->data());
-			}
-			else if (NSN_Output.Compare(pin->name()->c_str()) == 0) {
-				OutputUUID = *pin->id();
 			}
 			else if (NSN_OutputFormat.Compare(pin->name()->c_str()) == 0) {
 				IsSavedNode = true;
@@ -95,13 +89,14 @@ struct TextureFormatConverter : nos::NodeContext
 			for (int i = 0; i < 69; i++) {
 				Formats.push_back(nos::sys::vulkan::EnumNameFormat(FormatEnums[i]));
 			}
-			CreateStringList(FormatUUID, NodeUUID, NSN_OutputFormat.AsString(), std::move(Formats));
+			CreateStringList(FormatUUID, NodeId, NSN_OutputFormat.AsString(), std::move(Formats));
 		}
+		return NOS_RESULT_SUCCESS;
 	}
 
 	void OnPinValueChanged(nos::Name pinName, uuid const& pinId, nosBuffer value) override
 	{
-		if (InputUUID == pinId) {
+		if (NSN_Input == pinName) {
 			InputTexture = nos::vkss::DeserializeTextureInfo(value.Data);
 			PrepareResources();
 		}
@@ -244,7 +239,7 @@ struct TextureFormatConverter : nos::NodeContext
 
 		OutputTexture = vkss::Resource::Create(outputInfo, "TextureFormatConverter Output Texture");
 		if (OutputTexture)
-			nosEngine.SetPinValue(OutputUUID, OutputTexture->ToPinData());
+			SetPinValue(NSN_Output, OutputTexture->ToPinData());
 	}
 };
 
