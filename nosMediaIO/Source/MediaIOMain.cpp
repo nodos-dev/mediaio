@@ -86,5 +86,24 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 		return NOS_RESULT_SUCCESS;
 	}
 };
-NOS_EXPORT_PLUGIN_FUNCTIONS(MediaIOPluginFunctions)
+extern "C" __declspec(dllexport) nosResult __stdcall nosExportPlugin(nosPluginFunctions* outFunctions)
+{
+	static MediaIOPluginFunctions pluginFunctions{};
+	outFunctions->Initialize = []() -> nosResult { return pluginFunctions.Initialize(); };
+	outFunctions->ExportNodeFunctions = [](size_t* outSize, nosNodeFunctions** outList) -> nosResult {
+		return pluginFunctions.ExportNodeFunctions(*outSize, outList);
+	};
+	outFunctions->OnPreUnloadPlugin = []() -> nosResult { return pluginFunctions.OnPreUnloadPlugin(); };
+
+	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
+		if (!outRenamedFrom)
+		{
+			*outSize = 1;
+			return;
+		}
+		outRenamedFrom[0] = NOS_NAME("nos.interop.TextureFormatConverter");
+		outRenamedTo[0] = NOS_NAME("nos.mediaio.TextureFormatConverter");
+	};
+	return NOS_RESULT_SUCCESS;
+}
 }
