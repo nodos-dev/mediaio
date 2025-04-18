@@ -86,7 +86,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 		return NOS_RESULT_SUCCESS;
 	}
 };
-extern "C" __declspec(dllexport) nosResult __stdcall nosExportPlugin(nosPluginFunctions* outFunctions)
+extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* outFunctions)
 {
 	static MediaIOPluginFunctions pluginFunctions{};
 	outFunctions->Initialize = []() -> nosResult { return pluginFunctions.Initialize(); };
