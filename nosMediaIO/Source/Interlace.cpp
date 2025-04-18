@@ -144,7 +144,7 @@ struct DeinterlaceNode : NodeContext
 nosResult RegisterInterlace(nosNodeFunctions* nodeFunctions)
 {
 	NOS_BIND_NODE_CLASS(NSN_ClassName_MediaIO_Interlace, InterlaceNode, nodeFunctions);
-	fs::path root = nosEngine.Module->RootFolderPath;
+	fs::path root = nosEngine.Plugin->RootFolderPath;
 	auto interlacePath = (root / "Shaders" / "Interlace.frag").generic_string();
 	nosShaderInfo shader = {.ShaderName = NSN_MediaIO_Interlace_Fragment_Shader,
 	                        .Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = interlacePath.c_str()}, .AssociatedNodeClassName = NSN_ClassName_MediaIO_Interlace};
@@ -161,7 +161,7 @@ nosResult RegisterDeinterlace(nosNodeFunctions* nodeFunctions)
 {
 	NOS_BIND_NODE_CLASS(NSN_ClassName_MediaIO_Deinterlace, DeinterlaceNode, nodeFunctions);
 
-	fs::path root = nosEngine.Module->RootFolderPath;
+	fs::path root = nosEngine.Plugin->RootFolderPath;
 	auto deinterlacePath = (root / "Shaders" / "Deinterlace.frag").generic_string();
 	nosShaderInfo shader = {.ShaderName = NSN_MediaIO_Deinterlace_Fragment_Shader,
 							.Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = deinterlacePath.c_str()}, .AssociatedNodeClassName = NSN_ClassName_MediaIO_Deinterlace};

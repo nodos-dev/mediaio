@@ -10,11 +10,11 @@ if (NOT WITH_NODOS_WORKSPACE)
 endif()
 add_compile_definitions(NOS_DISABLE_DEPRECATED)
 
-nos_find_sdk("1.3.0" NOS_PLUGIN_SDK_TARGET NOS_SUBSYSTEM_SDK_TARGET NOS_SDK_DIR)
+nos_find_plugin_sdk("38.0.0" NOS_PLUGIN_SDK_TARGET NOS_SDK_DIR)
 cmake_path(SET FLATC_EXECUTABLE "${NOS_SDK_DIR}/bin/flatc")
 
 nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Config" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" "" nosSysMediaIO_generated)
-set(DEPENDENCIES nosSysMediaIO_generated ${NOS_SUBSYSTEM_SDK_TARGET})
+set(DEPENDENCIES nosSysMediaIO_generated ${NOS_PLUGIN_SDK_TARGET})
 
 nos_add_plugin("nosSysMediaIO" "${DEPENDENCIES}" "")
 
