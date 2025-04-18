@@ -247,7 +247,7 @@ nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn)
 {
 	NOS_BIND_NODE_CLASS(NSN_TextureFormatConverter, TextureFormatConverter, fn);
 
-	std::filesystem::path root = nosEngine.Module->RootFolderPath;
+	std::filesystem::path root = nosEngine.Plugin->RootFolderPath;
 	auto shaderPath = (root / "Shaders" / "FloatToInt.comp").generic_string();
 	nosShaderInfo FloatToIntShaderInfo = {
 		.ShaderName = NSN_FloatToIntFormat,

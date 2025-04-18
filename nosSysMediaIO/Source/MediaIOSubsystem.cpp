@@ -1,5 +1,5 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
-#include <Nodos/SubsystemAPI.h>
+#include <Nodos/PluginAPI.h>
 
 #include <nosMediaIO/nosMediaIO.h>
 
@@ -173,24 +173,11 @@ nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outSubsystemContext)
 	GExportedSubsystemVersions[minorVersion] = subsystem;
 	return NOS_RESULT_SUCCESS;
 }
-
-nosResult NOSAPI_CALL Initialize()
-{
-	return NOS_RESULT_SUCCESS;
-}
-
-nosResult NOSAPI_CALL UnloadSubsystem()
-{
-	return NOS_RESULT_SUCCESS;
-}
-
 extern "C"
 {
-NOSAPI_ATTR nosResult NOSAPI_CALL nosExportSubsystem(nosSubsystemFunctions* subsystemFunctions)
+NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* pluginFunctions)
 {
-	subsystemFunctions->OnRequest = Export;
-	subsystemFunctions->Initialize = Initialize;
-	subsystemFunctions->OnPreUnloadSubsystem = UnloadSubsystem;
+	pluginFunctions->OnRequest = Export;
 	return NOS_RESULT_SUCCESS;
 }
 }
