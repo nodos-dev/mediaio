@@ -192,7 +192,7 @@ typedef struct nosMediaIOSubsystem {
 // Make sure these are same with nossys file.
 #define NOS_MEDIAIO_SUBSYSTEM_NAME "nos.sys.mediaio"
 #define NOS_MEDIAIO_SUBSYSTEM_VERSION_MAJOR 0
-#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MINOR 10
+#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MINOR 11
 
 extern struct nosPluginInfo nosMediaIOSubsystemModuleInfo;
 extern nosMediaIOSubsystem* nosMediaIO;
