@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.11.0"
+			"version": "2.11.1"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -30,9 +30,9 @@
 		"Config/ResolutionNames.json"
 	],
 	"binary_path": "Binaries/nosMediaIO",
-	"subsystem_options": [
+	"plugin_options": [
 		{
-			"subsystem": "nos.sys.vulkan",
+			"plugin": "nos.sys.vulkan",
 			"type": "nos.sys.vulkan.Resources",
 			"path": "Config/Resources.json"
 		}
