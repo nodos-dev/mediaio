@@ -10,7 +10,7 @@ NOS_END_IMPORT_DEPS()
 
 namespace nos::sys::mediaio
 {
-std::unordered_map<uint32_t, nosMediaIOSubsystem*> GExportedSubsystemVersions;
+std::unordered_map<uint32_t, nosMediaIOSubsystem*> GExportedAPIVersions;
 
 const char* NOSAPI_CALL GetFrameGeometryName(nosMediaIOFrameGeometry geometry)
 {
@@ -150,12 +150,12 @@ nosResult NOSAPI_CALL Get2DFrameResolution(nosMediaIOFrameGeometry geom, nosVec2
 	return NOS_RESULT_INVALID_ARGUMENT;
 }
 
-nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outSubsystemContext)
+nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outAPI)
 {
-	auto it = GExportedSubsystemVersions.find(minorVersion);
-	if (it != GExportedSubsystemVersions.end())
+	auto it = GExportedAPIVersions.find(minorVersion);
+	if (it != GExportedAPIVersions.end())
 	{
-		*outSubsystemContext = it->second;
+		*outAPI = it->second;
 		return NOS_RESULT_SUCCESS;
 	}
 	nosMediaIOSubsystem* subsystem = new nosMediaIOSubsystem();
@@ -169,15 +169,15 @@ nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outSubsystemContext)
 	subsystem->Get2DFrameResolution = Get2DFrameResolution;
 	subsystem->GetVideoScanTypeName = GetVideoScanTypeName;
 	subsystem->GetVideoScanTypeFromString = GetVideoScanTypeFromString;
-	*outSubsystemContext = subsystem;
-	GExportedSubsystemVersions[minorVersion] = subsystem;
+	*outAPI = subsystem;
+	GExportedAPIVersions[minorVersion] = subsystem;
 	return NOS_RESULT_SUCCESS;
 }
 extern "C"
 {
 NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* pluginFunctions)
 {
-	pluginFunctions->OnRequest = Export;
+	pluginFunctions->OnRequestAPI = Export;
 	return NOS_RESULT_SUCCESS;
 }
 }
