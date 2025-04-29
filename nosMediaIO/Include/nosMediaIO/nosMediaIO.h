@@ -174,7 +174,7 @@ typedef enum nosMediaIOInterlacedFieldType
 	NOS_MEDIAIO_INTERLACED_FIELD_TYPE_MAX = NOS_MEDIAIO_INTERLACED_ODD_FIELD
 } nosMediaIOInterlacedFieldType;
 
-typedef struct nosMediaIOSubsystem {
+typedef struct nosMediaIOAPI {
 	const char* (NOSAPI_CALL* GetFrameGeometryName)(nosMediaIOFrameGeometry geometry);
 	const char* (NOSAPI_CALL* GetFrameRateName)(nosMediaIOFrameRate frameRate);
 	const char* (NOSAPI_CALL* GetPixelFormatName)(nosMediaIOPixelFormat pixelFormat);
@@ -185,23 +185,23 @@ typedef struct nosMediaIOSubsystem {
 	nosResult (NOSAPI_CALL* Get2DFrameResolution)(nosMediaIOFrameGeometry geometry, nosVec2u* outResolution);
 	const char* (NOSAPI_CALL* GetVideoScanTypeName)(nosMediaIOVideoScanType scanType);
 	nosMediaIOVideoScanType (NOSAPI_CALL* GetVideoScanTypeFromString)(const char* str);
-} nosMediaIOSubsystem;
+} nosMediaIOAPI;
 
 #pragma region Helper Declarations & Macros
 
 // Make sure these are same with nossys file.
-#define NOS_MEDIAIO_SUBSYSTEM_NAME "nos.sys.mediaio"
-#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MAJOR 0
-#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MINOR 11
+#define NOS_MEDIAIO_PLUGIN_NAME "nos.mediaio"
+#define NOS_MEDIAIO_PLUGIN_VERSION_MAJOR 2
+#define NOS_MEDIAIO_PLUGIN_VERSION_MINOR 12
 
-extern struct nosPluginInfo nosMediaIOSubsystemModuleInfo;
-extern nosMediaIOSubsystem* nosMediaIO;
+extern struct nosPluginInfo nosMediaIOPluginInfo;
+extern nosMediaIOAPI* nosMediaIO;
 
-#define NOS_MEDIAIO_SUBSYSTEM_INIT()      \
-	nosPluginInfo nosMediaIOSubsystemModuleInfo; \
-	nosMediaIOSubsystem* nosMediaIO = nullptr;
+#define NOS_MEDIAIO_PLUGIN_INIT()      \
+	nosPluginInfo nosMediaIOPluginInfo; \
+	nosMediaIOAPI* nosMediaIO = nullptr;
 
-#define NOS_MEDIAIO_SUBSYSTEM_IMPORT() NOS_IMPORT_DEP(NOS_MEDIAIO_SUBSYSTEM_NAME, nosMediaIOSubsystemModuleInfo, nosMediaIO)
+#define NOS_MEDIAIO_PLUGIN_IMPORT() NOS_IMPORT_DEP(NOS_MEDIAIO_PLUGIN_NAME, nosMediaIOPluginInfo, nosMediaIO)
 
 #pragma endregion
 
@@ -209,4 +209,4 @@ extern nosMediaIOSubsystem* nosMediaIO;
 }
 #endif
 
-#endif
+#endif // NOS_MEDIAIO_H_INCLUDED 

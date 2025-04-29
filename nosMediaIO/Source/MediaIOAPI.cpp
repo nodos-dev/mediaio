@@ -1,16 +1,10 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 #include <Nodos/PluginAPI.h>
-
 #include <nosMediaIO/nosMediaIO.h>
 
-NOS_INIT();
-
-NOS_BEGIN_IMPORT_DEPS()
-NOS_END_IMPORT_DEPS()
-
-namespace nos::sys::mediaio
+namespace nos::mediaio
 {
-std::unordered_map<uint32_t, nosMediaIOSubsystem*> GExportedAPIVersions;
+std::unordered_map<uint32_t, nosMediaIOAPI*> GExportedAPIVersions;
 
 const char* NOSAPI_CALL GetFrameGeometryName(nosMediaIOFrameGeometry geometry)
 {
@@ -79,9 +73,9 @@ nosMediaIOVideoScanType NOSAPI_CALL GetVideoScanTypeFromString(const char* str)
 	}
 	return NOS_MEDIAIO_VIDEO_SCAN_TYPE_INVALID;
 }
-	
-// Function implementation
-nosResult NOSAPI_CALL GetFrameRateDeltaSeconds(nosMediaIOFrameRate frameRate, nosVec2u* outDeltaSeconds) {
+
+nosResult NOSAPI_CALL GetFrameRateDeltaSeconds(nosMediaIOFrameRate frameRate, nosVec2u* outDeltaSeconds)
+{
 	if (outDeltaSeconds == nullptr)
 		return NOS_RESULT_INVALID_ARGUMENT;
 
@@ -158,27 +152,19 @@ nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outAPI)
 		*outAPI = it->second;
 		return NOS_RESULT_SUCCESS;
 	}
-	nosMediaIOSubsystem* subsystem = new nosMediaIOSubsystem();
-	subsystem->GetFrameGeometryName = GetFrameGeometryName;
-	subsystem->GetFrameRateName = GetFrameRateName;
-	subsystem->GetPixelFormatName = GetPixelFormatName;
-	subsystem->GetFrameGeometryFromString = GetFrameGeometryFromString;
-	subsystem->GetFrameRateFromString = GetFrameRateFromString;
-	subsystem->GetPixelFormatFromString = GetPixelFormatFromString;
-	subsystem->GetFrameRateDeltaSeconds = GetFrameRateDeltaSeconds;
-	subsystem->Get2DFrameResolution = Get2DFrameResolution;
-	subsystem->GetVideoScanTypeName = GetVideoScanTypeName;
-	subsystem->GetVideoScanTypeFromString = GetVideoScanTypeFromString;
-	*outAPI = subsystem;
-	GExportedAPIVersions[minorVersion] = subsystem;
+	nosMediaIOAPI* api = new nosMediaIOAPI();
+	api->GetFrameGeometryName = GetFrameGeometryName;
+	api->GetFrameRateName = GetFrameRateName;
+	api->GetPixelFormatName = GetPixelFormatName;
+	api->GetFrameGeometryFromString = GetFrameGeometryFromString;
+	api->GetFrameRateFromString = GetFrameRateFromString;
+	api->GetPixelFormatFromString = GetPixelFormatFromString;
+	api->GetFrameRateDeltaSeconds = GetFrameRateDeltaSeconds;
+	api->Get2DFrameResolution = Get2DFrameResolution;
+	api->GetVideoScanTypeName = GetVideoScanTypeName;
+	api->GetVideoScanTypeFromString = GetVideoScanTypeFromString;
+	*outAPI = api;
+	GExportedAPIVersions[minorVersion] = api;
 	return NOS_RESULT_SUCCESS;
 }
-extern "C"
-{
-NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* pluginFunctions)
-{
-	pluginFunctions->OnRequestAPI = Export;
-	return NOS_RESULT_SUCCESS;
-}
-}
-}
+} 

@@ -86,6 +86,9 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 		return NOS_RESULT_SUCCESS;
 	}
 };
+
+nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outAPI);
+
 extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* outFunctions)
 {
 	static MediaIOPluginFunctions pluginFunctions{};
@@ -94,6 +97,7 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 		return pluginFunctions.ExportNodeFunctions(*outSize, outList);
 	};
 	outFunctions->OnPreUnloadPlugin = []() -> nosResult { return pluginFunctions.OnPreUnloadPlugin(); };
+	outFunctions->OnRequestAPI = Export;
 
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
 		if (!outRenamedFrom)
