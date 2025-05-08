@@ -35,7 +35,6 @@ inline void CreateStringList(uuid& GenUUID, uuid& NodeUUID, std::string name, st
 		"string",
 		nos::fb::ShowAs::PROPERTY,
 		nos::fb::CanShowAs::PROPERTY_ONLY,
-		0,
 		nos::fb::Visualizer::Pack(fbb, &vis),
 		&buf));
 
