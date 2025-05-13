@@ -395,6 +395,7 @@ struct RingNodeBase : NodeContext
 
 	void OnPathStart() override
 	{
+		WantedField = NOS_TEXTURE_FIELD_TYPE_UNKNOWN;
 		if (Ring && OnRestart == OnRestartType::RESET)
 			Ring->Reset(false);
 		if (Ring && OnRestart == OnRestartType::WAIT_UNTIL_FULL && Ring->IsFull())
