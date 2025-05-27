@@ -9,6 +9,7 @@
 			"node": {
 				"class_name": "RGB2YCbCr",
 				"contents_type": "Job",
+				"always_execute": true,
 				"contents": {
 					"type": "nos.sys.vulkan.GPUNode",
 					"options": {
