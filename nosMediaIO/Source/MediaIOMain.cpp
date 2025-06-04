@@ -6,12 +6,16 @@
 #include <Builtins_generated.h>
 
 #include <nosVulkanSubsystem/nosVulkanSubsystem.h>
+#include <nosSync/nosSync.h>
+#include <nosMediaIO/nosMediaIO.h>
 
 NOS_INIT()
 NOS_VULKAN_INIT()
+NOS_SYNC_INIT()
 
 NOS_BEGIN_IMPORT_DEPS()
 	NOS_VULKAN_IMPORT()
+	NOS_SYNC_IMPORT()
 NOS_END_IMPORT_DEPS()
 
 namespace nos::mediaio
@@ -49,6 +53,23 @@ nosResult RegisterFieldJuggler(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
+	nosResult Initialize() override
+	{
+		nosRegisterEventGroupParams params {
+			.Id = NOS_MEDIAIO_VIDEO_SYNC_EVENT_GROUP,
+			.Timeout = 10, // Allow 10 frames for sync
+			.Tolerance = 0.01f, // Allow 0.01 of a frame time for tolerance
+		};
+		nosSync->RegisterEventGroup(&params);
+		return NOS_RESULT_SUCCESS;
+	}
+
+	nosResult OnPreUnloadPlugin() override
+	{
+		nosSync->UnregisterEventGroup(NOS_MEDIAIO_VIDEO_SYNC_EVENT_GROUP);
+		return NOS_RESULT_SUCCESS;
+	}
+
 	nosResult ExportNodeFunctions(size_t& outSize, nosNodeFunctions** outList) override
 	{
 		outSize = Nodes::Count;

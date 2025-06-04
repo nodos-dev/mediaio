@@ -15,8 +15,9 @@ cmake_path(SET FLATC_EXECUTABLE "${NOS_SDK_DIR}/bin/flatc")
 
 # Dependencies
 nos_get_module("nos.sys.vulkan" "6.22" NOS_SYS_VULKAN_TARGET)
+nos_get_module("nos.sync" "2.0" NOS_SYNC_TARGET)
 nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Config" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" "" nosMediaIO_generated)
-set(DEPENDENCIES nosMediaIO_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_PLUGIN_SDK_TARGET})
+set(DEPENDENCIES nosMediaIO_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_SYNC_TARGET} ${NOS_PLUGIN_SDK_TARGET})
 
 nos_add_plugin("nosMediaIO" "${DEPENDENCIES}" "")
 

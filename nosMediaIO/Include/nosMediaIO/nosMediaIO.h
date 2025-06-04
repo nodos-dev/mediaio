@@ -12,6 +12,8 @@ extern "C"
 
 #include <Nodos/Types.h>
 
+#define NOS_MEDIAIO_VIDEO_SYNC_EVENT_GROUP 1
+
 typedef enum nosMediaIODirection
 {
 	NOS_MEDIAIO_DIRECTION_OUTPUT,
@@ -192,7 +194,7 @@ typedef struct nosMediaIOAPI {
 // Make sure these are same with nossys file.
 #define NOS_MEDIAIO_PLUGIN_NAME "nos.mediaio"
 #define NOS_MEDIAIO_PLUGIN_VERSION_MAJOR 2
-#define NOS_MEDIAIO_PLUGIN_VERSION_MINOR 12
+#define NOS_MEDIAIO_PLUGIN_VERSION_MINOR 13
 
 extern struct nosPluginInfo nosMediaIOPluginInfo;
 extern nosMediaIOAPI* nosMediaIO;
