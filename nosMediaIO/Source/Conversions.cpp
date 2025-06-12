@@ -80,7 +80,12 @@ struct RGB2YCbCrNodeContext : NodeContext
 	{
 	}
 
-	nosTextureFieldType FieldType = NOS_TEXTURE_FIELD_TYPE_EVEN;
+	void OnPathStart() override
+	{
+		FieldType = NOS_TEXTURE_FIELD_TYPE_EVEN;
+	}
+
+	nosTextureFieldType FieldType{};
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
