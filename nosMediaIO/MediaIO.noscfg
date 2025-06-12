@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.12.1"
+			"version": "2.12.2"
 		},
 		"description": "Media I/O nodes and API.",
 		"display_name": "Media I/O",
