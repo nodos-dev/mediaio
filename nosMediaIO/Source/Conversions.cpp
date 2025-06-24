@@ -12,6 +12,8 @@ namespace nos::mediaio
 
 static std::set<uint32_t> const& FindDivisors(const uint32_t N)
 {
+	static std::mutex Mutex;
+	std::unique_lock _(Mutex);
 	static std::map<uint32_t, std::set<uint32_t>> Map;
 
 	auto it = Map.find(N);
@@ -36,10 +38,7 @@ static std::set<uint32_t> const& FindDivisors(const uint32_t N)
 			for(uint32_t k = 0; k <= p5; ++k)
 				D.insert(pow(2, i) * pow(3, j) * pow(5, k));
 
-	static std::mutex Lock;
-	Lock.lock();
 	std::set<uint32_t> const& re = (Map[N] = std::move(D));
-	Lock.unlock();
 	return re;
 }
 
