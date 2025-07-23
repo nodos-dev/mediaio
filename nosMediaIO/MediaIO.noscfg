@@ -2,14 +2,14 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.12.2"
+			"version": "2.12.3"
 		},
 		"description": "Media I/O nodes and API.",
 		"display_name": "Media I/O",
 		"dependencies": [
 			{
 				"name": "nos.sys.vulkan",
-				"version": "6.22"
+				"version": "6.28"
 			}
 		],
         "category": "Media I/O"
