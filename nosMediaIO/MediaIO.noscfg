@@ -21,7 +21,8 @@
 		"Config/IsInterlaced.nosdef",
 		"Config/FieldJuggler.nosdef",
 		"Config/SetBufferFieldType.nosdef",
-		"Config/GetLumaCoeffs.nosdef"
+		"Config/GetLumaCoeffs.nosdef",
+		"Config/RGBAToBGRABuffer.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs"

@@ -31,6 +31,7 @@ enum Nodes : int
 	NV12ToRGBA,
 	RGBAToBGR24Buffer,
 	FieldJuggler,
+	RGBAToBGRABuffer,
 	Count
 };
 
@@ -46,6 +47,7 @@ nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
 nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
+nosResult RegisterRGBAToBGRABuffer(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -81,6 +83,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(NV12ToRGBA)
 				GEN_CASE_NODE(RGBAToBGR24Buffer)
 				GEN_CASE_NODE(FieldJuggler)
+				GEN_CASE_NODE(RGBAToBGRABuffer)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
@@ -102,11 +105,13 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
 		if (!outRenamedFrom)
 		{
-			*outSize = 1;
+			*outSize = 2;
 			return;
 		}
 		outRenamedFrom[0] = NOS_NAME("nos.interop.TextureFormatConverter");
 		outRenamedTo[0] = NOS_NAME("nos.mediaio.TextureFormatConverter");
+		outRenamedFrom[1] = NOS_NAME("zd.ndi.RGBAToBGRABuffer");
+		outRenamedTo[1] = NOS_NAME("nos.mediaio.RGBAToBGRABuffer");
 	};
 	return NOS_RESULT_SUCCESS;
 }

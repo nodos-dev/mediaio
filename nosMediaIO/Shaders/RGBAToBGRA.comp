@@ -1,0 +1,131 @@
+// Copyright MediaZ Teknoloji A.S. All Rights Reserved.
+
+#version 450
+#extension GL_EXT_shader_8bit_storage : enable
+
+layout (local_size_x = 1, local_size_y = 1) in;
+layout (binding = 0) uniform sampler2D Source;
+layout (binding = 1) writeonly buffer OutputBuffer
+{
+    uint Pixels[];
+} Output;
+
+uvec4 fetchPixel(uint x, uint y){
+    vec4 color = pow(texelFetch(Source, ivec2(x,y), 0), vec4(1/2.2f));
+	
+    vec4 clamped = clamp(color, vec4(0.0f), vec4(1.0f));
+    // Convert color channels to byte values
+    uint r = uint(clamped.r * 255.0f);
+    uint g = uint(clamped.g * 255.0f);
+    uint b = uint(clamped.b * 255.0f);
+    uint a = uint(clamped.a * 255.0f);
+    return uvec4(b, g, r, a);
+}
+
+void main() {
+
+    // Calculate the global coordinates for this thread
+    ivec2 size = textureSize(Source, 0);
+    ivec2 coord = ivec2(gl_GlobalInvocationID.x * 4, gl_GlobalInvocationID.y);
+
+    // Ensure we don't go out of bounds
+    if (coord.x + 4 >= size.x || coord.y >= size.y) {
+        return;
+    }
+
+    // Fetch RGB values for 4 adjacent pixels (clamped to texture bounds)
+    uvec4 pixels[4];
+    for (uint i = 0; i < 4; i++) {
+        uint xCoord = coord.x + i;
+        if (xCoord < uint(size.x)) {
+            pixels[i] = fetchPixel(xCoord, coord.y);
+        } else {
+            pixels[i] = uvec4(255); // Fill with black if out of bounds
+        }
+    }
+    // Compute the global pixel index
+    uint globalPixelIndx = coord.y * size.x + coord.x;
+
+    // Compute the byte offset in the output buffer
+    uint byteOffset = globalPixelIndx * 4;
+
+    // Determine the target word index and byte offset within the word
+    uint wordIndex = byteOffset / 4;
+
+	uint values[4] = {0, 0, 0, 0};
+	for(uint byteIndx = 0; byteIndx < 16; byteIndx++){
+		uint componentIndx = byteIndx % 4;
+		uint pixelIndx = byteIndx / 4;
+		uint componentValue = pixels[pixelIndx][componentIndx];
+		if(componentValue > 255) {
+			componentValue = 255;
+		}
+		values[byteIndx / 4] |= componentValue << (32 - ((4-(byteIndx % 4)) * 8));
+	}
+	Output.Pixels[wordIndex] = values[0];
+	Output.Pixels[wordIndex + 1] = values[1];
+	Output.Pixels[wordIndex + 2] = values[2];
+	Output.Pixels[wordIndex + 3] = values[3];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

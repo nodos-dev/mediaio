@@ -1,0 +1,46 @@
+{
+	"nodes": [
+		{
+			"class_name": "RGBAToBGRABuffer",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "RGBAToBGRABuffer",
+				"name_aliases": []
+			},
+			"node": {
+				"contents_type": "Job",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/RGBAToBGRA.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 120
+						}
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		}
+	]
+}
