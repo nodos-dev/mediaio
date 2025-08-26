@@ -105,13 +105,15 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
 		if (!outRenamedFrom)
 		{
-			*outSize = 2;
+			*outSize = 3;
 			return;
 		}
 		outRenamedFrom[0] = NOS_NAME("nos.interop.TextureFormatConverter");
 		outRenamedTo[0] = NOS_NAME("nos.mediaio.TextureFormatConverter");
 		outRenamedFrom[1] = NOS_NAME("zd.ndi.RGBAToBGRABuffer");
 		outRenamedTo[1] = NOS_NAME("nos.mediaio.RGBAToBGRABuffer");
+		outRenamedFrom[2] = NOS_NAME("nos.ndi.RGBAToBGRABuffer");
+		outRenamedTo[2] = NOS_NAME("nos.mediaio.RGBAToBGRABuffer");
 	};
 	return NOS_RESULT_SUCCESS;
 }
