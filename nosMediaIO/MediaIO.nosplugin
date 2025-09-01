@@ -1,0 +1,28 @@
+{
+	"info": {
+		"id": {
+			"name": "nos.mediaio",
+			"version": "3.0.0"
+		},
+		"description": "Media I/O nodes and API.",
+		"display_name": "Media I/O",
+		"dependencies": [
+			{
+				"name": "nos.sys.vulkan",
+				"version": "7.0"
+			}
+		],
+        "category": "Media I/O"
+	},
+	"named_values": [
+		"Types/ResolutionNames.json"
+	],
+	"binary_path": "Binaries/nosMediaIO",
+	"plugin_options": [
+		{
+			"plugin": "nos.sys.vulkan",
+			"type": "nos.sys.vulkan.Resources",
+			"path": "Types/Resources.json"
+		}
+	]
+}
