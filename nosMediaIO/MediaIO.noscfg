@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.5.4"
+			"version": "2.6.0"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -12,7 +12,7 @@
 				"version": "6.0"
 			}
 		],
-        "category": "Media I/O"
+		"category": "Media I/O"
 	},
 	"node_definitions": [
 		"Config/Interlace.nosdef",
@@ -21,7 +21,8 @@
 		"Config/IsInterlaced.nosdef",
 		"Config/FieldJuggler.nosdef",
 		"Config/SetBufferFieldType.nosdef",
-		"Config/GetLumaCoeffs.nosdef"
+		"Config/GetLumaCoeffs.nosdef",
+		"Config/SetInterlacedFieldType.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs"

@@ -31,6 +31,7 @@ enum Nodes : int
 	NV12ToRGBA,
 	RGBAToBGR24Buffer,
 	FieldJuggler,
+	SetInterlacedFieldType,
 	Count
 };
 
@@ -46,6 +47,7 @@ nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
 nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
+nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -81,6 +83,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(NV12ToRGBA)
 				GEN_CASE_NODE(RGBAToBGR24Buffer)
 				GEN_CASE_NODE(FieldJuggler)
+				GEN_CASE_NODE(SetInterlacedFieldType)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
