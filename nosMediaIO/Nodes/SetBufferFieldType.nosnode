@@ -2,9 +2,10 @@
 	"nodes": [
 		{
 			"class_name": "SetBufferFieldType",
+			"hide_in_context_menu": true,
 			"menu_info": {
 				"category": "Media IO",
-				"display_name": "Set Field Type (Buffer)"
+				"display_name": "Set Field Type (Buffer) (Deprecated)"
 			},
 			"node": {
 				"id": "b5565240-539f-4180-8d56-ea6ace2decc9",
