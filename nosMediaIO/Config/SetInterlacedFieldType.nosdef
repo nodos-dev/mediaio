@@ -1,0 +1,38 @@
+{
+	"nodes": [
+		{
+			"class_name": "SetInterlacedFieldType",
+			"menu_info": {
+				"category": "Media IO",
+				"display_name": "Set Interlaced Field Type"
+			},
+			"node": {
+				"class_name": "SetInterlacedFieldType",
+				"display_name": "Set Interlaced Field Type",
+				"contents_type": "Job",
+				"description": "Sets the interlaced field type for a buffer or texture",
+				"pins": [
+					{
+						"name": "Input",
+						"type_name": "nos.Generic",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "NewFieldType",
+						"display_name": "New Field Type",
+						"type_name": "nos.sys.vulkan.FieldType",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.Generic",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		}
+    ]
+}
