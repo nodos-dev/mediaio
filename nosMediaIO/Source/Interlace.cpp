@@ -215,8 +215,8 @@ struct SetInterlacedFieldTypeNode : NodeContext
 	nosResult OnResolvePinDataTypes(nosResolvePinDataTypesParams* params) override
 	{
 		nosName incomingType = params->IncomingTypeName;
-		if (incomingType != NOS_NAME("nos.sys.vulkan.Buffer") && 
-			incomingType != NOS_NAME("nos.sys.vulkan.Texture"))
+		if (incomingType != NOS_NAME(sys::vulkan::Buffer::GetFullyQualifiedName()) && 
+			incomingType != NOS_NAME(sys::vulkan::Texture::GetFullyQualifiedName()))
 		{
 			// Reject connection if incoming type is not Buffer or Texture
 			const char* errorMsg = "SetInterlacedFieldType only accepts nos.sys.vulkan.Buffer or nos.sys.vulkan.Texture types";
@@ -224,17 +224,6 @@ struct SetInterlacedFieldTypeNode : NodeContext
 			params->OutErrorMessage[sizeof(params->OutErrorMessage) - 1] = '\0';
 			return NOS_RESULT_FAILED;
 		}
-		
-		for (size_t i = 0; i < params->PinCount; ++i)
-		{
-			auto& pin = params->Pins[i];
-			
-			if (pin.Name == NOS_NAME("Input"))
-				pin.OutResolvedTypeName = params->IncomingTypeName;
-			else if (pin.Name == NOS_NAME("Output"))
-				pin.OutResolvedTypeName = params->IncomingTypeName;
-		}
-		
 		return NOS_RESULT_SUCCESS;
 	}
 
@@ -243,22 +232,22 @@ struct SetInterlacedFieldTypeNode : NodeContext
 		nos::NodeExecuteParams execParams(params);
 		
 		// Get the input and new field type
-		const nosBuffer* inputPinData = execParams[NOS_NAME("Input")].Data;
+		const nosBuffer* inputPinData = execParams[NSN_Input].Data;
 		auto newFieldType = *GetPinValue<sys::vulkan::FieldType>(GetPinValues(params), NOS_NAME("NewFieldType"));
 		
 		// Check the actual type name of the input pin to determine if it's Buffer or Texture
-		auto inputPin = GetPin(NOS_NAME("Input"));
+		auto inputPin = GetPin(NSN_Input);
 		if (!inputPin)
 			return NOS_RESULT_FAILED;
 		
-		if (inputPin->TypeName == NOS_NAME("nos.sys.vulkan.Buffer"))
+		if (inputPin->TypeName == NOS_NAME(sys::vulkan::Buffer::GetFullyQualifiedName()))
 		{
 			// Handle Buffer type
 			auto& inputBufferDesc = *InterpretPinValue<sys::vulkan::Buffer>(inputPinData->Data);
 			inputBufferDesc.mutate_field_type(newFieldType);
-			nosEngine.SetPinValueByName(NodeId, NOS_NAME("Output"), nos::Buffer::From(inputBufferDesc));
+			nosEngine.SetPinValueByName(NodeId, NSN_Output, nos::Buffer::From(inputBufferDesc));
 		}
-		else if (inputPin->TypeName == NOS_NAME("nos.sys.vulkan.Texture"))
+		else if (inputPin->TypeName == NOS_NAME(sys::vulkan::Texture::GetFullyQualifiedName()))
 		{
 			// Handle Texture type
 			auto& inputTextureDesc = *InterpretPinValue<sys::vulkan::Texture>(inputPinData->Data);
@@ -267,10 +256,10 @@ struct SetInterlacedFieldTypeNode : NodeContext
 				// If mutation fails, recreate the texture descriptor with the new field type
 				sys::vulkan::TTexture newDesc = nos::Buffer::From(inputTextureDesc);
 				newDesc.field_type = newFieldType;
-				nosEngine.SetPinValueByName(NodeId, NOS_NAME("Output"), nos::Buffer::From(newDesc));
+				nosEngine.SetPinValueByName(NodeId, NSN_Output, nos::Buffer::From(newDesc));
 			}
 			else
-				nosEngine.SetPinValueByName(NodeId, NOS_NAME("Output"), nos::Buffer::From(inputTextureDesc));
+				nosEngine.SetPinValueByName(NodeId, NSN_Output, nos::Buffer::From(inputTextureDesc));
 		}
 		else
 		{
