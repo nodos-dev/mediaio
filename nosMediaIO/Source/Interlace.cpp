@@ -22,10 +22,11 @@ struct InterlaceNode : NodeContext
 {
 	nosTextureFieldType Field;
 
-	nosResult CopyFrom(nosCopyInfo* copyInfo) override
+	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
-		vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, Field);
-		Field = vkss::FlippedField(Field);
+		// TODO: Transfer
+		//vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, Field);
+		//Field = vkss::FlippedField(Field);
 		return NOS_RESULT_SUCCESS;
 	}
 
@@ -37,19 +38,17 @@ struct InterlaceNode : NodeContext
 	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
 	{
 		auto pinIds = GetPinIds(params);
-		auto pinValues = GetPinValues(params);
-		auto inputTextureInfo = vkss::DeserializeTextureInfo(pinValues[NSN_Input]);
-		auto outputTextureInfo = vkss::DeserializeTextureInfo(pinValues[NSN_Output]);
+		NodeExecuteParams execParams(params);
 		nosRunPassParams interlacePass = {};
 		interlacePass.Key = NSN_MediaIO_Interlace_Pass;
 		uint32_t isOdd = Field - 1;
 		std::vector bindings = {
-			vkss::ShaderBinding(NSN_Input, inputTextureInfo),
-			vkss::ShaderBinding(NSN_ShouldOutputOdd, isOdd),
+			vkss::ShaderTextureBinding(NSN_Input, execParams.GetPinObject(NSN_Input), NOS_TEXTURE_FILTER_NEAREST),
+			vkss::ShaderDataBinding(NSN_ShouldOutputOdd, isOdd),
 		};
 		interlacePass.Bindings = bindings.data();
 		interlacePass.BindingCount = bindings.size();
-		interlacePass.Output = outputTextureInfo;
+		interlacePass.Output = execParams.GetPinObject(NSN_Output);
 		nosCmd cmd;
 		nosCmdBeginParams begin{ .Name = NOS_NAME("Interlace Pass"), .AssociatedNodeId = params->NodeId, .OutCmdHandle = &cmd };
 		nosVulkan->Begin(&begin);
@@ -78,8 +77,8 @@ struct FieldJugglerNode : NodeContext
 
 	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
 	{
-		auto values = GetPinValues(params);
-		bool isInterlaced = *GetPinValue<bool>(values, NOS_NAME("IsInterlaced"));
+		NodeExecuteParams execParams(params);
+		bool isInterlaced = *execParams.GetPinData<bool>(NOS_NAME("IsInterlaced"));
 		if (!isInterlaced)
 		{
 			Field = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
@@ -88,27 +87,29 @@ struct FieldJugglerNode : NodeContext
 		{
 			Field = vkss::FlippedField(Field);
 		}
-		SetPinValue(NOS_NAME("FieldType"), nos::Buffer::From((sys::vulkan::FieldType)Field));
+		SetPinValue(NOS_NAME("FieldType"), (sys::vulkan::FieldType)Field);
 		return NOS_RESULT_SUCCESS;
 	}
 };
 
 struct DeinterlaceNode : NodeContext
 {
-	nosResult CopyFrom(nosCopyInfo* copyInfo) override
+	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
-		vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
+		//TODO: Transfer
+		//vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
 		return NOS_RESULT_SUCCESS;
 	}
 
 	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
 	{
-		auto pinValues = GetPinValues(params);
-		auto inputTextureInfo = vkss::DeserializeTextureInfo(pinValues[NSN_Input]);
-		auto outputTextureInfo = vkss::DeserializeTextureInfo(pinValues[NSN_Output]);
+		NodeExecuteParams execParams(params);
+		auto inputTex = execParams.GetPinObject<vkss::Texture>(NSN_Input);
+		auto outputTex = execParams.GetPinObject<vkss::Texture>(NSN_Output);
 		nosRunPassParams deinterlacePass = {};
 		deinterlacePass.Key = NSN_MediaIO_Deinterlace_Pass;
-		auto field = inputTextureInfo.Info.Texture.FieldType;
+		auto inTexInfo = vkss::GetResourceInfo(inputTex);
+		auto field = inTexInfo->FieldType;
 		bool isInterlaced = vkss::IsTextureFieldTypeInterlaced(field);
 		if (!isInterlaced)
 		{
@@ -117,12 +118,12 @@ struct DeinterlaceNode : NodeContext
 		}
 		uint32_t isOdd = field - 1;
 		std::vector bindings = {
-			vkss::ShaderBinding(NSN_Input, inputTextureInfo),
-			vkss::ShaderBinding(NSN_IsOdd, isOdd)
+			vkss::ShaderTextureBinding(NSN_Input, inputTex, NOS_TEXTURE_FILTER_NEAREST),
+			vkss::ShaderDataBinding(NSN_IsOdd, isOdd)
 		};
 		deinterlacePass.Bindings = bindings.data();
 		deinterlacePass.BindingCount = bindings.size();
-		deinterlacePass.Output = outputTextureInfo;
+		deinterlacePass.Output = outputTex;
 		deinterlacePass.DoNotClear = true;
 		nosCmd cmd;
 		nosCmdBeginParams begin {.Name = NOS_NAME("Deinterlace Pass"), .AssociatedNodeId = params->NodeId, .OutCmdHandle = &cmd};
