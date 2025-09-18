@@ -78,36 +78,33 @@ struct RGB2YCbCrNodeContext : NodeContext
 	void OnPathStart() override { FieldType = NOS_TEXTURE_FIELD_TYPE_EVEN; }
 
 	nosTextureFieldType FieldType{};
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto inputTex = execParams.GetPinObject<vkss::Texture>(NOS_NAME("Source"));
-		auto outputBuf = execParams.GetPinObject<vkss::Buffer>(NOS_NAME("Output"));
+		auto inputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Source"));
+		auto outputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Output"));
 		auto inputTexInfo = *vkss::GetResourceInfo(inputTex);
 		auto outputBufInfo = vkss::GetResourceInfo(outputBuf);
-		auto outputPinData = execParams[NOS_NAME_STATIC("Output")].Data;
-		auto inputFieldType = *execParams.GetPinData<nos::sys::vulkan::FieldType>(NOS_NAME("InputFieldType"));
-		auto outputFieldType = *execParams.GetPinData<nos::sys::vulkan::FieldType>(NOS_NAME("OutputFieldType"));
-		auto isOutInterlaced = *execParams.GetPinData<bool>(NOS_NAME("IsOutputInterlaced"));
-		auto fmt = *execParams.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto inputFieldType = inputTexInfo.FieldType;
+		auto outputFieldType = inputFieldType;
+		auto isOutInterlaced = *params.GetPinData<bool>(NOS_NAME("IsOutputInterlaced"));
+		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
 
-		// TODO: Transfer
-		//*inputFieldType = (nos::sys::vulkan::FieldType)inputTexInfo.FieldType;
-		//*outputFieldType = *inputFieldType;
 		bool isInInterlaced = vkss::IsTextureFieldTypeInterlaced(inputTexInfo.FieldType);
 
-		// TODO: Transfer
-		// if (isOutInterlaced)
-		//{
-		//	if (!isInInterlaced)
-		//	{
-		//		*outputFieldType = (nos::sys::vulkan::FieldType)FieldType; // Deinterlace: Override with locally tracked
-		//field 		FieldType = vkss::FlippedField(FieldType);
-		//	}
-		//	output.mutate_field_type(*outputFieldType);
-		//}
-		// else
-		//	output.mutate_field_type(sys::vulkan::FieldType::PROGRESSIVE);
+		if (isOutInterlaced)
+		{
+			if (!isInInterlaced)
+			{
+				outputFieldType = FieldType; // Deinterlace: Override with locally tracked field 	
+				FieldType = vkss::FlippedField(FieldType);
+			}
+			nosVulkan->SetResourceFieldType(outputBuf, outputFieldType);
+		}
+		else
+			nosVulkan->SetResourceFieldType(outputBuf, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
+
+		SetPinValue(NOS_NAME("InputFieldType"), inputFieldType);
+		SetPinValue(NOS_NAME("OutputFieldType"), outputFieldType);
 
 		nosVec2u ext = {inputTexInfo.Width, inputTexInfo.Height};
 		nosVec2u yCbCrExt = GetYCbCrBufferResolution(ext, fmt, isOutInterlaced);
@@ -128,11 +125,11 @@ struct RGB2YCbCrNodeContext : NodeContext
 					"YCbCrBuffer"));
 		}
 		SetPinValue(NOS_NAME("DispatchSize"),
-					GetSuitableDispatchSize(*execParams.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
+					GetSuitableDispatchSize(*params.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
 											yCbCrExt,
 											fmt == YCbCrPixelFormat::V210 ? 10 : 8,
 											isOutInterlaced));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 
@@ -155,19 +152,18 @@ struct YCbCr2RGBNodeContext : NodeContext
 		return NOS_RESULT_SUCCESS;
 	}
 
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto fmt = *execParams.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
-		auto res = *execParams.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto inputBuf = execParams.GetPinObject<vkss::Buffer>(NOS_NAME("Source"));
+		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Source"));
 		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
 			nosEngine.LogE("YCbCr2RGB Node: Input buffer is not valid!");
 			return NOS_RESULT_FAILED;
 		}
-		auto outputTex = execParams.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
+		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
 		auto outputTexInfo = vkss::GetResourceInfo(outputTex);
 
 		bool isInterlaced = inputBufInfo->FieldType == NOS_TEXTURE_FIELD_TYPE_EVEN ||
@@ -192,18 +188,15 @@ struct YCbCr2RGBNodeContext : NodeContext
 		}
 		else
 		{
-			// TODO: Transfer
-			// output.UnPackTo(&texDef);
-			// texDef.field_type = input.field_type();
-			// nosEngine.SetPinValueByName(NodeId, NOS_NAME("Output"), Buffer::From(texDef));
+			nosVulkan->SetResourceFieldType(outputTex, inputBufInfo->FieldType);
 		}
 
 		SetPinValue(NOS_NAME("DispatchSize"),
-					GetSuitableDispatchSize(*execParams.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
+					GetSuitableDispatchSize(*params.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
 											yCbCrExt,
 											fmt == YCbCrPixelFormat::V210 ? 10 : 8,
 											isInterlaced));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 
@@ -215,12 +208,11 @@ nosResult RegisterYCbCr2RGB(nosNodeFunctions* funcs)
 
 struct YUVBufferSizeCalculator : NodeContext
 {
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto fmt = *execParams.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
-		auto res = *execParams.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto isInterlaced = *execParams.GetPinData<bool>(NOS_NAME("IsInterlaced"));
+		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto isInterlaced = *params.GetPinData<bool>(NOS_NAME("IsInterlaced"));
 		nosVec2u ext = { res.x(), res.y() };
 		nosVec2u yCbCrExt = GetYCbCrBufferResolution(ext, fmt, isInterlaced);
 		uint64_t bufSize = yCbCrExt.x * yCbCrExt.y * 4;
@@ -253,12 +245,11 @@ struct GammaLUTNodeContext : NodeContext
 		return NOS_RESULT_SUCCESS;
 	}
 	NOS_REGISTER_NAME(LUT)
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto outputBuf = execParams.GetPinObject<vkss::Buffer>(NSN_LUT);
-		const auto& curve = *execParams.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve"));
-		const auto& dir = *execParams.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
+		auto outputBuf = params.GetPinObject<vkss::Buffer>(NSN_LUT);
+		const auto& curve = *params.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve"));
+		const auto& dir = *params.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
 		if (Curve == curve && Type == dir)
 			return NOS_RESULT_SUCCESS;
 		constexpr auto outMemoryFlags = NOS_MEMORY_FLAGS_DEVICE_MEMORY;
@@ -385,13 +376,12 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 			glm::vec<4, T>(0, 0, 0, 1)));
 	}
 
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		const auto& colorSpace = *execParams.GetPinData<ColorSpace>(NOS_NAME_STATIC("ColorSpace"));
-		auto fmt = *execParams.GetPinData<YCbCrPixelFormat>(NOS_NAME_STATIC("PixelFormat"));
-		const auto& dir = *execParams.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
-		auto narrowRange = *execParams.GetPinData<bool>(NOS_NAME_STATIC("NarrowRange"));
+		const auto& colorSpace = *params.GetPinData<ColorSpace>(NOS_NAME_STATIC("ColorSpace"));
+		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME_STATIC("PixelFormat"));
+		const auto& dir = *params.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
+		auto narrowRange = *params.GetPinData<bool>(NOS_NAME_STATIC("NarrowRange"));
 		glm::mat4 matrix = GetMatrix<double>(colorSpace, fmt == YCbCrPixelFormat::V210 ? 10 : 8, narrowRange);
 		if(dir == GammaConversionType::DECODE)
 			matrix = glm::inverse(matrix);
@@ -408,12 +398,11 @@ nosResult RegisterColorSpaceMatrix(nosNodeFunctions* funcs)
 
 struct YUY2ToRGBANodeContext : NodeContext
 {
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto res = *execParams.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto outputTex = execParams.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
-		auto inputBuf = execParams.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
+		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
+		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
 		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
@@ -438,7 +427,7 @@ struct YUY2ToRGBANodeContext : NodeContext
 							 "YUY2RGBAResult"));
 		}
 		SetPinValue(NOS_NAME("DispatchSize"), nosVec2u(glm::ceil(res.x() / 16.0f), glm::ceil(res.y() / 8.0f)));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 
@@ -450,12 +439,11 @@ nosResult RegisterYUY2ToRGBA(nosNodeFunctions* funcs)
 
 struct NV12ToRGBANodeContext : NodeContext
 {
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto res = *execParams.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto outputTex = execParams.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
-		auto inputBuf = execParams.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
+		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
+		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
 		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
@@ -481,7 +469,7 @@ struct NV12ToRGBANodeContext : NodeContext
 		}
 		// Work group size is 16x16, each thread processes 4x2 pixels
 		SetPinValue(NOS_NAME("DispatchSize"), nosVec2u(glm::ceil(res.x()/32.0f), glm::ceil(res.y()/16.0f)));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 
@@ -493,21 +481,18 @@ nosResult RegisterNV12ToRGBA(nosNodeFunctions* funcs)
 
 struct RGBA2BGR24BufferNodeContext : NodeContext
 {
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		auto inputTex = execParams.GetPinObject<vkss::Texture>(NOS_NAME_STATIC("Source"));
-		auto outputBuf = execParams.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output"));
+		auto inputTex = params.GetPinObject<vkss::Texture>(NOS_NAME_STATIC("Source"));
+		auto outputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output"));
 		auto inputTexInfo = *vkss::GetResourceInfo(inputTex);
 		auto outputBufInfo = vkss::GetResourceInfo(outputBuf);
-		// TODO: Transfer
-		// output.mutate_field_type(sys::vulkan::FieldType::PROGRESSIVE);
 
 		nosVec2u ext = {inputTexInfo.Width, inputTexInfo.Height};
 
 		uint32_t bufSize = ext.x * ext.y * 3;
 		constexpr auto outMemoryFlags = NOS_MEMORY_FLAGS_DEVICE_MEMORY;
-		if (!outputBufInfo || !outputBufInfo->Size != bufSize || outputBufInfo->MemoryFlags != outMemoryFlags)
+		if (!outputBufInfo || outputBufInfo->Size != bufSize || outputBufInfo->MemoryFlags != outMemoryFlags)
 		{
 			SetPinObject(
 				NOS_NAME_STATIC("Output"),
@@ -520,8 +505,10 @@ struct RGBA2BGR24BufferNodeContext : NodeContext
 					},
 					"RGBA2BGR24Result"));
 		}
+		else
+			nosVulkan->SetResourceFieldType(outputBuf, nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
 		SetPinValue(NOS_NAME("DispatchSize"), nosVec2u(ext.x / 4, ext.y));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 

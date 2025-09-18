@@ -5,13 +5,11 @@ namespace nos::mediaio {
 
 struct RGBA2BGRABufferNodeContext : NodeContext
 {
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		nos::NodeExecuteParams execParams(params);
-		nosTextureInfo inputInfo = *vkss::GetResourceInfo(execParams.GetPinObject<vkss::Texture>(NOS_NAME_STATIC("Source")));
-		auto optOutputInfo = vkss::GetResourceInfo(execParams.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output")));
-		// TODO: Transfer
-		// output.mutate_field_type(nos::sys::vulkan::FieldType::PROGRESSIVE);
+		nosTextureInfo inputInfo =
+			*vkss::GetResourceInfo(params.GetPinObject<vkss::Texture>(NOS_NAME_STATIC("Source")));
+		auto optOutputInfo = vkss::GetResourceInfo(params.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output")));
 
 		nosVec2u ext = {inputInfo.Width, inputInfo.Height};
 
@@ -26,8 +24,11 @@ struct RGBA2BGRABufferNodeContext : NodeContext
 					.FieldType = nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE,
 				}, "BGRABuffer"));
 		}
+		else
+			nosVulkan->SetResourceFieldType(params.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output")),
+											nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
 		SetPinValue(NOS_NAME("DispatchSize"), nosVec2u(ext.x / 4, ext.y));
-		return nosVulkan->ExecuteGPUNode(this, params);
+		return nosVulkan->ExecuteGPUNode(this, params.RawParams);
 	}
 };
 

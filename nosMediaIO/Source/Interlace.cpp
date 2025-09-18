@@ -24,33 +24,28 @@ struct InterlaceNode : NodeContext
 
 	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
-		// TODO: Transfer
-		//vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, Field);
-		//Field = vkss::FlippedField(Field);
+		nosVulkan->SetResourceFieldType(*copyInfo->PinObjectHandle, Field);
+		Field = vkss::FlippedField(Field);
 		return NOS_RESULT_SUCCESS;
 	}
 
-	void OnPathStart() override
-	{
-		Field = NOS_TEXTURE_FIELD_TYPE_EVEN;
-	}
+	void OnPathStart() override { Field = NOS_TEXTURE_FIELD_TYPE_EVEN; }
 
-	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto pinIds = GetPinIds(params);
-		NodeExecuteParams execParams(params);
 		nosRunPassParams interlacePass = {};
 		interlacePass.Key = NSN_MediaIO_Interlace_Pass;
 		uint32_t isOdd = Field - 1;
 		std::vector bindings = {
-			vkss::ShaderTextureBinding(NSN_Input, execParams.GetPinObject(NSN_Input), NOS_TEXTURE_FILTER_NEAREST),
+			vkss::ShaderTextureBinding(NSN_Input, params.GetPinObject(NSN_Input), NOS_TEXTURE_FILTER_NEAREST),
 			vkss::ShaderDataBinding(NSN_ShouldOutputOdd, isOdd),
 		};
 		interlacePass.Bindings = bindings.data();
 		interlacePass.BindingCount = bindings.size();
-		interlacePass.Output = execParams.GetPinObject(NSN_Output);
+		interlacePass.Output = params.GetPinObject(NSN_Output);
 		nosCmd cmd;
-		nosCmdBeginParams begin{ .Name = NOS_NAME("Interlace Pass"), .AssociatedNodeId = params->NodeId, .OutCmdHandle = &cmd };
+		nosCmdBeginParams begin{
+			.Name = NOS_NAME("Interlace Pass"), .AssociatedNodeId = params.NodeId, .OutCmdHandle = &cmd};
 		nosVulkan->Begin(&begin);
 		nosVulkan->RunPass(cmd, &interlacePass);
 		nosVulkan->End(cmd, nullptr);
@@ -70,15 +65,11 @@ struct FieldJugglerNode : NodeContext
 {
 	nosTextureFieldType Field;
 
-	void OnPathStart() override
-	{
-		Field = NOS_TEXTURE_FIELD_TYPE_EVEN;
-	}
+	void OnPathStart() override { Field = NOS_TEXTURE_FIELD_TYPE_EVEN; }
 
-	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		NodeExecuteParams execParams(params);
-		bool isInterlaced = *execParams.GetPinData<bool>(NOS_NAME("IsInterlaced"));
+		bool isInterlaced = *params.GetPinData<bool>(NOS_NAME("IsInterlaced"));
 		if (!isInterlaced)
 		{
 			Field = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
@@ -96,16 +87,14 @@ struct DeinterlaceNode : NodeContext
 {
 	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
-		//TODO: Transfer
-		//vkss::SetFieldType(copyInfo->ID, *copyInfo->PinData, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
+		nosVulkan->SetResourceFieldType(*copyInfo->PinObjectHandle, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
 		return NOS_RESULT_SUCCESS;
 	}
 
-	virtual nosResult ExecuteNode(nosNodeExecuteParams* params)
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		NodeExecuteParams execParams(params);
-		auto inputTex = execParams.GetPinObject<vkss::Texture>(NSN_Input);
-		auto outputTex = execParams.GetPinObject<vkss::Texture>(NSN_Output);
+		auto inputTex = params.GetPinObject<vkss::Texture>(NSN_Input);
+		auto outputTex = params.GetPinObject<vkss::Texture>(NSN_Output);
 		nosRunPassParams deinterlacePass = {};
 		deinterlacePass.Key = NSN_MediaIO_Deinterlace_Pass;
 		auto inTexInfo = vkss::GetResourceInfo(inputTex);
@@ -117,16 +106,15 @@ struct DeinterlaceNode : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 		uint32_t isOdd = field - 1;
-		std::vector bindings = {
-			vkss::ShaderTextureBinding(NSN_Input, inputTex, NOS_TEXTURE_FILTER_NEAREST),
-			vkss::ShaderDataBinding(NSN_IsOdd, isOdd)
-		};
+		std::vector bindings = {vkss::ShaderTextureBinding(NSN_Input, inputTex, NOS_TEXTURE_FILTER_NEAREST),
+								vkss::ShaderDataBinding(NSN_IsOdd, isOdd)};
 		deinterlacePass.Bindings = bindings.data();
 		deinterlacePass.BindingCount = bindings.size();
 		deinterlacePass.Output = outputTex;
 		deinterlacePass.DoNotClear = true;
 		nosCmd cmd;
-		nosCmdBeginParams begin {.Name = NOS_NAME("Deinterlace Pass"), .AssociatedNodeId = params->NodeId, .OutCmdHandle = &cmd};
+		nosCmdBeginParams begin{
+			.Name = NOS_NAME("Deinterlace Pass"), .AssociatedNodeId = params.NodeId, .OutCmdHandle = &cmd};
 		nosVulkan->Begin(&begin);
 		nosVulkan->RunPass(cmd, &deinterlacePass);
 		nosVulkan->End(cmd, nullptr);
@@ -148,13 +136,16 @@ nosResult RegisterInterlace(nosNodeFunctions* nodeFunctions)
 	fs::path root = nosEngine.Plugin->RootFolderPath;
 	auto interlacePath = (root / "Shaders" / "Interlace.frag").generic_string();
 	nosShaderInfo shader = {.ShaderName = NSN_MediaIO_Interlace_Fragment_Shader,
-	                        .Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = interlacePath.c_str()}, .AssociatedNodeClassName = NSN_ClassName_MediaIO_Interlace};
+							.Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = interlacePath.c_str()},
+							.AssociatedNodeClassName = NSN_ClassName_MediaIO_Interlace};
 	auto ret = nosVulkan->RegisterShaders(1, &shader);
 	if (NOS_RESULT_SUCCESS != ret)
 		return ret;
-	nosPassInfo pass = {.Key = NSN_MediaIO_Interlace_Pass,
-	                    .Shader = NSN_MediaIO_Interlace_Fragment_Shader,
-	                    .MultiSample = 1,};
+	nosPassInfo pass = {
+		.Key = NSN_MediaIO_Interlace_Pass,
+		.Shader = NSN_MediaIO_Interlace_Fragment_Shader,
+		.MultiSample = 1,
+	};
 	return nosVulkan->RegisterPasses(1, &pass);
 }
 
@@ -165,14 +156,16 @@ nosResult RegisterDeinterlace(nosNodeFunctions* nodeFunctions)
 	fs::path root = nosEngine.Plugin->RootFolderPath;
 	auto deinterlacePath = (root / "Shaders" / "Deinterlace.frag").generic_string();
 	nosShaderInfo shader = {.ShaderName = NSN_MediaIO_Deinterlace_Fragment_Shader,
-							.Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = deinterlacePath.c_str()}, .AssociatedNodeClassName = NSN_ClassName_MediaIO_Deinterlace};
+							.Source = {.Stage = NOS_SHADER_STAGE_FRAG, .GLSLPath = deinterlacePath.c_str()},
+							.AssociatedNodeClassName = NSN_ClassName_MediaIO_Deinterlace};
 	auto ret = nosVulkan->RegisterShaders(1, &shader);
 	if (NOS_RESULT_SUCCESS != ret)
 		return ret;
 	nosPassInfo pass = {
 		.Key = NSN_MediaIO_Deinterlace_Pass,
 		.Shader = NSN_MediaIO_Deinterlace_Fragment_Shader,
-		.MultiSample = 1,};
+		.MultiSample = 1,
+	};
 	return nosVulkan->RegisterPasses(1, &pass);
 }
 
@@ -182,4 +175,4 @@ nosResult RegisterFieldJuggler(nosNodeFunctions* nodeFunctions)
 	return NOS_RESULT_SUCCESS;
 }
 
-} // namespace nos::MediaIO
+} // namespace nos::mediaio
