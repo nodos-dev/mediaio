@@ -37,7 +37,7 @@ struct InterlaceNode : NodeContext
 		interlacePass.Key = NSN_MediaIO_Interlace_Pass;
 		uint32_t isOdd = Field - 1;
 		std::vector bindings = {
-			vkss::ShaderTextureBinding(NSN_Input, params.GetPinObject(NSN_Input), NOS_TEXTURE_FILTER_NEAREST),
+			vkss::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, params.GetPinObject(NSN_Input)),
 			vkss::ShaderDataBinding(NSN_ShouldOutputOdd, isOdd),
 		};
 		interlacePass.Bindings = bindings.data();
@@ -106,7 +106,7 @@ struct DeinterlaceNode : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 		uint32_t isOdd = field - 1;
-		std::vector bindings = {vkss::ShaderTextureBinding(NSN_Input, inputTex, NOS_TEXTURE_FILTER_NEAREST),
+		std::vector bindings = {vkss::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, inputTex),
 								vkss::ShaderDataBinding(NSN_IsOdd, isOdd)};
 		deinterlacePass.Bindings = bindings.data();
 		deinterlacePass.BindingCount = bindings.size();
