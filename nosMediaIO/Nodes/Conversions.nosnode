@@ -1,455 +1,463 @@
 {
-	"nodes": [
-		{
-			"class_name": "RGB2YCbCr",
-			"menu_info": {
-				"category": "Media IO|Conversions",
-				"display_name": "RGB to YCbCr Converter"
-			},
-			"node": {
-				"class_name": "RGB2YCbCr",
-				"contents_type": "Job",
-				"always_execute": true,
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/RGB2YCbCr.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Source",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "GammaLUT",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "InputFieldType",
-						"display_name": "Input Field Type",
-						"type_name": "nos.sys.vulkan.FieldType",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": "UNKNOWN",
-						"readonly": true
-					},
-					{
-						"name": "OutputFieldType",
-						"display_name": "Output Field Type",
-						"type_name": "nos.sys.vulkan.FieldType",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": "UNKNOWN",
-						"readonly": true
-					},
-					{
-						"name": "IsOutputInterlaced",
-						"display_name": "Is Output Interlaced",
-						"type_name": "bool",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": false
-					},
-					{
-						"name": "PixelFormat",
-						"display_name": "Pixel Format",
-						"type_name": "nos.mediaio.YCbCrPixelFormat",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Colorspace",
-						"display_name": "Colorspace Matrix",
-						"type_name": "nos.fb.mat4",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 120,
-							"y": 120
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					}
-				]
-			}
-		},
-		{
-			"class_name": "YCbCr2RGB",
-			"menu_info": {
-				"category": "Media IO|Conversions",
-				"display_name": "YCbCr to RGB Converter"
-			},
-			"node": {
-				"class_name": "YCbCr2RGB",
-				"contents_type": "Job",
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/YCbCr2RGB.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Source",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "GammaLUT",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "IsInterlaced",
-						"display_name": "Is Interlaced",
-						"type_name": "bool",
-						"show_as": "PROPERTY",
-						"can_show_as": "PROPERTY_ONLY",
-						"data": false,
-						"readonly": true
-					},
-					{
-						"name": "PixelFormat",
-						"display_name": "Pixel Format",
-						"type_name": "nos.mediaio.YCbCrPixelFormat",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Colorspace",
-						"display_name": "Colorspace Matrix",
-						"type_name": "nos.fb.mat4",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Resolution",
-						"display_name": "Resolution",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"visualizer": {
-							"type": "NAMED_VALUE",
-							"name": "nos.mediaio.ResolutionVisualizer"
-						},
-						"data": {
-							"x": 1920,
-							"y": 1080
-						}
-
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 120,
-							"y": 120
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					}
-				]
-			}
-		},
-		{
-			"class_name": "GammaLUT",
-			"menu_info": {
-				"category": "Media IO|Conversions",
-				"display_name": "Gamma LUT"
-			},
-			"node": {
-				"class_name": "GammaLUT",
-				"contents_type": "Job",
-				"description": "Provides a lookup table for Gamma conversions",
-				"pins": [
-					{
-						"name": "LUT",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "Type",
-						"type_name": "nos.mediaio.GammaConversionType",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "GammaCurve",
-						"display name": "Gamma Curve",
-						"type_name": "nos.mediaio.GammaCurve",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					}
-				]
-			}
-		},
-		{
-			"class_name": "ColorSpaceMatrix",
-			"menu_info": {
-				"category": "Media IO|Conversions",
-				"display_name": "Color Space"
-			},
-			"node": {
-				"class_name": "ColorSpaceMatrix",
-				"display_name": "Color Space Matrix",
-				"contents_type": "Job",
-				"description": "",
-				"pins": [
-					{
-						"name": "Output",
-						"type_name": "nos.fb.mat4",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "ColorSpace",
-						"display_name": "Color Space",
-						"type_name": "nos.mediaio.ColorSpace",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "PixelFormat",
-						"display_name": "Pixel Format",
-						"type_name": "nos.mediaio.YCbCrPixelFormat",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Type",
-						"type_name": "nos.mediaio.GammaConversionType",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "NarrowRange",
-						"display_name": "Use Narrow Range Encoding",
-						"type_name": "bool",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": true
-					}
-				]
-			}
-		},
-		{
-			"class_name": "YUVBufferSizeCalculator",
-			"menu_info": {
-				"category": "Media IO|Conversions",
-				"display_name": "YUV Buffer Size Calculator"
-			},
-			"node": {
-				"class_name": "YUVBufferSizeCalculator",
-				"display_name": "YUV Buffer Size Calculator",
-				"contents_type": "Job",
-				"description": "",
-				"pins": [
-					{
-						"name": "Output",
-						"type_name": "ulong",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "Resolution",
-						"display_name": "Resolution",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 1920,
-							"y": 1080
-						}
-					},
-					{
-						"name": "PixelFormat",
-						"display_name": "Pixel Format",
-						"type_name": "nos.mediaio.YCbCrPixelFormat",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "IsInterlaced",
-						"display_name": "Is Interlaced",
-						"type_name": "bool",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					}
-				]
-			}
-		},
-		{
-			"class_name": "YUY2ToRGBA",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "YUY2 To RGBA Converter"
-			},
-			"node": {
-				"class_name": "YUY2ToRGBA",
-				"contents_type": "Job",
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/YUY2ToRGBA.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "Resolution",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 1920,
-							"y": 1080
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "PROPERTY_ONLY",
-						"data": {
-							"x": 120,
-							"y": 135
-						}
-					}
-				]
-			}
-		},
-		{
-			"class_name": "NV12ToRGBA",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "NV12 To RGBA Converter"
-			},
-			"node": {
-				"class_name": "NV12ToRGBA",
-				"contents_type": "Job",
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/NV12ToRGBA.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "Resolution",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 1920,
-							"y": 1080
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "PROPERTY_ONLY",
-						"data": {
-							"x": 120,
-							"y": 135
-						}
-					}
-				]
-			}
-		},
-		{
-			"class_name": "RGBAToBGR24Buffer",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "RGBA To BGR24 Buffer Converter",
-				"name_aliases": [ "virtual camera format", "B8G8R8", "BGR8", "RGB24", "RGB8" ]
-			},
-			"node": {
-				"class_name": "RGBAToBGR24Buffer",
-				"contents_type": "Job",
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/RGBAToBGR24.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Source",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "PROPERTY_ONLY",
-						"data": {
-							"x": 120,
-							"y": 120
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					}
-				]
-			}
-		}
-	]
+    "nodes": [
+        {
+            "class_name": "RGB2YCbCr",
+            "menu_info": {
+                "category": "Media IO|Conversions",
+                "display_name": "RGB to YCbCr Converter"
+            },
+            "node": {
+                "class_name": "RGB2YCbCr",
+                "contents_type": "Job",
+                "always_execute": true,
+                "contents": {
+                    "type": "nos.sys.vulkan.GPUNode",
+                    "options": {
+                        "shader": "Shaders/RGB2YCbCr.comp",
+                        "stage": "COMPUTE"
+                    }
+                },
+                "pins": [
+                    {
+                        "name": "Source",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "GammaLUT",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "InputFieldType",
+                        "display_name": "Input Field Type",
+                        "type_name": "nos.sys.vulkan.FieldType",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "UNKNOWN",
+                        "readonly": true
+                    },
+                    {
+                        "name": "OutputFieldType",
+                        "display_name": "Output Field Type",
+                        "type_name": "nos.sys.vulkan.FieldType",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "UNKNOWN",
+                        "readonly": true
+                    },
+                    {
+                        "name": "IsOutputInterlaced",
+                        "display_name": "Is Output Interlaced",
+                        "type_name": "bool",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": false
+                    },
+                    {
+                        "name": "PixelFormat",
+                        "display_name": "Pixel Format",
+                        "type_name": "nos.mediaio.YCbCrPixelFormat",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Colorspace",
+                        "display_name": "Colorspace Matrix",
+                        "type_name": "nos.fb.mat4",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "DispatchSize",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 120,
+                            "y": 120
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "YCbCr2RGB",
+            "menu_info": {
+                "category": "Media IO|Conversions",
+                "display_name": "YCbCr to RGB Converter"
+            },
+            "node": {
+                "class_name": "YCbCr2RGB",
+                "contents_type": "Job",
+                "contents": {
+                    "type": "nos.sys.vulkan.GPUNode",
+                    "options": {
+                        "shader": "Shaders/YCbCr2RGB.comp",
+                        "stage": "COMPUTE"
+                    }
+                },
+                "pins": [
+                    {
+                        "name": "Source",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "GammaLUT",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "IsInterlaced",
+                        "display_name": "Is Interlaced",
+                        "type_name": "bool",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "PROPERTY_ONLY",
+                        "data": false,
+                        "readonly": true
+                    },
+                    {
+                        "name": "PixelFormat",
+                        "display_name": "Pixel Format",
+                        "type_name": "nos.mediaio.YCbCrPixelFormat",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Colorspace",
+                        "display_name": "Colorspace Matrix",
+                        "type_name": "nos.fb.mat4",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Resolution",
+                        "display_name": "Resolution",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "visualizers": [
+                            {
+                                "visualizer_subfield_path": "",
+                                "type": "NAMED_VALUE",
+                                "name": "nos.mediaio.ResolutionVisualizer"
+                            }
+                        ],
+                        "data": {
+                            "x": 1920,
+                            "y": 1080
+                        }
+                    },
+                    {
+                        "name": "DispatchSize",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 120,
+                            "y": 120
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "GammaLUT",
+            "menu_info": {
+                "category": "Media IO|Conversions",
+                "display_name": "Gamma LUT"
+            },
+            "node": {
+                "class_name": "GammaLUT",
+                "contents_type": "Job",
+                "description": "Provides a lookup table for Gamma conversions",
+                "pins": [
+                    {
+                        "name": "LUT",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Type",
+                        "type_name": "nos.mediaio.GammaConversionType",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "GammaCurve",
+                        "display name": "Gamma Curve",
+                        "type_name": "nos.mediaio.GammaCurve",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "ColorSpaceMatrix",
+            "menu_info": {
+                "category": "Media IO|Conversions",
+                "display_name": "Color Space"
+            },
+            "node": {
+                "class_name": "ColorSpaceMatrix",
+                "display_name": "Color Space Matrix",
+                "contents_type": "Job",
+                "description": "",
+                "pins": [
+                    {
+                        "name": "Output",
+                        "type_name": "nos.fb.mat4",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "ColorSpace",
+                        "display_name": "Color Space",
+                        "type_name": "nos.mediaio.ColorSpace",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "PixelFormat",
+                        "display_name": "Pixel Format",
+                        "type_name": "nos.mediaio.YCbCrPixelFormat",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Type",
+                        "type_name": "nos.mediaio.GammaConversionType",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "NarrowRange",
+                        "display_name": "Use Narrow Range Encoding",
+                        "type_name": "bool",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": true
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "YUVBufferSizeCalculator",
+            "menu_info": {
+                "category": "Media IO|Conversions",
+                "display_name": "YUV Buffer Size Calculator"
+            },
+            "node": {
+                "class_name": "YUVBufferSizeCalculator",
+                "display_name": "YUV Buffer Size Calculator",
+                "contents_type": "Job",
+                "description": "",
+                "pins": [
+                    {
+                        "name": "Output",
+                        "type_name": "ulong",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Resolution",
+                        "display_name": "Resolution",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 1920,
+                            "y": 1080
+                        }
+                    },
+                    {
+                        "name": "PixelFormat",
+                        "display_name": "Pixel Format",
+                        "type_name": "nos.mediaio.YCbCrPixelFormat",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "IsInterlaced",
+                        "display_name": "Is Interlaced",
+                        "type_name": "bool",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "YUY2ToRGBA",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "YUY2 To RGBA Converter"
+            },
+            "node": {
+                "class_name": "YUY2ToRGBA",
+                "contents_type": "Job",
+                "contents": {
+                    "type": "nos.sys.vulkan.GPUNode",
+                    "options": {
+                        "shader": "Shaders/YUY2ToRGBA.comp",
+                        "stage": "COMPUTE"
+                    }
+                },
+                "pins": [
+                    {
+                        "name": "Input",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Resolution",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 1920,
+                            "y": 1080
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "DispatchSize",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "PROPERTY_ONLY",
+                        "data": {
+                            "x": 120,
+                            "y": 135
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "NV12ToRGBA",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "NV12 To RGBA Converter"
+            },
+            "node": {
+                "class_name": "NV12ToRGBA",
+                "contents_type": "Job",
+                "contents": {
+                    "type": "nos.sys.vulkan.GPUNode",
+                    "options": {
+                        "shader": "Shaders/NV12ToRGBA.comp",
+                        "stage": "COMPUTE"
+                    }
+                },
+                "pins": [
+                    {
+                        "name": "Input",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Resolution",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 1920,
+                            "y": 1080
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "DispatchSize",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "PROPERTY_ONLY",
+                        "data": {
+                            "x": 120,
+                            "y": 135
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "RGBAToBGR24Buffer",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "RGBA To BGR24 Buffer Converter",
+                "name_aliases": [
+                    "virtual camera format",
+                    "B8G8R8",
+                    "BGR8",
+                    "RGB24",
+                    "RGB8"
+                ]
+            },
+            "node": {
+                "class_name": "RGBAToBGR24Buffer",
+                "contents_type": "Job",
+                "contents": {
+                    "type": "nos.sys.vulkan.GPUNode",
+                    "options": {
+                        "shader": "Shaders/RGBAToBGR24.comp",
+                        "stage": "COMPUTE"
+                    }
+                },
+                "pins": [
+                    {
+                        "name": "Source",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "DispatchSize",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "PROPERTY_ONLY",
+                        "data": {
+                            "x": 120,
+                            "y": 120
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        }
+    ]
 }

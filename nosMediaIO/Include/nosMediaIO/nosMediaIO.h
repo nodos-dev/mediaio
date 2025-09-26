@@ -191,8 +191,8 @@ typedef struct nosMediaIOAPI {
 
 // Make sure these are same with nossys file.
 #define NOS_MEDIAIO_PLUGIN_NAME "nos.mediaio"
-#define NOS_MEDIAIO_PLUGIN_VERSION_MAJOR 2
-#define NOS_MEDIAIO_PLUGIN_VERSION_MINOR 12
+#define NOS_MEDIAIO_PLUGIN_VERSION_MAJOR 3
+#define NOS_MEDIAIO_PLUGIN_VERSION_MINOR 1
 
 extern struct nosPluginInfo nosMediaIOPluginInfo;
 extern nosMediaIOAPI* nosMediaIO;

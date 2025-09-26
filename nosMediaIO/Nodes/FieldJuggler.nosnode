@@ -1,30 +1,30 @@
 {
-	"nodes": [
-		{
-			"class_name": "FieldJuggler",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "Field Juggler"
-			},
-			"node": {
-				"class_name": "FieldJuggler",
-				"contents_type": "Job",
-				"description": "Outputs even and odd fields per frame",
-				"pins": [
-					{
-						"name": "IsInterlaced",
-						"type_name": "bool",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "FieldType",
-						"type_name": "nos.sys.vulkan.FieldType",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
-					}
-				]
-			}
-		}
-	]
+    "nodes": [
+        {
+            "class_name": "FieldJuggler",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "Field Juggler"
+            },
+            "node": {
+                "class_name": "FieldJuggler",
+                "contents_type": "Job",
+                "description": "Outputs even and odd fields per frame",
+                "pins": [
+                    {
+                        "name": "IsInterlaced",
+                        "type_name": "bool",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "FieldType",
+                        "type_name": "nos.sys.vulkan.FieldType",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -1,58 +1,58 @@
 {
-	"nodes": [
-		{
-			"class_name": "Interlace",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "Interlace"
-			},
-			"node": {
-				"class_name": "Interlace",
-				"contents_type": "Job",
-				"description": "Produces full frame interlaced images (even-even, odd-odd)",
-				"always_execute": true,
-				"pins": [
-					{
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
-					}
-				]
-			}
-		},
-		{
-			"class_name": "Deinterlace",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "Deinterlace"
-			},
-			"node": {
-				"class_name": "Deinterlace",
-				"contents_type": "Job",
-				"description": "Takes full frame interlaced images and produces deinterlaced images",
-				"always_execute": true,
-				"pins": [
-					{
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
-					}
-				]
-			}
-		}
-	]
+    "nodes": [
+        {
+            "class_name": "Interlace",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "Interlace"
+            },
+            "node": {
+                "class_name": "Interlace",
+                "contents_type": "Job",
+                "description": "Produces full frame interlaced images (even-even, odd-odd)",
+                "always_execute": true,
+                "pins": [
+                    {
+                        "name": "Input",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                    }
+                ]
+            }
+        },
+        {
+            "class_name": "Deinterlace",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "Deinterlace"
+            },
+            "node": {
+                "class_name": "Deinterlace",
+                "contents_type": "Job",
+                "description": "Takes full frame interlaced images and produces deinterlaced images",
+                "always_execute": true,
+                "pins": [
+                    {
+                        "name": "Input",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                    }
+                ]
+            }
+        }
+    ]
 }

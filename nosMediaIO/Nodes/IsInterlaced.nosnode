@@ -1,443 +1,517 @@
 {
-	"nodes": [
-		{
-			"class_name": "IsInterlaced",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "Is Interlaced"
-			},
-			"node": {
-				"id": "cf45cae1-f259-455b-be35-501d91c41aa1",
-				"name": "IsInterlaced",
-				"class_name": "nos.mediaio.IsInterlaced",
-				"pins": [
-					{
-						"id": "d5d3f6aa-eacf-4a68-81c0-4bda1d22b714",
-						"name": "A",
-						"type_name": "nos.sys.vulkan.FieldType",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"pin_category": "",
-						"visualizer": {},
-						"data": "PROGRESSIVE",
-						"referred_by": [],
-						"def": "UNKNOWN",
-						"meta_data_map": [],
-						"contents_type": "PortalPin",
-						"contents": { "source_id": "cea8881b-eb8f-496c-b332-b7daaa400f61" },
-						"description": ""
-					},
-					{
-						"id": "834a44a2-d40c-4078-811e-250254cdffe8",
-						"name": "NotX",
-						"type_name": "bool",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY",
-						"pin_category": "",
-						"visualizer": {},
-						"data": true,
-						"referred_by": [],
-						"def": false,
-						"meta_data_map": [],
-						"contents_type": "PortalPin",
-						"contents": { "source_id": "64fd6e8f-603c-4315-b5c4-76fa85c2b4ac" },
-						"description": "",
-						"display_name": "Interlaced"
-					}
-				],
-				"pos": {
-					"x": 0.0,
-					"y": 0.0
-				},
-				"contents_type": "Graph",
-				"contents": {
-					"nodes": [
-						{
-							"id": "ea377944-5324-4c0b-b62f-9f2153efef98",
-							"name": "FieldType",
-							"class_name": "nos.internal.GraphInput",
-							"pins": [
-								{
-									"id": "631ce01e-87df-4010-88f6-11afce2e0de9",
-									"name": "Output",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "PROGRESSIVE",
-									"referred_by": [],
-									"def": "UNKNOWN",
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "cea8881b-eb8f-496c-b332-b7daaa400f61",
-									"name": "Input",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "PROGRESSIVE",
-									"referred_by": [
-										"d5d3f6aa-eacf-4a68-81c0-4bda1d22b714"
-									],
-									"def": "UNKNOWN",
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								}
-							],
-							"pos": {
-								"x": -206.0,
-								"y": -752.75
-							},
-							"contents_type": "Job",
-							"contents": { "type": "" },
-							"app_key": "",
-							"functions": [],
-							"function_category": "Default Node",
-							"status_messages": [],
-							"meta_data_map": [],
-							"description": "",
-							"template_parameters": []
-						},
-						{
-							"id": "fb3ae17c-126a-476e-b06f-71a5944a4c1d",
-							"name": "Even",
-							"class_name": "nos.reflect.IsEqual",
-							"pins": [
-								{
-									"id": "7a3a65ab-d323-48bf-a425-dcf70ea3a388",
-									"name": "A",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "PROGRESSIVE",
-									"referred_by": [],
-									"def": "UNKNOWN",
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "0a5d472f-9af6-4ab4-9ba8-6a5fee16643f",
-									"name": "B",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "EVEN",
-									"referred_by": [],
-									"def": "UNKNOWN",
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "4f53ea89-b4e5-4516-acf8-fdf90dd1cf78",
-									"name": "IsEqual",
-									"type_name": "bool",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": "",
-									"display_name": "Is Equal"
-								}
-							],
-							"pos": {
-								"x": -6.0,
-								"y": -681.0
-							},
-							"contents_type": "Job",
-							"contents": { "type": "" },
-							"app_key": "",
-							"functions": [],
-							"function_category": "Default Node",
-							"status_messages": [],
-							"meta_data_map": [
-								{
-									"key": "PluginVersion",
-									"value": "1.2.0"
-								}
-							],
-							"description": "",
-							"template_parameters": []
-						},
-						{
-							"id": "95e1546d-980d-4aac-807b-3d083e93323c",
-							"name": "Interlaced",
-							"class_name": "nos.internal.GraphOutput",
-							"pins": [
-								{
-									"id": "73a124f8-aeb4-4fbe-a7a7-ed320b5cb14a",
-									"name": "Input",
-									"type_name": "bool",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": "",
-									"display_name": "Not"
-								},
-								{
-									"id": "64fd6e8f-603c-4315-b5c4-76fa85c2b4ac",
-									"name": "Output",
-									"type_name": "bool",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": true,
-									"referred_by": [
-										"834a44a2-d40c-4078-811e-250254cdffe8"
-									],
-									"def": false,
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": "",
-									"display_name": "Not"
-								}
-							],
-							"pos": {
-								"x": 344.0,
-								"y": -762.0
-							},
-							"contents_type": "Job",
-							"contents": { "type": "" },
-							"app_key": "",
-							"functions": [],
-							"function_category": "Default Node",
-							"status_messages": [],
-							"meta_data_map": [],
-							"description": "",
-							"template_parameters": []
-						},
-						{
-							"id": "be14c8b9-04bb-4219-85e0-5e5d39dbd4b3",
-							"name": "Odd",
-							"class_name": "nos.reflect.IsEqual",
-							"pins": [
-								{
-									"id": "fa4f1b68-bde9-43fd-9204-35747d18fadc",
-									"name": "A",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "PROGRESSIVE",
-									"referred_by": [],
-									"def": "UNKNOWN",
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "cdb6d110-9e2a-4ecd-a3d2-508041b55248",
-									"name": "B",
-									"type_name": "nos.sys.vulkan.FieldType",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": "ODD",
-									"referred_by": [],
-									"def": "UNKNOWN",
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "37e86034-6081-40ff-b282-733965774f6e",
-									"name": "IsEqual",
-									"type_name": "bool",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": "",
-									"display_name": "Is Equal"
-								}
-							],
-							"pos": {
-								"x": 3.0,
-								"y": -796.0
-							},
-							"contents_type": "Job",
-							"contents": { "type": "" },
-							"app_key": "",
-							"functions": [],
-							"function_category": "Default Node",
-							"status_messages": [],
-							"meta_data_map": [
-								{
-									"key": "PluginVersion",
-									"value": "1.2.0"
-								}
-							],
-							"description": "",
-							"display_name": "Odd",
-							"template_parameters": []
-						},
-						{
-							"id": "2eedfe62-5ee7-4bfe-9581-f149f0963734",
-							"name": "Or",
-							"class_name": "nos.math.Or",
-							"pins": [
-								{
-									"id": "f9c010d1-984e-4eec-9a81-5c94ef9aac86",
-									"name": "A",
-									"type_name": "bool",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "4dc02d7c-2fcd-451e-a464-7aadeebe8f19",
-									"name": "B",
-									"type_name": "bool",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": ""
-								},
-								{
-									"id": "8ee59388-73f5-4f0a-bbd3-203f7814b2b3",
-									"name": "OrResult",
-									"type_name": "bool",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"pin_category": "",
-									"visualizer": {},
-									"data": false,
-									"referred_by": [],
-									"def": false,
-									"meta_data_map": [],
-									"contents_type": "JobPin",
-									"contents": {},
-									"description": "",
-									"display_name": "Or"
-								}
-							],
-							"pos": {
-								"x": 173.0,
-								"y": -759.0
-							},
-							"contents_type": "Job",
-							"contents": { "type": "" },
-							"app_key": "",
-							"functions": [],
-							"function_category": "Default Node",
-							"status_messages": [],
-							"meta_data_map": [
-								{
-									"key": "PluginVersion",
-									"value": "1.5.0"
-								}
-							],
-							"description": "Returns true if either A or B is true",
-							"template_parameters": []
-						}
-					],
-					"comments": [],
-					"connections": [
-						{
-							"from": "4f53ea89-b4e5-4516-acf8-fdf90dd1cf78",
-							"to": "4dc02d7c-2fcd-451e-a464-7aadeebe8f19",
-							"id": "0237deb6-1e18-4d9c-b66e-a8c2bd317a74"
-						},
-						{
-							"from": "37e86034-6081-40ff-b282-733965774f6e",
-							"to": "f9c010d1-984e-4eec-9a81-5c94ef9aac86",
-							"id": "9d9286ef-ff0d-4724-a346-18438417ae9a"
-						},
-						{
-							"from": "631ce01e-87df-4010-88f6-11afce2e0de9",
-							"to": "7a3a65ab-d323-48bf-a425-dcf70ea3a388",
-							"id": "bfcb8df6-67aa-4187-9f91-4ecbc3f3c286"
-						},
-						{
-							"from": "631ce01e-87df-4010-88f6-11afce2e0de9",
-							"to": "fa4f1b68-bde9-43fd-9204-35747d18fadc",
-							"id": "ae39aedf-2328-4ce7-b1b1-dc051000648e"
-						},
-						{
-							"from": "8ee59388-73f5-4f0a-bbd3-203f7814b2b3",
-							"to": "73a124f8-aeb4-4fbe-a7a7-ed320b5cb14a",
-							"id": "7c90dd41-b71d-4488-886b-ab2e1a08026d"
-						}
-					]
-				},
-				"app_key": "",
-				"functions": [],
-				"function_category": "Default Node",
-				"status_messages": [],
-				"meta_data_map": [
-					{
-						"key": "PluginVersion",
-						"value": "2.2.0"
-					}
-				],
-				"description": "",
-				"template_parameters": []
-			}
-		}
-	]
+    "nodes": [
+        {
+            "class_name": "IsInterlaced",
+            "menu_info": {
+                "category": "Media IO",
+                "display_name": "Is Interlaced"
+            },
+            "node": {
+                "id": "cf45cae1-f259-455b-be35-501d91c41aa1",
+                "name": "IsInterlaced",
+                "class_name": "nos.mediaio.IsInterlaced",
+                "pins": [
+                    {
+                        "id": "d5d3f6aa-eacf-4a68-81c0-4bda1d22b714",
+                        "name": "A",
+                        "type_name": "nos.sys.vulkan.FieldType",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "pin_category": "",
+                        "visualizers": [
+                            {
+                                "visualizer_subfield_path": ""
+                            }
+                        ],
+                        "data": "PROGRESSIVE",
+                        "referred_by": [],
+                        "def": "UNKNOWN",
+                        "meta_data_map": [],
+                        "contents_type": "PortalPin",
+                        "contents": {
+                            "source_id": "cea8881b-eb8f-496c-b332-b7daaa400f61"
+                        },
+                        "description": ""
+                    },
+                    {
+                        "id": "834a44a2-d40c-4078-811e-250254cdffe8",
+                        "name": "NotX",
+                        "type_name": "bool",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY",
+                        "pin_category": "",
+                        "visualizers": [
+                            {
+                                "visualizer_subfield_path": ""
+                            }
+                        ],
+                        "data": true,
+                        "referred_by": [],
+                        "def": false,
+                        "meta_data_map": [],
+                        "contents_type": "PortalPin",
+                        "contents": {
+                            "source_id": "64fd6e8f-603c-4315-b5c4-76fa85c2b4ac"
+                        },
+                        "description": "",
+                        "display_name": "Interlaced"
+                    }
+                ],
+                "pos": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "contents_type": "Graph",
+                "contents": {
+                    "nodes": [
+                        {
+                            "id": "ea377944-5324-4c0b-b62f-9f2153efef98",
+                            "name": "FieldType",
+                            "class_name": "nos.internal.GraphInput",
+                            "pins": [
+                                {
+                                    "id": "631ce01e-87df-4010-88f6-11afce2e0de9",
+                                    "name": "Output",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "OUTPUT_PIN",
+                                    "can_show_as": "OUTPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "PROGRESSIVE",
+                                    "referred_by": [],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "cea8881b-eb8f-496c-b332-b7daaa400f61",
+                                    "name": "Input",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "PROGRESSIVE",
+                                    "referred_by": [
+                                        "d5d3f6aa-eacf-4a68-81c0-4bda1d22b714"
+                                    ],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [
+                                        {
+                                            "key": "PinHidden",
+                                            "value": "true"
+                                        }
+                                    ],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                }
+                            ],
+                            "pos": {
+                                "x": -206.0,
+                                "y": -752.75
+                            },
+                            "contents_type": "Job",
+                            "contents": {
+                                "type": ""
+                            },
+                            "app_key": "",
+                            "functions": [],
+                            "function_category": "Default Node",
+                            "status_messages": [],
+                            "meta_data_map": [],
+                            "description": "",
+                            "template_parameters": []
+                        },
+                        {
+                            "id": "fb3ae17c-126a-476e-b06f-71a5944a4c1d",
+                            "name": "Even",
+                            "class_name": "nos.reflect.IsEqual",
+                            "pins": [
+                                {
+                                    "id": "7a3a65ab-d323-48bf-a425-dcf70ea3a388",
+                                    "name": "A",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "PROGRESSIVE",
+                                    "referred_by": [],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "0a5d472f-9af6-4ab4-9ba8-6a5fee16643f",
+                                    "name": "B",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "EVEN",
+                                    "referred_by": [],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "4f53ea89-b4e5-4516-acf8-fdf90dd1cf78",
+                                    "name": "IsEqual",
+                                    "type_name": "bool",
+                                    "show_as": "OUTPUT_PIN",
+                                    "can_show_as": "OUTPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": "",
+                                    "display_name": "Is Equal"
+                                }
+                            ],
+                            "pos": {
+                                "x": -6.0,
+                                "y": -681.0
+                            },
+                            "contents_type": "Job",
+                            "contents": {
+                                "type": ""
+                            },
+                            "app_key": "",
+                            "functions": [],
+                            "function_category": "Default Node",
+                            "status_messages": [],
+                            "meta_data_map": [
+                                {
+                                    "key": "PluginVersion",
+                                    "value": "1.2.0"
+                                }
+                            ],
+                            "description": "",
+                            "template_parameters": []
+                        },
+                        {
+                            "id": "95e1546d-980d-4aac-807b-3d083e93323c",
+                            "name": "Interlaced",
+                            "class_name": "nos.internal.GraphOutput",
+                            "pins": [
+                                {
+                                    "id": "73a124f8-aeb4-4fbe-a7a7-ed320b5cb14a",
+                                    "name": "Input",
+                                    "type_name": "bool",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": "",
+                                    "display_name": "Not"
+                                },
+                                {
+                                    "id": "64fd6e8f-603c-4315-b5c4-76fa85c2b4ac",
+                                    "name": "Output",
+                                    "type_name": "bool",
+                                    "show_as": "OUTPUT_PIN",
+                                    "can_show_as": "OUTPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": true,
+                                    "referred_by": [
+                                        "834a44a2-d40c-4078-811e-250254cdffe8"
+                                    ],
+                                    "def": false,
+                                    "meta_data_map": [
+                                        {
+                                            "key": "PinHidden",
+                                            "value": "true"
+                                        }
+                                    ],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": "",
+                                    "display_name": "Not"
+                                }
+                            ],
+                            "pos": {
+                                "x": 344.0,
+                                "y": -762.0
+                            },
+                            "contents_type": "Job",
+                            "contents": {
+                                "type": ""
+                            },
+                            "app_key": "",
+                            "functions": [],
+                            "function_category": "Default Node",
+                            "status_messages": [],
+                            "meta_data_map": [],
+                            "description": "",
+                            "template_parameters": []
+                        },
+                        {
+                            "id": "be14c8b9-04bb-4219-85e0-5e5d39dbd4b3",
+                            "name": "Odd",
+                            "class_name": "nos.reflect.IsEqual",
+                            "pins": [
+                                {
+                                    "id": "fa4f1b68-bde9-43fd-9204-35747d18fadc",
+                                    "name": "A",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "PROGRESSIVE",
+                                    "referred_by": [],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "cdb6d110-9e2a-4ecd-a3d2-508041b55248",
+                                    "name": "B",
+                                    "type_name": "nos.sys.vulkan.FieldType",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": "ODD",
+                                    "referred_by": [],
+                                    "def": "UNKNOWN",
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "37e86034-6081-40ff-b282-733965774f6e",
+                                    "name": "IsEqual",
+                                    "type_name": "bool",
+                                    "show_as": "OUTPUT_PIN",
+                                    "can_show_as": "OUTPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": "",
+                                    "display_name": "Is Equal"
+                                }
+                            ],
+                            "pos": {
+                                "x": 3.0,
+                                "y": -796.0
+                            },
+                            "contents_type": "Job",
+                            "contents": {
+                                "type": ""
+                            },
+                            "app_key": "",
+                            "functions": [],
+                            "function_category": "Default Node",
+                            "status_messages": [],
+                            "meta_data_map": [
+                                {
+                                    "key": "PluginVersion",
+                                    "value": "1.2.0"
+                                }
+                            ],
+                            "description": "",
+                            "display_name": "Odd",
+                            "template_parameters": []
+                        },
+                        {
+                            "id": "2eedfe62-5ee7-4bfe-9581-f149f0963734",
+                            "name": "Or",
+                            "class_name": "nos.math.Or",
+                            "pins": [
+                                {
+                                    "id": "f9c010d1-984e-4eec-9a81-5c94ef9aac86",
+                                    "name": "A",
+                                    "type_name": "bool",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "4dc02d7c-2fcd-451e-a464-7aadeebe8f19",
+                                    "name": "B",
+                                    "type_name": "bool",
+                                    "show_as": "INPUT_PIN",
+                                    "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": ""
+                                },
+                                {
+                                    "id": "8ee59388-73f5-4f0a-bbd3-203f7814b2b3",
+                                    "name": "OrResult",
+                                    "type_name": "bool",
+                                    "show_as": "OUTPUT_PIN",
+                                    "can_show_as": "OUTPUT_PIN_ONLY",
+                                    "pin_category": "",
+                                    "visualizers": [
+                                        {
+                                            "visualizer_subfield_path": ""
+                                        }
+                                    ],
+                                    "data": false,
+                                    "referred_by": [],
+                                    "def": false,
+                                    "meta_data_map": [],
+                                    "contents_type": "JobPin",
+                                    "contents": {},
+                                    "description": "",
+                                    "display_name": "Or"
+                                }
+                            ],
+                            "pos": {
+                                "x": 173.0,
+                                "y": -759.0
+                            },
+                            "contents_type": "Job",
+                            "contents": {
+                                "type": ""
+                            },
+                            "app_key": "",
+                            "functions": [],
+                            "function_category": "Default Node",
+                            "status_messages": [],
+                            "meta_data_map": [
+                                {
+                                    "key": "PluginVersion",
+                                    "value": "1.5.0"
+                                }
+                            ],
+                            "description": "Returns true if either A or B is true",
+                            "template_parameters": []
+                        }
+                    ],
+                    "comments": [],
+                    "connections": [
+                        {
+                            "from": "4f53ea89-b4e5-4516-acf8-fdf90dd1cf78",
+                            "to": "4dc02d7c-2fcd-451e-a464-7aadeebe8f19",
+                            "id": "0237deb6-1e18-4d9c-b66e-a8c2bd317a74"
+                        },
+                        {
+                            "from": "37e86034-6081-40ff-b282-733965774f6e",
+                            "to": "f9c010d1-984e-4eec-9a81-5c94ef9aac86",
+                            "id": "9d9286ef-ff0d-4724-a346-18438417ae9a"
+                        },
+                        {
+                            "from": "631ce01e-87df-4010-88f6-11afce2e0de9",
+                            "to": "7a3a65ab-d323-48bf-a425-dcf70ea3a388",
+                            "id": "bfcb8df6-67aa-4187-9f91-4ecbc3f3c286"
+                        },
+                        {
+                            "from": "631ce01e-87df-4010-88f6-11afce2e0de9",
+                            "to": "fa4f1b68-bde9-43fd-9204-35747d18fadc",
+                            "id": "ae39aedf-2328-4ce7-b1b1-dc051000648e"
+                        },
+                        {
+                            "from": "8ee59388-73f5-4f0a-bbd3-203f7814b2b3",
+                            "to": "73a124f8-aeb4-4fbe-a7a7-ed320b5cb14a",
+                            "id": "7c90dd41-b71d-4488-886b-ab2e1a08026d"
+                        }
+                    ]
+                },
+                "app_key": "",
+                "functions": [],
+                "function_category": "Default Node",
+                "status_messages": [],
+                "meta_data_map": [
+                    {
+                        "key": "PluginVersion",
+                        "value": "2.2.0"
+                    }
+                ],
+                "description": "",
+                "template_parameters": []
+            }
+        }
+    ]
 }
