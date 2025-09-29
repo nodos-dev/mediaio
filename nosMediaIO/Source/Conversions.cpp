@@ -80,23 +80,23 @@ struct RGB2YCbCrNodeContext : NodeContext
 	nosTextureFieldType FieldType{};
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto inputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Source"));
-		auto outputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Output"));
-		auto inputTexInfo = *vkss::GetResourceInfo(inputTex);
-		auto outputBufInfo = vkss::GetResourceInfo(outputBuf);
+		auto inputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Source"));
+		auto outputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Output"));
+		auto inputTexInfo = *sys::vulkan::GetResourceInfo(inputTex);
+		auto outputBufInfo = sys::vulkan::GetResourceInfo(outputBuf);
 		auto inputFieldType = inputTexInfo.FieldType;
 		auto outputFieldType = inputFieldType;
 		auto isOutInterlaced = *params.GetPinData<bool>(NOS_NAME("IsOutputInterlaced"));
 		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
 
-		bool isInInterlaced = vkss::IsTextureFieldTypeInterlaced(inputTexInfo.FieldType);
+		bool isInInterlaced = sys::vulkan::IsTextureFieldTypeInterlaced(inputTexInfo.FieldType);
 
 		if (isOutInterlaced)
 		{
 			if (!isInInterlaced)
 			{
 				outputFieldType = FieldType; // Deinterlace: Override with locally tracked field 	
-				FieldType = vkss::FlippedField(FieldType);
+				FieldType = sys::vulkan::FlippedField(FieldType);
 			}
 			nosVulkan->SetResourceFieldType(outputBuf, outputFieldType);
 		}
@@ -115,7 +115,7 @@ struct RGB2YCbCrNodeContext : NodeContext
 		{
 			SetPinObject(
 				NOS_NAME_STATIC("Output"),
-				vkss::CreateBuffer(
+				sys::vulkan::CreateBuffer(
 					nosBufferInfo{
 						.Size = (uint32_t)bufSize,
 						.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),
@@ -156,15 +156,15 @@ struct YCbCr2RGBNodeContext : NodeContext
 	{
 		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
 		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Source"));
-		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
+		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Source"));
+		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
 			nosEngine.LogE("YCbCr2RGB Node: Input buffer is not valid!");
 			return NOS_RESULT_FAILED;
 		}
-		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
-		auto outputTexInfo = vkss::GetResourceInfo(outputTex);
+		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
+		auto outputTexInfo = sys::vulkan::GetResourceInfo(outputTex);
 
 		bool isInterlaced = inputBufInfo->FieldType == NOS_TEXTURE_FIELD_TYPE_EVEN ||
 							inputBufInfo->FieldType == NOS_TEXTURE_FIELD_TYPE_ODD;
@@ -177,7 +177,7 @@ struct YCbCr2RGBNodeContext : NodeContext
 		if (!outputTexInfo || outputTexInfo->Width != ext.x || outputTexInfo->Height != ext.y)
 		{
 			SetPinObject(NOS_NAME("Output"),
-						 vkss::CreateTexture(
+						 sys::vulkan::CreateTexture(
 							 {
 								 .Width = ext.x,
 								 .Height = ext.y,
@@ -229,7 +229,7 @@ nosResult RegisterYUVBufferSizeCalculator(nosNodeFunctions* funcs)
 
 struct GammaLUTNodeContext : NodeContext
 {
-	TypedObjectRef<vkss::Buffer> StagingBuffer;
+	TypedObjectRef<sys::vulkan::Buffer> StagingBuffer;
 	nosBufferInfo StagingBufInfo;
 	static constexpr auto SSBO_SIZE = 10; // Can have a better name.
 
@@ -238,7 +238,7 @@ struct GammaLUTNodeContext : NodeContext
 		StagingBufInfo = {.Size = (1 << (SSBO_SIZE)) * sizeof(uint16_t),
 						  .Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC),
 						  .MemoryFlags = NOS_MEMORY_FLAGS_HOST_VISIBLE};
-		StagingBuffer = vkss::CreateBuffer(StagingBufInfo,
+		StagingBuffer = sys::vulkan::CreateBuffer(StagingBufInfo,
 										   "GammaLUT Staging Buffer");
 		if (!StagingBuffer.IsValid())
 			return NOS_RESULT_FAILED;
@@ -247,7 +247,7 @@ struct GammaLUTNodeContext : NodeContext
 	NOS_REGISTER_NAME(LUT)
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto outputBuf = params.GetPinObject<vkss::Buffer>(NSN_LUT);
+		auto outputBuf = params.GetPinObject<sys::vulkan::Buffer>(NSN_LUT);
 		const auto& curve = *params.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve"));
 		const auto& dir = *params.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
 		if (Curve == curve && Type == dir)
@@ -255,11 +255,11 @@ struct GammaLUTNodeContext : NodeContext
 		constexpr auto outMemoryFlags = NOS_MEMORY_FLAGS_DEVICE_MEMORY;
 
 		{
-			auto outputBufInfo = vkss::GetResourceInfo(outputBuf);
+			auto outputBufInfo = sys::vulkan::GetResourceInfo(outputBuf);
 			if (!outputBufInfo || outputBufInfo->MemoryFlags != outMemoryFlags ||
 				outputBufInfo->Size != StagingBufInfo.Size)
 			{
-				outputBuf = vkss::CreateBuffer({.Size = StagingBufInfo.Size,
+				outputBuf = sys::vulkan::CreateBuffer({.Size = StagingBufInfo.Size,
 													.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_DST | NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),
 													.MemoryFlags = outMemoryFlags},
 					"GammaLUT Buffer");
@@ -272,7 +272,7 @@ struct GammaLUTNodeContext : NodeContext
 		nosEngine.LogI("GammaLUT: Buffer updated");
 		Curve = curve;
 		Type = dir;
-		nosCmd cmd = vkss::BeginCmd(NOS_NAME("GammaLUT Staging Copy"), NodeId);
+		nosCmd cmd = sys::vulkan::BeginCmd(NOS_NAME("GammaLUT Staging Copy"), NodeId);
 		nosVulkan->Copy(cmd, StagingBuffer, outputBuf, 0);
 		nosVulkan->End(cmd, nullptr);
 		return NOS_RESULT_SUCCESS;
@@ -401,15 +401,15 @@ struct YUY2ToRGBANodeContext : NodeContext
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
 		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
-		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
-		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
+		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
+		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Input"));
+		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
 			nosEngine.LogE("YUY2ToRGBA Node: Input buffer is not valid!");
 			return NOS_RESULT_FAILED;
 		}
-		auto outputTexInfo = vkss::GetResourceInfo(outputTex);
+		auto outputTexInfo = sys::vulkan::GetResourceInfo(outputTex);
 
 		constexpr auto reqFormat = NOS_FORMAT_R8G8B8A8_UNORM;
 
@@ -417,7 +417,7 @@ struct YUY2ToRGBANodeContext : NodeContext
 			outputTexInfo->Format != reqFormat)
 		{
 			SetPinObject(NOS_NAME("Output"),
-						 vkss::CreateTexture(
+						 sys::vulkan::CreateTexture(
 							 {
 								 .Width = res.x(),
 								 .Height = res.y(),
@@ -442,15 +442,15 @@ struct NV12ToRGBANodeContext : NodeContext
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
 		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto outputTex = params.GetPinObject<vkss::Texture>(NOS_NAME("Output"));
-		auto inputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME("Input"));
-		auto inputBufInfo = vkss::GetResourceInfo(inputBuf);
+		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
+		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Input"));
+		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
 		{
 			nosEngine.LogE("YUY2ToRGBA Node: Input buffer is not valid!");
 			return NOS_RESULT_FAILED;
 		}
-		auto outputTexInfo = vkss::GetResourceInfo(outputTex);
+		auto outputTexInfo = sys::vulkan::GetResourceInfo(outputTex);
 		constexpr auto reqFormat = NOS_FORMAT_R16G16B16A16_UNORM;
 
 
@@ -458,7 +458,7 @@ struct NV12ToRGBANodeContext : NodeContext
 			outputTexInfo->Format != reqFormat)
 		{
 			SetPinObject(NOS_NAME("Output"),
-						 vkss::CreateTexture(
+						 sys::vulkan::CreateTexture(
 							 {
 								 .Width = res.x(),
 								 .Height = res.y(),
@@ -483,10 +483,10 @@ struct RGBA2BGR24BufferNodeContext : NodeContext
 {
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto inputTex = params.GetPinObject<vkss::Texture>(NOS_NAME_STATIC("Source"));
-		auto outputBuf = params.GetPinObject<vkss::Buffer>(NOS_NAME_STATIC("Output"));
-		auto inputTexInfo = *vkss::GetResourceInfo(inputTex);
-		auto outputBufInfo = vkss::GetResourceInfo(outputBuf);
+		auto inputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME_STATIC("Source"));
+		auto outputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME_STATIC("Output"));
+		auto inputTexInfo = *sys::vulkan::GetResourceInfo(inputTex);
+		auto outputBufInfo = sys::vulkan::GetResourceInfo(outputBuf);
 
 		nosVec2u ext = {inputTexInfo.Width, inputTexInfo.Height};
 
@@ -496,7 +496,7 @@ struct RGBA2BGR24BufferNodeContext : NodeContext
 		{
 			SetPinObject(
 				NOS_NAME_STATIC("Output"),
-				vkss::CreateBuffer(
+				sys::vulkan::CreateBuffer(
 					{
 						.Size = (uint32_t)bufSize,
 						.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),

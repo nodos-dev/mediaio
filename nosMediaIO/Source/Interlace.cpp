@@ -25,7 +25,7 @@ struct InterlaceNode : NodeContext
 	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
 		nosVulkan->SetResourceFieldType(*copyInfo->PinObjectHandle, Field);
-		Field = vkss::FlippedField(Field);
+		Field = sys::vulkan::FlippedField(Field);
 		return NOS_RESULT_SUCCESS;
 	}
 
@@ -37,8 +37,8 @@ struct InterlaceNode : NodeContext
 		interlacePass.Key = NSN_MediaIO_Interlace_Pass;
 		uint32_t isOdd = Field - 1;
 		std::vector bindings = {
-			vkss::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, params.GetPinObject(NSN_Input)),
-			vkss::ShaderDataBinding(NSN_ShouldOutputOdd, isOdd),
+			sys::vulkan::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, params.GetPinObject(NSN_Input)),
+			sys::vulkan::ShaderDataBinding(NSN_ShouldOutputOdd, isOdd),
 		};
 		interlacePass.Bindings = bindings.data();
 		interlacePass.BindingCount = bindings.size();
@@ -76,7 +76,7 @@ struct FieldJugglerNode : NodeContext
 		}
 		else
 		{
-			Field = vkss::FlippedField(Field);
+			Field = sys::vulkan::FlippedField(Field);
 		}
 		SetPinValue(NOS_NAME("FieldType"), (sys::vulkan::FieldType)Field);
 		return NOS_RESULT_SUCCESS;
@@ -93,21 +93,21 @@ struct DeinterlaceNode : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto inputTex = params.GetPinObject<vkss::Texture>(NSN_Input);
-		auto outputTex = params.GetPinObject<vkss::Texture>(NSN_Output);
+		auto inputTex = params.GetPinObject<sys::vulkan::Texture>(NSN_Input);
+		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NSN_Output);
 		nosRunPassParams deinterlacePass = {};
 		deinterlacePass.Key = NSN_MediaIO_Deinterlace_Pass;
-		auto inTexInfo = vkss::GetResourceInfo(inputTex);
+		auto inTexInfo = sys::vulkan::GetResourceInfo(inputTex);
 		auto field = inTexInfo->FieldType;
-		bool isInterlaced = vkss::IsTextureFieldTypeInterlaced(field);
+		bool isInterlaced = sys::vulkan::IsTextureFieldTypeInterlaced(field);
 		if (!isInterlaced)
 		{
 			nosEngine.LogW("Deinterlace Node: Input is not interlaced!");
 			return NOS_RESULT_FAILED;
 		}
 		uint32_t isOdd = field - 1;
-		std::vector bindings = {vkss::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, inputTex),
-								vkss::ShaderDataBinding(NSN_IsOdd, isOdd)};
+		std::vector bindings = {sys::vulkan::ShaderTextureBindingFromPin(params[NSN_Input].Id, NSN_Input, inputTex),
+								sys::vulkan::ShaderDataBinding(NSN_IsOdd, isOdd)};
 		deinterlacePass.Bindings = bindings.data();
 		deinterlacePass.BindingCount = bindings.size();
 		deinterlacePass.Output = outputTex;
