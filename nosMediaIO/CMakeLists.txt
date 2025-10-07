@@ -14,8 +14,13 @@ nos_find_plugin_sdk("40.0.0" NOS_PLUGIN_SDK_TARGET NOS_SDK_DIR)
 
 # Dependencies
 nos_get_plugin("nos.sys.vulkan" "8.0" NOS_SYS_VULKAN_TARGET)
-nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Types" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" "" nosMediaIO_generated)
-set(DEPENDENCIES nosMediaIO_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_PLUGIN_SDK_TARGET})
+nos_get_plugin("nos.audio" "1.0" NOS_AUDIO_TARGET)
+nos_find_plugin_path("nos.sys.vulkan" "8.0" NOS_SYS_VULKAN_PATH)
+nos_find_plugin_path("nos.audio" "1.0" NOS_AUDIO_PATH)
+
+nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Types" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" 
+    "${NOS_SDK_DIR}/Types;${NOS_AUDIO_PATH};${NOS_SYS_VULKAN_PATH}" nosMediaIO_generated)
+set(DEPENDENCIES nosMediaIO_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_AUDIO_TARGET} ${NOS_PLUGIN_SDK_TARGET})
 
 nos_add_plugin("nosMediaIO" "${DEPENDENCIES}" "")
 

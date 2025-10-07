@@ -10,6 +10,10 @@
 			{
 				"name": "nos.sys.vulkan",
 				"version": "8.0"
+			},
+			{
+				"name": "nos.audio",
+				"version": "1.0"
 			}
 		],
         "category": "Media I/O"
