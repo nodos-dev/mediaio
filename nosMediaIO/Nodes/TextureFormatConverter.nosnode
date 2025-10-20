@@ -29,5 +29,6 @@
                 "functions": []
             }
         }
-    ]
+    ],
+    "schema_version": "1.4-v1"
 }
