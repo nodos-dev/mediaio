@@ -13,6 +13,21 @@ struct SetFieldType : NodeContext
 
 	std::optional<nos::TypeInfo> TypeInfo;
 
+	nosResult OnCreate(nosFbNodePtr node) override
+	{
+		for (auto pin : *node->pins())
+		{
+			if (pin->name()->string_view() == NSN_Output)
+			{
+				if (pin->type_name()->string_view() != NSN_Generic)
+				{
+					TypeInfo = nos::TypeInfo(nos::Name(pin->type_name()->string_view()));
+				}
+			}
+		}
+		return NOS_RESULT_SUCCESS;
+	}
+
 	nosResult OnResolvePinDataTypes(nosResolvePinDataTypesParams* params) override
 	{
 		if (!(params->IncomingTypeName == NOS_NAME(nos::sys::vulkan::Texture::GetFullyQualifiedName()) ||
