@@ -1,0 +1,36 @@
+{
+	"nodes": [
+		{
+			"class_name": "SetFieldType",
+			"menu_info": {
+				"category": "Media IO",
+				"display_name": "Set Field Type"
+			},
+			"node": {
+				"class_name": "SetFieldType",
+				"contents_type": "Job",
+				"description": "Changes the given resource's field type",
+				"pins": [
+					{
+						"name": "Input",
+						"type_name": "nos.Generic",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "FieldType",
+						"type_name": "nos.sys.vulkan.FieldType",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.Generic",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		}
+	]
+}
