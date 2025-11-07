@@ -18,11 +18,12 @@
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY",
 						"pin_category": "",
-						"visualizer": {},
 						"data": {
 							"size_in_bytes": 5529600,
 							"alignment": 0,
-							"external_memory": { "handle_type": 2 },
+							"external_memory": {
+								"handle_type": 2
+							},
 							"usage": "TRANSFER_SRC STORAGE_BUFFER",
 							"memory_flags": "DEVICE_MEMORY",
 							"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -31,14 +32,18 @@
 						"def": {
 							"size_in_bytes": 0,
 							"alignment": 0,
-							"external_memory": { "handle_type": 0 },
+							"external_memory": {
+								"handle_type": 0
+							},
 							"usage": "NONE",
 							"memory_flags": "NONE",
 							"element_type": "ELEMENT_TYPE_UNDEFINED"
 						},
 						"meta_data_map": [],
 						"contents_type": "PortalPin",
-						"contents": { "source_id": "8474f599-61fc-462c-87b8-ac0a531da7c6" },
+						"contents": {
+							"source_id": "8474f599-61fc-462c-87b8-ac0a531da7c6"
+						},
 						"description": "",
 						"display_name": "Output"
 					},
@@ -49,13 +54,14 @@
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
 						"pin_category": "",
-						"visualizer": {},
 						"data": "EVEN",
 						"referred_by": [],
 						"def": "UNKNOWN",
 						"meta_data_map": [],
 						"contents_type": "PortalPin",
-						"contents": { "source_id": "cdd9bbe4-eb32-4fa7-8d60-9c35b317367d" },
+						"contents": {
+							"source_id": "cdd9bbe4-eb32-4fa7-8d60-9c35b317367d"
+						},
 						"description": ""
 					},
 					{
@@ -65,11 +71,12 @@
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
 						"pin_category": "",
-						"visualizer": {},
 						"data": {
 							"size_in_bytes": 5529600,
 							"alignment": 0,
-							"external_memory": { "handle_type": 2 },
+							"external_memory": {
+								"handle_type": 2
+							},
 							"usage": "TRANSFER_SRC STORAGE_BUFFER",
 							"memory_flags": "DEVICE_MEMORY",
 							"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -78,14 +85,18 @@
 						"def": {
 							"size_in_bytes": 0,
 							"alignment": 0,
-							"external_memory": { "handle_type": 0 },
+							"external_memory": {
+								"handle_type": 0
+							},
 							"usage": "NONE",
 							"memory_flags": "NONE",
 							"element_type": "ELEMENT_TYPE_UNDEFINED"
 						},
 						"meta_data_map": [],
 						"contents_type": "PortalPin",
-						"contents": { "source_id": "1546d53c-067d-40a5-b5ac-54f6da52d790" },
+						"contents": {
+							"source_id": "1546d53c-067d-40a5-b5ac-54f6da52d790"
+						},
 						"description": ""
 					}
 				],
@@ -108,11 +119,12 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_ONLY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -121,7 +133,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -139,7 +153,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 2482706533776,
 									"referred_by": [],
 									"def": 0,
@@ -155,7 +168,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 5529600,
 									"referred_by": [],
 									"def": 0,
@@ -171,7 +183,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 5529600,
 									"referred_by": [],
 									"def": 0,
@@ -187,7 +198,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 0,
 									"referred_by": [],
 									"def": 0,
@@ -203,10 +213,13 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
-									"data": { "handle_type": 2 },
+									"data": {
+										"handle_type": 2
+									},
 									"referred_by": [],
-									"def": { "handle_type": 0 },
+									"def": {
+										"handle_type": 0
+									},
 									"meta_data_map": [],
 									"contents_type": "JobPin",
 									"contents": {},
@@ -219,7 +232,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "TRANSFER_SRC STORAGE_BUFFER",
 									"referred_by": [],
 									"def": "NONE",
@@ -235,7 +247,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "DEVICE_MEMORY",
 									"referred_by": [],
 									"def": "NONE",
@@ -251,7 +262,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "ELEMENT_TYPE_UNDEFINED",
 									"referred_by": [],
 									"def": "ELEMENT_TYPE_UNDEFINED",
@@ -267,7 +277,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "EVEN",
 									"referred_by": [],
 									"def": "UNKNOWN",
@@ -282,7 +291,9 @@
 								"y": 278.0
 							},
 							"contents_type": "Job",
-							"contents": { "type": "" },
+							"contents": {
+								"type": ""
+							},
 							"app_key": "",
 							"functions": [],
 							"function_category": "Default Node",
@@ -313,11 +324,12 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_ONLY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -326,7 +338,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -343,11 +357,12 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -358,7 +373,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -379,7 +396,9 @@
 								"y": 347.5
 							},
 							"contents_type": "Job",
-							"contents": { "type": "" },
+							"contents": {
+								"type": ""
+							},
 							"app_key": "",
 							"functions": [],
 							"function_category": "Default Node",
@@ -400,11 +419,12 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -413,7 +433,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -430,7 +452,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 2482706533776,
 									"referred_by": [],
 									"def": 0,
@@ -446,7 +467,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 5529600,
 									"referred_by": [],
 									"def": 0,
@@ -462,7 +482,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 5529600,
 									"referred_by": [],
 									"def": 0,
@@ -478,7 +497,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": 0,
 									"referred_by": [],
 									"def": 0,
@@ -494,10 +512,13 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
-									"data": { "handle_type": 2 },
+									"data": {
+										"handle_type": 2
+									},
 									"referred_by": [],
-									"def": { "handle_type": 0 },
+									"def": {
+										"handle_type": 0
+									},
 									"meta_data_map": [],
 									"contents_type": "JobPin",
 									"contents": {},
@@ -510,7 +531,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "TRANSFER_SRC STORAGE_BUFFER",
 									"referred_by": [],
 									"def": "NONE",
@@ -526,7 +546,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "DEVICE_MEMORY",
 									"referred_by": [],
 									"def": "NONE",
@@ -542,7 +561,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "ELEMENT_TYPE_UNDEFINED",
 									"referred_by": [],
 									"def": "ELEMENT_TYPE_UNDEFINED",
@@ -558,7 +576,6 @@
 									"show_as": "PROPERTY",
 									"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "PROGRESSIVE",
 									"referred_by": [],
 									"def": "UNKNOWN",
@@ -573,7 +590,9 @@
 								"y": 267.0
 							},
 							"contents_type": "Job",
-							"contents": { "type": "" },
+							"contents": {
+								"type": ""
+							},
 							"app_key": "",
 							"functions": [],
 							"function_category": "Default Node",
@@ -600,11 +619,12 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_ONLY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -613,7 +633,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -631,11 +653,12 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_ONLY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": {
 										"size_in_bytes": 5529600,
 										"alignment": 0,
-										"external_memory": { "handle_type": 2 },
+										"external_memory": {
+											"handle_type": 2
+										},
 										"usage": "TRANSFER_SRC STORAGE_BUFFER",
 										"memory_flags": "DEVICE_MEMORY",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -646,7 +669,9 @@
 									"def": {
 										"size_in_bytes": 0,
 										"alignment": 0,
-										"external_memory": { "handle_type": 0 },
+										"external_memory": {
+											"handle_type": 0
+										},
 										"usage": "NONE",
 										"memory_flags": "NONE",
 										"element_type": "ELEMENT_TYPE_UNDEFINED"
@@ -668,7 +693,9 @@
 								"y": 272.5
 							},
 							"contents_type": "Job",
-							"contents": { "type": "" },
+							"contents": {
+								"type": ""
+							},
 							"app_key": "",
 							"functions": [],
 							"function_category": "Default Node",
@@ -689,7 +716,6 @@
 									"show_as": "OUTPUT_PIN",
 									"can_show_as": "OUTPUT_PIN_ONLY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "EVEN",
 									"referred_by": [],
 									"def": "UNKNOWN",
@@ -705,7 +731,6 @@
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",
 									"pin_category": "",
-									"visualizer": {},
 									"data": "EVEN",
 									"referred_by": [
 										"f617c5bf-c502-4f43-afae-090bb6e530ff"
@@ -727,7 +752,9 @@
 								"y": 272.5
 							},
 							"contents_type": "Job",
-							"contents": { "type": "" },
+							"contents": {
+								"type": ""
+							},
 							"app_key": "",
 							"functions": [],
 							"function_category": "Default Node",

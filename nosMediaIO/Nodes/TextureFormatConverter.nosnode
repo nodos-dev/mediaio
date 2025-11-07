@@ -5,7 +5,9 @@
 			"menu_info": {
 				"category": "Media IO|Conversions",
 				"display_name": "Texture Format Converter",
-				"name_aliases": [ "image type" ]
+				"name_aliases": [
+					"image type"
+				]
 			},
 			"node": {
 				"class_name": "TextureFormatConverter",
