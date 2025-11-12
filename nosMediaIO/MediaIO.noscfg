@@ -22,10 +22,13 @@
 		"Config/FieldJuggler.nosdef",
 		"Config/SetBufferFieldType.nosdef",
 		"Config/GetLumaCoeffs.nosdef",
-		"Config/SetInterlacedFieldType.nosdef"
+		"Config/GetLumaCoeffs.nosdef",
+		"Config/SetInterlacedFieldType.nosdef",
+		"Config/Debayer.nosdef"
 	],
 	"custom_types": [
-		"Config/Conversion.fbs"
+		"Config/Conversion.fbs",
+		"Config/Debayer.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"

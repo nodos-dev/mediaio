@@ -1,6 +1,16 @@
 {
-    "shaders": [
-    ],
-    "passes": [
-    ]
+	"shaders": [
+		{
+			"key": "DEBAYER_COMP",
+			"path": "Shaders/Debayer.comp",
+			"stage": "COMPUTE",
+			"lang": "GLSL"
+		}
+	],
+	"passes": [
+		{
+			"key": "DEBAYER_PASS",
+			"shader": "DEBAYER_COMP"
+		}
+	]
 }
