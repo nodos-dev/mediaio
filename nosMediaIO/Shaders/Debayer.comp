@@ -42,6 +42,10 @@ vec4 VLogToLinear(vec4 v)
 
 uint idx(ivec2 uv, uint offset)
 {
+
+    // LeftBuffer  = {x0[10],y0[10],z0[10],pad[2]}  {w0[10],x2[10],y2[10],pad[2]} {z2[10],x4[10],y4[10],pad[2]} ...
+    // RightBuffer = {x1[10],y1[10],z1[10],pad[2]}  {w1[10],x3[10],y3[10],pad[2]} {z3[10],x5[10],y5[10],pad[2]} ...
+    // 10 bit indexing fetches from both buffers depending on even/odd pixel
     const uint i = uv.y * 5120 + 16 * (uv.x / 6) + offset;
     switch ((uv.x) & 1)
     {
@@ -130,6 +134,7 @@ vec4 sample_ssbo(ivec2 uv)
     }
 }
 
+// White balance matrices for 3200K and 5500K
 const mat3 WB3200 = mat3(
     vec3(0.91188918, 0.150989861, -0.062879041),
     vec3(0.051637539, 0.914403266, 0.033959194),
@@ -143,6 +148,7 @@ const mat3 WB5500 = mat3(
 void main()
 {
     float WB = float(WhiteBalance);
+    // interpolate between 3200K and 5500K white balance matrices
     mat3 M = ISOSensitivity * (((WB-3200)/2300)*(WB5500 - WB3200)  + WB3200);
 
     const ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
