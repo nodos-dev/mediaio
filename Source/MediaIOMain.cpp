@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <Builtins_generated.h>
 
-#include <nosVulkanSubsystem/nosVulkanSubsystem.h>
+#include <nosSysVulkan/nosVulkanSubsystem.h>
 
 NOS_INIT()
 NOS_VULKAN_INIT()
