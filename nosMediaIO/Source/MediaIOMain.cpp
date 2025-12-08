@@ -33,6 +33,7 @@ enum Nodes : int
 	FieldJuggler,
 	RGBAToBGRABuffer,
 	SetFieldType,
+	GetFieldType,
 	Count
 };
 
@@ -50,6 +51,7 @@ nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
 nosResult RegisterRGBAToBGRABuffer(nosNodeFunctions*);
 nosResult RegisterSetFieldType(nosNodeFunctions*);
+nosResult RegisterGetFieldType(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -87,6 +89,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(FieldJuggler)
 				GEN_CASE_NODE(RGBAToBGRABuffer)
 				GEN_CASE_NODE(SetFieldType)
+				GEN_CASE_NODE(GetFieldType)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
