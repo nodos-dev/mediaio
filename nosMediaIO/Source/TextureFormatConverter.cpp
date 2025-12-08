@@ -29,13 +29,17 @@ inline void CreateStringList(uuid& GenUUID, uuid& NodeUUID, std::string name, st
 
 	GenUUID = nosEngine.GenerateID();
 
+	std::vector<flatbuffers::Offset<nos::fb::Visualizer>> visualizers;
+	visualizers.push_back(nos::fb::CreateVisualizer(fbb,
+		&vis));
+
 	StrListPin.push_back(nos::fb::CreatePinDirect(fbb,
 		&GenUUID,
 		name.c_str(),
 		"string",
 		nos::fb::ShowAs::PROPERTY,
 		nos::fb::CanShowAs::PROPERTY_ONLY,
-		nos::fb::Visualizer::Pack(fbb, &vis),
+		&visualizers,
 		&buf));
 
 	HandleEvent(nos::CreateAppEvent(fbb,

@@ -98,7 +98,7 @@ struct DeinterlaceNode : NodeContext
 		nosRunPassParams deinterlacePass = {};
 		deinterlacePass.Key = NSN_MediaIO_Deinterlace_Pass;
 		auto inTexInfo = sys::vulkan::GetResourceInfo(inputTex);
-		auto field = inTexInfo->FieldType;
+		nosTextureFieldType field = sys::vulkan::GetResourceFieldType(inputTex);
 		bool isInterlaced = sys::vulkan::IsTextureFieldTypeInterlaced(field);
 		if (!isInterlaced)
 		{

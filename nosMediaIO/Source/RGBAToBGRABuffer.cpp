@@ -17,12 +17,15 @@ struct RGBA2BGRABufferNodeContext : NodeContext
 		constexpr auto outMemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_DEVICE_MEMORY);
 		if (!optOutputInfo || optOutputInfo->Size != bufSize || optOutputInfo->MemoryFlags != outMemoryFlags)
 		{
-			SetPinObject(NOS_NAME_STATIC("Output"), sys::vulkan::CreateBuffer(nosBufferInfo{
+			auto bufObj = sys::vulkan::CreateBuffer(
+				nosBufferInfo{
 					.Size = (uint32_t)bufSize,
 					.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),
 					.MemoryFlags = outMemoryFlags,
-					.FieldType = nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE,
-				}, "BGRABuffer"));
+				},
+				"BGRABuffer");
+			SetPinObject(NOS_NAME_STATIC("Output"), bufObj);
+			nosVulkan->SetResourceFieldType(bufObj, nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
 		}
 		else
 			nosVulkan->SetResourceFieldType(params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME_STATIC("Output")),
