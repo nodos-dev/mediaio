@@ -27,7 +27,16 @@
 						"name": "Output",
 						"type_name": "nos.Generic",
 						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
+						"can_show_as": "OUTPUT_PIN_ONLY",
+						"extensions": [
+							{
+								"name": "resource_options",
+								"type_name": "nos.sys.vulkan.ResourcePinOptions",
+								"data": {
+									"disable_out_field_type_inference": true
+								}
+							}
+						]
 					}
 				]
 			}
