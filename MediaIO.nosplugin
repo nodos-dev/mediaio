@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "3.3.0"
+			"version": "3.3.1"
 		},
 		"description": "Media I/O nodes and API.",
 		"display_name": "Media I/O",
@@ -25,5 +25,5 @@
 			"path": "Types/Resources.json"
 		}
 	],
-    "sdk_dependency": "40.0"
+    "sdk_version": "40.0"
 }

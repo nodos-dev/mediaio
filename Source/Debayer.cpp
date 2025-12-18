@@ -1,6 +1,6 @@
 #include <Nodos/Plugin.hpp>
-#include <nosVulkanSubsystem/Helpers.hpp>
-#include "SensorInfo_generated.h"
+#include <nosSysVulkan/Helpers.hpp>
+#include "nosMediaio/SensorInfo_generated.h"
 
 namespace nos::mediaio
 {
