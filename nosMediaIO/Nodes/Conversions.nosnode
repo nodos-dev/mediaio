@@ -147,15 +147,16 @@
 						"type_name": "nos.fb.vec2u",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"visualizer": {
-							"type": "NAMED_VALUE",
-							"name": "nos.mediaio.ResolutionVisualizer"
-						},
 						"data": {
 							"x": 1920,
 							"y": 1080
-						}
-
+						},
+						"visualizers": [
+							{
+								"type": "NAMED_VALUE",
+								"name": "nos.mediaio.ResolutionVisualizer"
+							}
+						]
 					},
 					{
 						"name": "DispatchSize",
@@ -413,7 +414,13 @@
 			"menu_info": {
 				"category": "Media IO",
 				"display_name": "RGBA To BGR24 Buffer Converter",
-				"name_aliases": [ "virtual camera format", "B8G8R8", "BGR8", "RGB24", "RGB8" ]
+				"name_aliases": [
+					"virtual camera format",
+					"B8G8R8",
+					"BGR8",
+					"RGB24",
+					"RGB8"
+				]
 			},
 			"node": {
 				"class_name": "RGBAToBGR24Buffer",
@@ -451,5 +458,6 @@
 				]
 			}
 		}
-	]
+	],
+	"schema_version": "1.4-v1"
 }
