@@ -1,63 +1,64 @@
 {
-    "nodes": [
-        {
-            "class_name": "Debayer",
-            "menu_info": {
-                "category": "Experimental",
-                "display_name": "Debayer",
-                "name_aliases": []
-            },
-            "node": {
-                "class_name": "Debayer",
-                "contents_type": "Job",
-                "pins": [
-                    {
-                        "name": "SourceLeft",
-                        "type_name": "nos.sys.vulkan.Buffer",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "SourceRight",
-                        "type_name": "nos.sys.vulkan.Buffer",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "Output",
-                        "type_name": "nos.sys.vulkan.Texture",
-                        "show_as": "OUTPUT_PIN",
-                        "can_show_as": "OUTPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "BitWidth",
-                        "display_name": "Bit Width",
-                        "type_name": "nos.mediaio.YCbCrPixelFormat",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": "V210",
-                        "advanced_property": true
-                    },
-                    {
-                        "name": "WhiteBalance",
-                        "display_name": "White Balance",
-                        "type_name": "uint",
-                        "min": "0",
-                        "max": "10000",
-                        "data": "3200",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
-                    },
-                    {
-                        "name": "ISOSensitivity",
-                        "display_name": "ISO Sensitivity",
-                        "type_name": "nos.mediaio.ISOSensitivity",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": "ISO800_SENS800"
-                    }
-                ]
-            }
-        }
-    ]
+	"nodes": [
+		{
+			"class_name": "Debayer",
+			"menu_info": {
+				"category": "Experimental",
+				"display_name": "Debayer",
+				"name_aliases": []
+			},
+			"node": {
+				"class_name": "Debayer",
+				"contents_type": "Job",
+				"pins": [
+					{
+						"name": "SourceLeft",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "SourceRight",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "BitWidth",
+						"display_name": "Bit Width",
+						"type_name": "nos.mediaio.YCbCrPixelFormat",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": "V210",
+						"advanced_property": true
+					},
+					{
+						"name": "WhiteBalance",
+						"display_name": "White Balance",
+						"type_name": "uint",
+						"min": "0",
+						"max": "10000",
+						"data": "3200",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "ISOSensitivity",
+						"display_name": "ISO Sensitivity",
+						"type_name": "nos.mediaio.ISOSensitivity",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": "ISO800_SENS800"
+					}
+				]
+			}
+		}
+	],
+	"schema_version": "1.4-v1"
 }
