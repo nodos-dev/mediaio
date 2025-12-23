@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "3.3.1"
+			"version": "3.4.0"
 		},
 		"description": "Media I/O nodes and API.",
 		"display_name": "Media I/O",
@@ -12,7 +12,7 @@
 				"version": "7.1"
 			}
 		],
-        "category": "Media I/O"
+		"category": "Media I/O"
 	},
 	"named_values": [
 		"Types/ResolutionNames.json"
@@ -25,5 +25,5 @@
 			"path": "Types/Resources.json"
 		}
 	],
-    "sdk_version": "40.0"
+  "sdk_version": "40.0"
 }
