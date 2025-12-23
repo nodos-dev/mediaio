@@ -1,9 +1,9 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 
 #include <Nodos/Plugin.hpp>
-#include <nosVulkanSubsystem/Helpers.hpp>
+#include <nosSysVulkan/Helpers.hpp>
 
-#include "Conversion_generated.h"
+#include "nosMediaio/Conversion_generated.h"
 
 #include <glm/glm.hpp>
 
