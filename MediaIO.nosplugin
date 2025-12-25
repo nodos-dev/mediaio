@@ -16,12 +16,12 @@
 				"version": "1.0"
 			}
 		],
-        "category": "Media I/O"
+		"category": "Media I/O"
 	},
 	"named_values": [
 		"Types/ResolutionNames.json"
 	],
-	"binary_path": "Binaries/nosMediaIO",
+	"binary_path": "Binaries/nosMediaio",
 	"plugin_options": [
 		{
 			"plugin": "nos.sys.vulkan",
@@ -29,5 +29,6 @@
 			"path": "Types/Resources.json"
 		}
 	],
-	"sdk_version": "41.0"
+	"sdk_version": "41.0",
+	"schema_version": "1.4-v1"
 }

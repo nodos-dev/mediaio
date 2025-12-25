@@ -2,12 +2,12 @@
 
 #include "Names.h"
 
-#include <nosVulkanSubsystem/Helpers.hpp>
+#include <nosSysVulkan/Helpers.hpp>
 
 namespace nos::mediaio
 {
 
-struct SetFieldType : NodeContext
+struct GetFieldType : NodeContext
 {
 	using NodeContext::NodeContext;
 
@@ -17,7 +17,7 @@ struct SetFieldType : NodeContext
 	{
 		for (auto pin : *node->pins())
 		{
-			if (pin->name()->string_view() == NSN_Output)
+			if (pin->name()->string_view() == NSN_Input)
 			{
 				if (pin->type_name()->string_view() != NSN_Generic)
 				{
@@ -33,7 +33,7 @@ struct SetFieldType : NodeContext
 		if (!(params->IncomingTypeName == NOS_NAME(nos::sys::vulkan::Texture::GetFullyQualifiedName()) ||
 			  params->IncomingTypeName == NOS_NAME(nos::sys::vulkan::Buffer::GetFullyQualifiedName())))
 		{
-			strncpy(params->OutErrorMessage, "SetFieldType only supports Vulkan Texture or Buffer types", 58);
+			strncpy(params->OutErrorMessage, "GetFieldType only supports Vulkan Texture or Buffer types", 58);
 			return NOS_RESULT_FAILED;
 		}
 
@@ -43,7 +43,7 @@ struct SetFieldType : NodeContext
 		{
 			auto& pinInfo = params->Pins[i];
 			std::string pinName = nosEngine.GetString(pinInfo.Name);
-			if (pinName == "Input" || pinName == "Output")
+			if (pinName == "Input")
 				pinInfo.OutResolvedTypeName = TypeInfo->TypeName;
 		}
 
@@ -55,18 +55,17 @@ struct SetFieldType : NodeContext
 		if (!TypeInfo || TypeInfo->TypeName == NSN_Generic)
 			return NOS_RESULT_FAILED;
 		auto inputObj = params.GetPinObject(NOS_NAME("Input"));
-		auto fieldType = *params.GetPinData<sys::vulkan::FieldType>(NOS_NAME("FieldType"));
 		if (!inputObj)
 			return NOS_RESULT_FAILED;
-		nosVulkan->SetResourceFieldType(inputObj, nosTextureFieldType(fieldType));
-		SetPinObject(NOS_NAME("Output"), inputObj);
+		auto fieldType = sys::vulkan::GetResourceFieldType(inputObj);
+		SetPinValue(NOS_NAME("FieldType"), fieldType);
 		return NOS_RESULT_SUCCESS;
 	}
 };
 
-nosResult RegisterSetFieldType(nosNodeFunctions* fn)
+nosResult RegisterGetFieldType(nosNodeFunctions* fn)
 {
-	NOS_BIND_NODE_CLASS(NOS_NAME("SetFieldType"), SetFieldType, fn);
+	NOS_BIND_NODE_CLASS(NOS_NAME("GetFieldType"), GetFieldType, fn);
 	return NOS_RESULT_SUCCESS;
 }
 

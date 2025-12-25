@@ -1,0 +1,187 @@
+#version 450
+#extension GL_EXT_shader_8bit_storage : enable
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) readonly buffer Source_Left_Buffer
+{
+    uint8_t Pixels[];
+}
+SourceLeft;
+
+layout(binding = 1) readonly buffer Source_Right_Buffer
+{
+    uint8_t Pixels[];
+}
+SourceRight;
+
+layout(binding = 2, rgba8) uniform writeonly image2D Output;
+
+layout(binding = 3) uniform UniformParams
+{
+    int BitWidth; // 8 or 10
+    int WhiteBalance;
+    float ISOSensitivity;
+};
+
+float Delog(float x)
+{
+    return x < 0.0695 ? (x - 0.0625) / 0.7 : pow(10.0, ((x - 0.313585) / 0.412059)) - 0.24565;
+}
+
+// Decode V-Log -> linear
+float VLogToLinear(float x)
+{
+    return Delog(x);
+}
+
+vec4 VLogToLinear(vec4 v)
+{
+    return vec4(VLogToLinear(v.x), VLogToLinear(v.y), VLogToLinear(v.z), VLogToLinear(v.w));
+}
+
+uint idx(ivec2 uv, uint offset)
+{
+
+    // LeftBuffer  = {x0[10],y0[10],z0[10],pad[2]}  {w0[10],x2[10],y2[10],pad[2]} {z2[10],x4[10],y4[10],pad[2]} ...
+    // RightBuffer = {x1[10],y1[10],z1[10],pad[2]}  {w1[10],x3[10],y3[10],pad[2]} {z3[10],x5[10],y5[10],pad[2]} ...
+    // 10 bit indexing fetches from both buffers depending on even/odd pixel
+    const uint i = uv.y * 5120 + 16 * (uv.x / 6) + offset;
+    switch ((uv.x) & 1)
+    {
+    case 0:
+        return uint(SourceLeft.Pixels[i]);
+    case 1:
+        return uint(SourceRight.Pixels[i]);
+    }
+}
+
+uvec4 sample_ssbo_8bit(ivec2 uv)
+{
+    const uint base = uv.y * 3840 + 4 * (uv.x / 2);
+    switch (uv.x & 1)
+    {
+    case 0:
+        return uvec4(SourceLeft.Pixels[base + 0], SourceLeft.Pixels[base + 1], SourceLeft.Pixels[base + 2],
+                     SourceLeft.Pixels[base + 3]);
+    case 1:
+        return uvec4(SourceRight.Pixels[base + 0], SourceRight.Pixels[base + 1], SourceRight.Pixels[base + 2],
+                     SourceRight.Pixels[base + 3]);
+    }
+}
+
+uvec4 sample_ssbo_10bit(ivec2 UV)
+{
+    const ivec2 uv = ivec2(6 * (UV.x / 6) + int(UV.x & 1), UV.y);
+
+    switch (UV.x % 6)
+    {
+    case 1:
+    case 0: {
+        uint x0 = idx(uv, 0);
+        uint x1 = idx(uv, 1);
+        uint x2 = idx(uv, 2);
+        uint x3 = idx(uv, 3);
+        uint x4 = idx(uv, 4);
+        uint x5 = idx(uv, 5);
+        return uvec4(0x3FF & (x0 | (x1 << 8)),        // x0 used 8 bits, x1 used 2 bits
+                     0x3FF & ((x1 >> 2) | (x2 << 6)), // x1 used 6 bits, x2 used 4 bits
+                     0x3FF & ((x2 >> 4) | (x3 << 4)), // x2 used 4 bits, x3 used 6 bits, x3 last 2 bits is garbage
+                     0x3FF & (x4 | x5 << 8)           // x4 used 8 bits, x5 used 2 bits
+        );
+    }
+    case 3:
+    case 2: {
+        uint x5 = idx(uv, 5);
+        uint x6 = idx(uv, 6);
+        uint x7 = idx(uv, 7);
+        uint x8 = idx(uv, 8);
+        uint x9 = idx(uv, 9);
+        uint x10 = idx(uv, 10);
+        return uvec4(0x3FF & ((x5 >> 2) | (x6 << 6)), // x5 used 6 bits, x6 used 4 bits
+                     0x3FF & ((x6 >> 4) | (x7 << 4)), // x6 used 4 bits, 7 used 6 bits, x7 last 2 bits is garbage
+                     0x3FF & ((x8 | (x9 << 8))),      // x8 used 8 bits, x9 used 2 bits
+                     0x3FF & ((x9 >> 2) | (x10 << 6)) // x9 used 6 bits, x10 used 4 bits
+        );
+    }
+    case 5:
+    case 4: {
+        uint x10 = idx(uv, 10);
+        uint x11 = idx(uv, 11);
+        uint x12 = idx(uv, 12);
+        uint x13 = idx(uv, 13);
+        uint x14 = idx(uv, 14);
+        uint x15 = idx(uv, 15);
+        return uvec4(0x3FF & ((x10 >> 4) | (x11 << 4)), // x10 used 4 bits, x11 used 6 bits, x11 last 2 bits is garbage
+                     0x3FF & (x12 | (x13 << 8)),        // x12 used 8 bits, x13 used 2 bits
+                     0x3FF & ((x13 >> 2) | (x14 << 6)), // x13 used 6 bits, x14 used 4 bits
+                     0x3FF & ((x14 >> 4) | (x15 << 4))  // x14 used 4 bits, x15 used 6 bits, x15 last 2 bits is garbage
+        );
+    }
+    }
+}
+
+vec4 sample_ssbo(ivec2 uv)
+{
+    uv = clamp(uv, ivec2(0), ivec2(1919, 1079));
+
+    switch (BitWidth)
+    {
+    case 8:
+        return VLogToLinear(sample_ssbo_8bit(uv).barg / 255.0);
+    case 10:
+        return VLogToLinear(sample_ssbo_10bit(uv).barg / 1023.0);
+    }
+}
+
+// White balance matrices for 3200K and 5500K
+const mat3 WB3200 = mat3(
+    vec3(0.91188918, 0.150989861, -0.062879041),
+    vec3(0.051637539, 0.914403266, 0.033959194),
+    vec3(0.072942222, -0.443743345, 1.370801123));
+
+const mat3 WB5500 = mat3(
+    vec3(0.882307249, 0.087576341, 0.03011641),
+    vec3(0.066865918, 0.930934114, 0.002199968),
+    vec3(0.055159769, -0.226836665, 1.171676896));
+
+void main()
+{
+    float WB = float(WhiteBalance);
+    // interpolate between 3200K and 5500K white balance matrices
+    mat3 M = ISOSensitivity * (((WB-3200)/2300)*(WB5500 - WB3200)  + WB3200);
+
+    const ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    
+    vec4 C = sample_ssbo(uv);
+
+    vec4 R  = sample_ssbo(uv + ivec2(1, 0));
+    vec4 D  = sample_ssbo(uv + ivec2(0, 1));
+    vec4 L  = sample_ssbo(uv - ivec2(1, 0));
+    vec4 U  = sample_ssbo(uv - ivec2(0, 1));
+    vec4 DR = sample_ssbo(uv + ivec2(1, 1));
+    vec4 UL = sample_ssbo(uv - ivec2(1, 1));
+    
+
+    float g0 = (C.g + C.a + U.a + L.g) * 0.25;
+    float b0 = (C.b + L.b + U.b + UL.b) * 0.25;
+
+    float r1 = (C.r + R.r) * 0.5;
+    float b1 = (C.b + U.b) * 0.5;
+
+    float r2 = (C.r + D.r) * 0.5;
+    float b2 = (C.b + L.b) * 0.5;
+
+    float r3 = (C.r + R.r + D.r + DR.r) * 0.25;
+    float g1 = (C.g + C.a + D.g +  R.a) * 0.25;
+    
+    vec3 C0 = vec3(C.r, g0,  b0) * M;
+    vec3 C1 = vec3(r1,  C.g, b1) * M;
+    vec3 C2 = vec3(r2,  C.a, b2) * M;
+    vec3 C3 = vec3(r3,  g1,  C.b) * M;
+
+    imageStore(Output, uv * 2 + ivec2(0, 0), vec4(C0,1));
+    imageStore(Output, uv * 2 + ivec2(1, 0), vec4(C1,1));
+    imageStore(Output, uv * 2 + ivec2(0, 1), vec4(C2,1));
+    imageStore(Output, uv * 2 + ivec2(1, 1), vec4(C3,1));
+}

@@ -1,6 +1,6 @@
 #include <Nodos/Plugin.hpp>
-#include <nosVulkanSubsystem/Helpers.hpp>
-#include <nosVulkanSubsystem/Types_generated.h>
+#include <nosSysVulkan/Helpers.hpp>
+#include <nosSysVulkan/Types_generated.h>
 
 namespace nos::mediaio
 {
