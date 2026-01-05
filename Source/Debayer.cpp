@@ -9,32 +9,31 @@ struct DebayerContext : NodeContext
 {
 	using NodeContext::NodeContext;
 
-	nosResult ExecuteNode(nosNodeExecuteParams* inParams) override
+	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto params = nos::NodeExecuteParams(inParams);
-		auto out   = nos::vkss::DeserializeTextureInfo(params[nos::Name("Output")].Data->Data);
-		if (out.Info.Texture.Width != 3840 || out.Info.Texture.Height != 2160)
+		auto out   = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
+		auto outResInfo = sys::vulkan::GetResourceInfo(out);
+		if (!outResInfo || outResInfo->Width != 3840 || outResInfo->Height != 2160)
 		{
-			nosResourceShareInfo tex{ .Info = {
-				.Type = NOS_RESOURCE_TYPE_TEXTURE,
-				.Texture = {
+			outResInfo = {
 					.Width = 3840,
 					.Height = 2160,
 					.Format = NOS_FORMAT_R8G8B8A8_UNORM,
 					.Usage = nosImageUsage(NOS_IMAGE_USAGE_SAMPLED | NOS_IMAGE_USAGE_RENDER_TARGET | NOS_IMAGE_USAGE_STORAGE),
-				}
-			} };
-			if (auto res = nosEngine.SetPinValueByName(NodeId, NOS_NAME("Output"), nos::Buffer::From(nos::vkss::ConvertTextureInfo(tex))); NOS_RESULT_SUCCESS != res)
-				return res;
-			out = nos::vkss::DeserializeTextureInfo(params[nos::Name("Output")].Data->Data);
+			};
+			out = sys::vulkan::CreateTexture(*outResInfo, "Debayer Output Texture");
+			outResInfo = sys::vulkan::GetResourceInfo(out);
+			if (!out || !outResInfo)
+				return NOS_RESULT_FAILED;
+			SetPinObject(NOS_NAME("Output"), out);
 		}
 
-		auto left = nos::vkss::ConvertToResourceInfo(*params.GetPinData<nos::sys::vulkan::Buffer>(nos::Name("SourceLeft")));
-		auto right = nos::vkss::ConvertToResourceInfo(*params.GetPinData<nos::sys::vulkan::Buffer>(nos::Name("SourceRight")));
-		uint32_t bitwidth  = 8u + 2u**(uint32_t*)(params[nos::Name("BitWidth")].Data->Data);
-		uint32_t wb  = *(uint32_t*)(params[nos::Name("WhiteBalance")].Data->Data);
+		auto left = params.GetPinObject<nos::sys::vulkan::Buffer>(NOS_NAME("SourceLeft"));
+		auto right = params.GetPinObject<nos::sys::vulkan::Buffer>(NOS_NAME("SourceRight"));
+		uint32_t bitwidth  = 8u + 2u * (*params.GetPinData<uint32_t>(NOS_NAME("BitWidth")));
+		uint32_t wb  = *params.GetPinData<uint32_t>(NOS_NAME("WhiteBalance"));
 
-		auto sens  = *(nos::mediaio::ISOSensitivity*)(params[nos::Name("ISOSensitivity")].Data->Data);
+		auto sens  = *params.GetPinData<nos::mediaio::ISOSensitivity>(NOS_NAME("ISOSensitivity"));
 
         // Determine dynamic range scaling factor based on ISO sensitivity setting.
         // Lower effective ISO values yield higher dynamic range (smaller drangeScale).
@@ -68,16 +67,16 @@ struct DebayerContext : NodeContext
 		}	
 
 		std::vector<nosShaderBinding> bindings = {
-			nos::vkss::ShaderBinding(nos::Name("SourceLeft"), left),
-			nos::vkss::ShaderBinding(nos::Name("SourceRight"), right),
-			nos::vkss::ShaderBinding(nos::Name("Output"), out),
-			nos::vkss::ShaderBinding(nos::Name("BitWidth"), bitwidth),
-			nos::vkss::ShaderBinding(nos::Name("WhiteBalance"), wb),
-			nos::vkss::ShaderBinding(nos::Name("ISOSensitivity"), drangeScale),
+			sys::vulkan::ShaderBufferBinding(NOS_NAME("SourceLeft"), left),
+			sys::vulkan::ShaderBufferBinding(NOS_NAME("SourceRight"), right),
+			sys::vulkan::ShaderTextureBindingFromPin(params[NOS_NAME("Output")].Id, NOS_NAME("Output"), out),
+			sys::vulkan::ShaderDataBinding(NOS_NAME("BitWidth"), bitwidth),
+			sys::vulkan::ShaderDataBinding(NOS_NAME("WhiteBalance"), wb),
+			sys::vulkan::ShaderDataBinding(NOS_NAME("ISOSensitivity"), drangeScale),
 		};
 
 		nosRunComputePassParams debayerPass = {
-			.Key = nos::Name("DEBAYER_PASS"),
+			.Key = NOS_NAME("DEBAYER_PASS"),
 			.Bindings = bindings.data(),
 			.BindingCount = (u32)bindings.size(),
             // WorkGroupSize = (8,8), NumWorkGroups(DispatchSize) = (240,135)
@@ -86,7 +85,7 @@ struct DebayerContext : NodeContext
 			.DispatchSize = {240, 135},
 		};
         
-		auto cmd = nos::vkss::BeginCmd(NOS_NAME("Debayer"), NodeId);
+		auto cmd = sys::vulkan::BeginCmd(NOS_NAME("Debayer"), NodeId);
 		nosVulkan->RunComputePass(cmd, &debayerPass);
 		nosVulkan->End(cmd, 0);
 		return NOS_RESULT_SUCCESS;

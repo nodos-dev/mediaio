@@ -1,0 +1,10 @@
+include "Types/Types.fbs";
+include "Types/Audio.fbs";
+
+namespace nos.mediaio;
+
+table VideoFrame
+{
+    texture: nos.sys.vulkan.Texture;
+    audio: nos.audio.AudioPacket;
+}

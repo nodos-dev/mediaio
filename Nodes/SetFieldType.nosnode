@@ -1,16 +1,15 @@
 {
 	"nodes": [
 		{
-			"class_name": "SetInterlacedFieldType",
+			"class_name": "SetFieldType",
 			"menu_info": {
 				"category": "Media IO",
-				"display_name": "Set Interlaced Field Type"
+				"display_name": "Set Field Type"
 			},
 			"node": {
-				"class_name": "SetInterlacedFieldType",
-				"display_name": "Set Interlaced Field Type",
+				"class_name": "SetFieldType",
 				"contents_type": "Job",
-				"description": "Sets the interlaced field type for a buffer or texture",
+				"description": "Changes the given resource's field type",
 				"pins": [
 					{
 						"name": "Input",
@@ -19,8 +18,7 @@
 						"can_show_as": "INPUT_PIN_ONLY"
 					},
 					{
-						"name": "NewFieldType",
-						"display_name": "New Field Type",
+						"name": "FieldType",
 						"type_name": "nos.sys.vulkan.FieldType",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY"
@@ -29,7 +27,16 @@
 						"name": "Output",
 						"type_name": "nos.Generic",
 						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
+						"can_show_as": "OUTPUT_PIN_ONLY",
+						"extensions": [
+							{
+								"name": "resource_options",
+								"type_name": "nos.sys.vulkan.ResourcePinOptions",
+								"data": {
+									"disable_out_field_type_inference": true
+								}
+							}
+						]
 					}
 				]
 			}

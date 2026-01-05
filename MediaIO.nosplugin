@@ -2,14 +2,18 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "3.4.0"
+			"version": "4.0.0"
 		},
 		"description": "Media I/O nodes and API.",
 		"display_name": "Media I/O",
 		"dependencies": [
 			{
 				"name": "nos.sys.vulkan",
-				"version": "7.1"
+				"version": "8.0"
+			},
+			{
+				"name": "nos.audio",
+				"version": "1.0"
 			}
 		],
 		"category": "Media I/O"
@@ -25,6 +29,6 @@
 			"path": "Types/Resources.json"
 		}
 	],
-	"sdk_version": "40.0",
+	"sdk_version": "41.0",
 	"schema_version": "1.4-v1"
 }
