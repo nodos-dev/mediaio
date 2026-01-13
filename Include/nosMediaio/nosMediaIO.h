@@ -5,10 +5,7 @@
 #ifndef NOS_MEDIAIO_H_INCLUDED
 #define NOS_MEDIAIO_H_INCLUDED
 
-#if __cplusplus
-extern "C"
-{
-#endif
+NOS_BEGIN_C_LINKAGE
 
 #include <Nodos/Types.h>
 
@@ -205,8 +202,6 @@ extern nosMediaIOAPI* nosMediaIO;
 
 #pragma endregion
 
-#if __cplusplus
-}
-#endif
+NOS_END_C_LINKAGE
 
 #endif // NOS_MEDIAIO_H_INCLUDED 
