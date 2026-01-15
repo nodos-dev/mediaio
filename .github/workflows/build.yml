@@ -14,8 +14,8 @@ on:
           - If Changed
           - Force
           - None
-      plugin_name:
-        description: 'Single plugin name (optional)'
+      plugin_names:
+        description: 'Publish only these plugins (semicolon-delimited) (optional)'
         required: false
         default: ''
         type: string
