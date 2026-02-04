@@ -79,6 +79,23 @@ nosMediaIOVideoScanType NOSAPI_CALL GetVideoScanTypeFromString(const char* str)
 	}
 	return NOS_MEDIAIO_VIDEO_SCAN_TYPE_INVALID;
 }
+
+nosMediaIOVideoConnectionType NOSAPI_CALL GetVideoConnectionTypeFromString(const char* str)
+{
+	for (size_t i = NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MIN; i <= NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MAX; ++i)
+	{
+		if (strcmp(str, NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_NAMES[i]) == 0)
+			return static_cast<nosMediaIOVideoConnectionType>(i);
+	}
+	return NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID;
+}
+
+const char* NOSAPI_CALL GetVideoConnectionTypeName(nosMediaIOVideoConnectionType connectionType)
+{
+	if (connectionType < NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MIN || connectionType > NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MAX)
+		return NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_NAMES[NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID];
+	return NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_NAMES[connectionType];
+}
 	
 // Function implementation
 nosResult NOSAPI_CALL GetFrameRateDeltaSeconds(nosMediaIOFrameRate frameRate, nosVec2u* outDeltaSeconds) {
@@ -169,6 +186,8 @@ nosResult NOSAPI_CALL Export(uint32_t minorVersion, void** outSubsystemContext)
 	subsystem->Get2DFrameResolution = Get2DFrameResolution;
 	subsystem->GetVideoScanTypeName = GetVideoScanTypeName;
 	subsystem->GetVideoScanTypeFromString = GetVideoScanTypeFromString;
+	subsystem->GetVideoConnectionTypeName = GetVideoConnectionTypeName;
+	subsystem->GetVideoConnectionTypeFromString = GetVideoConnectionTypeFromString;
 	*outSubsystemContext = subsystem;
 	GExportedSubsystemVersions[minorVersion] = subsystem;
 	return NOS_RESULT_SUCCESS;

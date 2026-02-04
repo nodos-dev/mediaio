@@ -165,6 +165,21 @@ typedef struct nosMediaIOVideoScanTypeList {
 	nosMediaIOVideoScanType ScanTypes[2];
 } nosMediaIOVideoScanTypeList;
 
+typedef enum nosMediaIOVideoConnectionType
+{
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MIN = NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_SDI,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_OPTICAL_ETHERNET,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MAX = NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_OPTICAL_ETHERNET
+} nosMediaIOVideoConnectionType;
+
+inline const char* NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_NAMES[] = {
+	"INVALID",
+	"SDI",
+	"Optical Ethernet",
+};
+
 typedef enum nosMediaIOInterlacedFieldType
 {
 	NOS_MEDIAIO_INTERLACED_FIELD_TYPE_INVALID,
@@ -185,6 +200,8 @@ typedef struct nosMediaIOSubsystem {
 	nosResult (NOSAPI_CALL* Get2DFrameResolution)(nosMediaIOFrameGeometry geometry, nosVec2u* outResolution);
 	const char* (NOSAPI_CALL* GetVideoScanTypeName)(nosMediaIOVideoScanType scanType);
 	nosMediaIOVideoScanType (NOSAPI_CALL* GetVideoScanTypeFromString)(const char* str);
+	nosMediaIOVideoConnectionType (NOSAPI_CALL* GetVideoConnectionTypeFromString)(const char* str);
+	const char* (NOSAPI_CALL* GetVideoConnectionTypeName)(nosMediaIOVideoConnectionType connectionType);
 } nosMediaIOSubsystem;
 
 #pragma region Helper Declarations & Macros
@@ -192,7 +209,7 @@ typedef struct nosMediaIOSubsystem {
 // Make sure these are same with nossys file.
 #define NOS_MEDIAIO_SUBSYSTEM_NAME "nos.sys.mediaio"
 #define NOS_MEDIAIO_SUBSYSTEM_VERSION_MAJOR 0
-#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MINOR 4
+#define NOS_MEDIAIO_SUBSYSTEM_VERSION_MINOR 5
 
 extern struct nosModuleInfo nosMediaIOSubsystemModuleInfo;
 extern nosMediaIOSubsystem* nosMediaIO;
