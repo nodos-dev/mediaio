@@ -1,0 +1,44 @@
+{
+	"nodes": [
+		{
+			"class_name": "LoadCubeLUT",
+			"menu_info": {
+				"category": "Media",
+				"display_name": "Load Cube LUT",
+				"name_aliases": [
+					"LUT"
+				]
+			},
+			"node": {
+				"class_name": "LoadCubeLUT",
+				"display_name": "Load Cube LUT",
+				"contents_type": "Job",
+				"description": "Reads a .cube files from filesystem",
+				"pins": [
+					{
+						"name": "Path",
+						"type_name": "string",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"visualizers": [
+							{
+								"type": "FILE_PICKER",
+								"file_extensions": [
+									"cube"
+								],
+								"file_picker_type": "OPEN"
+							}
+						]
+					},
+					{
+						"name": "Out",
+						"type_name": "nos.sys.vulkan.Texture3D",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+					}
+				]
+			}
+		}
+	],
+	"schema_version": "1.4-v1"
+}
