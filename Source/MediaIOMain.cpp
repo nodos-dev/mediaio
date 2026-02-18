@@ -28,11 +28,8 @@ enum Nodes : int
 	GammaLUT,
 	ColorSpaceMatrix,
 	YUY2ToRGBA,
-	TextureFormatConverter,
 	NV12ToRGBA,
-	RGBAToBGR24Buffer,
 	FieldJuggler,
-	RGBAToBGRABuffer,
 	SetFieldType,
 	GetFieldType,
 	Debayer,
@@ -51,11 +48,8 @@ nosResult RegisterYUVBufferSizeCalculator(nosNodeFunctions*);
 nosResult RegisterGammaLUT(nosNodeFunctions*);
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions*);
 nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
-nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
-nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
-nosResult RegisterRGBAToBGRABuffer(nosNodeFunctions*);
 nosResult RegisterSetFieldType(nosNodeFunctions*);
 nosResult RegisterGetFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
@@ -102,11 +96,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(GammaLUT)
 				GEN_CASE_NODE(ColorSpaceMatrix)
 				GEN_CASE_NODE(YUY2ToRGBA)
-				GEN_CASE_NODE(TextureFormatConverter)
 				GEN_CASE_NODE(NV12ToRGBA)
-				GEN_CASE_NODE(RGBAToBGR24Buffer)
 				GEN_CASE_NODE(FieldJuggler)
-				GEN_CASE_NODE(RGBAToBGRABuffer)
 				GEN_CASE_NODE(SetFieldType)
 				GEN_CASE_NODE(GetFieldType)
 				GEN_CASE_NODE(Debayer)
@@ -134,9 +125,6 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
 		static std::vector<std::pair<nos::Name, nos::Name>> renames = {
-			{NOS_NAME("nos.interop.TextureFormatConverter"), NOS_NAME("nos.mediaio.TextureFormatConverter")},
-			{NOS_NAME("zd.ndi.RGBAToBGRABuffer"), NOS_NAME("nos.mediaio.RGBAToBGRABuffer")},
-			{NOS_NAME("nos.ndi.RGBAToBGRABuffer"), NOS_NAME("nos.mediaio.RGBAToBGRABuffer")},
 			{NOS_NAME("nos.utilities.StbiLoad"), NOS_NAME("nos.mediaio.StbiLoad")},
 			{NOS_NAME("nos.utilities.WriteImage"), NOS_NAME("nos.mediaio.WriteImage")},
 			{NOS_NAME("nos.utilities.LoadCubeLUT"), NOS_NAME("nos.mediaio.LoadCubeLUT")},

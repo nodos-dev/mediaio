@@ -408,55 +408,6 @@
 					}
 				]
 			}
-		},
-		{
-			"class_name": "RGBAToBGR24Buffer",
-			"menu_info": {
-				"category": "Media IO",
-				"display_name": "RGBA To BGR24 Buffer Converter",
-				"name_aliases": [
-					"virtual camera format",
-					"B8G8R8",
-					"BGR8",
-					"RGB24",
-					"RGB8"
-				]
-			},
-			"node": {
-				"class_name": "RGBAToBGR24Buffer",
-				"contents_type": "Job",
-				"contents": {
-					"type": "nos.sys.vulkan.GPUNode",
-					"options": {
-						"shader": "Shaders/RGBAToBGR24.comp",
-						"stage": "COMPUTE"
-					}
-				},
-				"pins": [
-					{
-						"name": "Source",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "DispatchSize",
-						"type_name": "nos.fb.vec2u",
-						"show_as": "PROPERTY",
-						"can_show_as": "PROPERTY_ONLY",
-						"data": {
-							"x": 120,
-							"y": 120
-						}
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					}
-				]
-			}
 		}
 	],
 	"schema_version": "1.4-v1"
