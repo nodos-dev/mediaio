@@ -1,0 +1,44 @@
+include "Types/Types.fbs";
+include "Types/Sync.fbs";
+include "Types/Audio.fbs";
+
+namespace nos.mediaio;
+
+table BufferSyncTuple
+{
+    buffer: nos.sys.vulkan.Buffer;
+    wait_gpu: nos.sys.vulkan.GPUEventHolder;
+    host_promise: nos.sync.Promise;
+}
+
+table TextureSyncTuple
+{
+    texture: nos.sys.vulkan.Texture;
+    wait_gpu: nos.sys.vulkan.GPUEventHolder;
+    host_promise: nos.sync.Promise;
+}
+
+table AudioSyncTuple
+{
+    audio_packet: nos.audio.AudioPacket;
+    wait_gpu: nos.sys.vulkan.GPUEventHolder;
+    host_promise: nos.sync.Promise;
+}
+
+table AudioTexturePair
+{
+    audio_packet: nos.audio.AudioPacket;
+    texture: nos.sys.vulkan.Texture;
+}
+
+table FrameBufferWithAudioSync
+{
+    audio_packet: AudioSyncTuple;
+    frame_buffer: BufferSyncTuple;
+}
+
+table VideoFrameWithAudioSync
+{
+    audio_packet: AudioSyncTuple;
+    frame: TextureSyncTuple;
+}

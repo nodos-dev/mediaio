@@ -26,6 +26,10 @@
 			{
 				"name": "nos.reflect",
 				"version": "3.0"
+			},
+			{
+				"name": "nos.sync",
+				"version": "11.1"
 			}
 		],
 		"category": "Media I/O"
