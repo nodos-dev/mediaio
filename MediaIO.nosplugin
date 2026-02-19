@@ -18,6 +18,14 @@
 			{
 				"name": "nos.flow",
 				"version": "1.0"
+			},
+			{
+				"name": "nos.math",
+				"version": "2.0"
+			},
+			{
+				"name": "nos.reflect",
+				"version": "3.0"
 			}
 		],
 		"category": "Media I/O"

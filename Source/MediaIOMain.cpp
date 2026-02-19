@@ -30,8 +30,6 @@ enum Nodes : int
 	YUY2ToRGBA,
 	NV12ToRGBA,
 	FieldJuggler,
-	SetFieldType,
-	GetFieldType,
 	Debayer,
 	StbiLoad,
 	WriteImage,
@@ -50,8 +48,6 @@ nosResult RegisterColorSpaceMatrix(nosNodeFunctions*);
 nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
-nosResult RegisterSetFieldType(nosNodeFunctions*);
-nosResult RegisterGetFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
 
 } // namespace nos::mediaio
@@ -98,8 +94,6 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(YUY2ToRGBA)
 				GEN_CASE_NODE(NV12ToRGBA)
 				GEN_CASE_NODE(FieldJuggler)
-				GEN_CASE_NODE(SetFieldType)
-				GEN_CASE_NODE(GetFieldType)
 				GEN_CASE_NODE(Debayer)
 				GEN_CASE_NODE(StbiLoad)
 				GEN_CASE_NODE(WriteImage)
