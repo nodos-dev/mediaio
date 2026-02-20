@@ -4,6 +4,7 @@
 #include <Nodos/Plugin.hpp>
 #include <glm/glm.hpp>
 #include <Builtins_generated.h>
+#include <vector>
 
 #include <nosSysVulkan/nosVulkanSubsystem.h>
 
@@ -27,14 +28,13 @@ enum Nodes : int
 	GammaLUT,
 	ColorSpaceMatrix,
 	YUY2ToRGBA,
-	TextureFormatConverter,
 	NV12ToRGBA,
-	RGBAToBGR24Buffer,
 	FieldJuggler,
-	RGBAToBGRABuffer,
-	SetFieldType,
-	GetFieldType,
 	Debayer,
+	StbiLoad,
+	WriteImage,
+	LoadCubeLUT,
+	ReadImage,
 	Count
 };
 
@@ -46,15 +46,22 @@ nosResult RegisterYUVBufferSizeCalculator(nosNodeFunctions*);
 nosResult RegisterGammaLUT(nosNodeFunctions*);
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions*);
 nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
-nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
-nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
-nosResult RegisterRGBAToBGRABuffer(nosNodeFunctions*);
-nosResult RegisterSetFieldType(nosNodeFunctions*);
-nosResult RegisterGetFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
 
+} // namespace nos::mediaio
+
+namespace nos::mediaio
+{
+nosResult RegisterStbiLoad(nosNodeFunctions*);
+nosResult RegisterWriteImage(nosNodeFunctions*);
+nosResult RegisterLoadCubeLUT(nosNodeFunctions*);
+nosResult RegisterReadImage(nosNodeFunctions*);
+}
+
+namespace nos::mediaio
+{
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
 	nosResult ExportNodeFunctions(size_t& outSize, nosNodeFunctions** outList) override
@@ -85,14 +92,13 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(GammaLUT)
 				GEN_CASE_NODE(ColorSpaceMatrix)
 				GEN_CASE_NODE(YUY2ToRGBA)
-				GEN_CASE_NODE(TextureFormatConverter)
 				GEN_CASE_NODE(NV12ToRGBA)
-				GEN_CASE_NODE(RGBAToBGR24Buffer)
 				GEN_CASE_NODE(FieldJuggler)
-				GEN_CASE_NODE(RGBAToBGRABuffer)
-				GEN_CASE_NODE(SetFieldType)
-				GEN_CASE_NODE(GetFieldType)
 				GEN_CASE_NODE(Debayer)
+				GEN_CASE_NODE(StbiLoad)
+				GEN_CASE_NODE(WriteImage)
+				GEN_CASE_NODE(LoadCubeLUT)
+				GEN_CASE_NODE(ReadImage)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
@@ -112,17 +118,26 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 	outFunctions->OnRequestAPI = Export;
 
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
+		static std::vector<std::pair<nos::Name, nos::Name>> renames = {
+			{NOS_NAME("nos.utilities.StbiLoad"), NOS_NAME("nos.mediaio.StbiLoad")},
+			{NOS_NAME("nos.utilities.WriteImage"), NOS_NAME("nos.mediaio.WriteImage")},
+			{NOS_NAME("nos.utilities.LoadCubeLUT"), NOS_NAME("nos.mediaio.LoadCubeLUT")},
+			{NOS_NAME("nos.utilities.ReadImage"), NOS_NAME("nos.mediaio.ReadImage")},
+			{NOS_NAME("zd.utilities.StbiLoad"), NOS_NAME("nos.mediaio.StbiLoad")},
+			{NOS_NAME("zd.utilities.WriteImage"), NOS_NAME("nos.mediaio.WriteImage")},
+			{NOS_NAME("zd.utilities.LoadCubeLUT"), NOS_NAME("nos.mediaio.LoadCubeLUT")},
+			{NOS_NAME("zd.utilities.ReadImage"), NOS_NAME("nos.mediaio.ReadImage")},
+		};
 		if (!outRenamedFrom)
 		{
-			*outSize = 3;
+			*outSize = renames.size();
 			return;
 		}
-		outRenamedFrom[0] = NOS_NAME("nos.interop.TextureFormatConverter");
-		outRenamedTo[0] = NOS_NAME("nos.mediaio.TextureFormatConverter");
-		outRenamedFrom[1] = NOS_NAME("zd.ndi.RGBAToBGRABuffer");
-		outRenamedTo[1] = NOS_NAME("nos.mediaio.RGBAToBGRABuffer");
-		outRenamedFrom[2] = NOS_NAME("nos.ndi.RGBAToBGRABuffer");
-		outRenamedTo[2] = NOS_NAME("nos.mediaio.RGBAToBGRABuffer");
+		for (size_t i = 0; i < renames.size(); ++i)
+		{
+			outRenamedFrom[i] = renames[i].first;
+			outRenamedTo[i] = renames[i].second;
+		}
 	};
 	return NOS_RESULT_SUCCESS;
 }

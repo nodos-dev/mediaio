@@ -14,6 +14,22 @@
 			{
 				"name": "nos.audio",
 				"version": "1.0"
+			},
+			{
+				"name": "nos.flow",
+				"version": "1.0"
+			},
+			{
+				"name": "nos.math",
+				"version": "2.0"
+			},
+			{
+				"name": "nos.reflect",
+				"version": "3.0"
+			},
+			{
+				"name": "nos.sync",
+				"version": "11.1"
 			}
 		],
 		"category": "Media I/O"

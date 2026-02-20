@@ -1,0 +1,137 @@
+{
+	"nodes": [
+		{
+			"class_name": "StbiLoad",
+			"menu_info": {
+				"category": "Media|Advanced",
+				"display_name": "STBI Load",
+				"name_aliases": [
+					"Load",
+					"Texture",
+					"Image",
+					"JPEG",
+					"JPG",
+					"PNG",
+					"TGA",
+					"BMP",
+					"PSD",
+					"GIF",
+					"HDR",
+					"PIC"
+				]
+			},
+			"node": {
+				"class_name": "StbiLoad",
+				"contents_type": "Job",
+				"description": "Reads an image file from filesystem using STB library",
+				"pins": [
+					{
+						"name": "Path",
+						"type_name": "string",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "Supported filetypes (with some limitations):\nJPEG, PNG, TGA, BMP, PSD, GIF, HDR, PIC",
+						"visualizers": [
+							{
+								"type": "FILE_PICKER",
+								"file_extensions": [
+									"png",
+									"jpg",
+									"jpeg",
+									"tga",
+									"bmp",
+									"psd"
+								],
+								"file_picker_type": "OPEN"
+							}
+						]
+					},
+					{
+						"name": "sRGB",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": false
+					},
+					{
+						"name": "Out",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+					}
+				],
+				"functions": []
+			}
+		},
+		{
+			"class_name": "WriteImage",
+			"menu_info": {
+				"category": "Media",
+				"display_name": "Write Image",
+				"name_aliases": [
+					"Save texture to disk",
+					"JPEG",
+					"JPG",
+					"PNG",
+					"TGA",
+					"BMP",
+					"PSD",
+					"GIF",
+					"HDR",
+					"PIC"
+				]
+			},
+			"node": {
+				"class_name": "WriteImage",
+				"contents_type": "Job",
+				"description": "Writes an image file to filesystem using STB library",
+				"pins": [],
+				"functions": [
+					{
+						"class_name": "WriteImage_Save",
+						"contents_type": "Job",
+						"pins": [
+							{
+								"name": "Path",
+								"type_name": "string",
+								"show_as": "PROPERTY",
+								"can_show_as": "INPUT_PIN_OR_PROPERTY",
+								"visualizers": [
+									{
+										"type": "FILE_PICKER",
+										"file_extensions": [
+											"png",
+											"jpg",
+											"jpeg",
+											"tga",
+											"bmp",
+											"psd"
+										],
+										"file_picker_type": "SAVE"
+									}
+								]
+							},
+							{
+								"name": "IncludeAlpha",
+								"type_name": "bool",
+								"data": true,
+								"show_as": "PROPERTY",
+								"can_show_as": "INPUT_PIN_OR_PROPERTY"
+							},
+							{
+								"name": "In",
+								"type_name": "nos.sys.vulkan.Texture",
+								"show_as": "INPUT_PIN",
+								"can_show_as": "INPUT_PIN",
+								"data": {
+									"format": "R8G8B8A8_UNORM"
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	],
+	"schema_version": "1.4-v1"
+}
