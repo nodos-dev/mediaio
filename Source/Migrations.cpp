@@ -11,7 +11,9 @@ namespace nos::mediaio
 
 nosResult MigrateReadImageToGraph(nosFbNodePtr node, nosBuffer* outBuffer) {
 	auto pluginVersion = node->plugin_version();
-	bool needsMigration = !pluginVersion || pluginVersion->major() <= 2 || (pluginVersion->major() == 3 && pluginVersion->minor() < 10);
+	bool needsMigration = false;
+	// TODO: This was moved from nos.utilities. So check that.
+	// needsMigration = !pluginVersion || pluginVersion->major() <= 2 || (pluginVersion->major() == 3 && pluginVersion->minor() < 10);
 	if (!needsMigration)
 		return NOS_RESULT_SUCCESS;
 	fb::TNode cur;
