@@ -75,8 +75,8 @@ struct WriteImage : NodeContext
 		nos::NodeExecuteParams execParams(params->FunctionNodeExecuteParams);
 
 		std::unique_lock<std::mutex> lock(Mutex);
-		Path = nos::Utf8ToPath(std::string(execParams.GetPinData<const char*>(NSN_Path)));
-		IncludeAlpha = *execParams.GetPinData<bool>(NSN_IncludeAlpha);
+		Path = nos::Utf8ToPath(std::string(execParams.GetPinValue<const char*>(NSN_Path)));
+		IncludeAlpha = *execParams.GetPinValue<bool>(NSN_IncludeAlpha);
 		assert(Event == 0);
 		nosCmd cmd = sys::vulkan::BeginCmd(NOS_NAME("Write Image Copy To"), NodeId);
 		auto inputTex = execParams.GetPinObject<sys::vulkan::Texture>(NSN_In);

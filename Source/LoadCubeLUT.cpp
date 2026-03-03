@@ -132,7 +132,7 @@ struct LoadCubeLUTContext : NodeContext
 	{
 		nos::uuid outPinId = params[NSN_Out].Id;
 		std::filesystem::path FilePath =
-			nos::Utf8ToPath(params.GetPinData<const char>(NSN_Path));
+			nos::Utf8ToPath(params.GetPinValue<const char>(NSN_Path));
 		return LoadCubeFile(FilePath, outPinId);
 	}
 

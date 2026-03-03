@@ -69,7 +69,7 @@ struct FieldJugglerNode : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		bool isInterlaced = *params.GetPinData<bool>(NOS_NAME("IsInterlaced"));
+		bool isInterlaced = *params.GetPinValue<bool>(NOS_NAME("IsInterlaced"));
 		if (!isInterlaced)
 		{
 			Field = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;

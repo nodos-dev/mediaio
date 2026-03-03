@@ -88,8 +88,8 @@ struct RGB2YCbCrNodeContext : NodeContext
 		auto outputBufInfo = sys::vulkan::GetResourceInfo(outputBuf);
 		nosTextureFieldType inputFieldType = sys::vulkan::GetResourceFieldType(inputTex);
 		auto outputFieldType = inputFieldType;
-		auto isOutInterlaced = *params.GetPinData<bool>(NOS_NAME("IsOutputInterlaced"));
-		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto isOutInterlaced = *params.GetPinValue<bool>(NOS_NAME("IsOutputInterlaced"));
+		auto fmt = *params.GetPinValue<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
 
 		bool isInInterlaced = sys::vulkan::IsTextureFieldTypeInterlaced(inputFieldType);
 
@@ -126,7 +126,7 @@ struct RGB2YCbCrNodeContext : NodeContext
 			nosVulkan->SetResourceFieldType(bufObj, outputFieldType);
 		}
 		SetPinValue(NOS_NAME("DispatchSize"),
-					GetSuitableDispatchSize(*params.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
+					GetSuitableDispatchSize(*params.GetPinValue<nosVec2u>(NOS_NAME("DispatchSize")),
 											yCbCrExt,
 											fmt == YCbCrPixelFormat::V210 ? 10 : 8,
 											isOutInterlaced));
@@ -155,8 +155,8 @@ struct YCbCr2RGBNodeContext : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
-		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto fmt = *params.GetPinValue<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto res = *params.GetPinValue<nos::fb::vec2u>(NOS_NAME("Resolution"));
 		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Source"));
 		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);
 		if (!inputBufInfo || !inputBuf.IsValid())
@@ -195,7 +195,7 @@ struct YCbCr2RGBNodeContext : NodeContext
 		}
 
 		SetPinValue(NOS_NAME("DispatchSize"),
-					GetSuitableDispatchSize(*params.GetPinData<nosVec2u>(NOS_NAME("DispatchSize")),
+					GetSuitableDispatchSize(*params.GetPinValue<nosVec2u>(NOS_NAME("DispatchSize")),
 											yCbCrExt,
 											fmt == YCbCrPixelFormat::V210 ? 10 : 8,
 											isInterlaced));
@@ -213,9 +213,9 @@ struct YUVBufferSizeCalculator : NodeContext
 {
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
-		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
-		auto isInterlaced = *params.GetPinData<bool>(NOS_NAME("IsInterlaced"));
+		auto fmt = *params.GetPinValue<YCbCrPixelFormat>(NOS_NAME("PixelFormat"));
+		auto res = *params.GetPinValue<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto isInterlaced = *params.GetPinValue<bool>(NOS_NAME("IsInterlaced"));
 		nosVec2u ext = {res.x(), res.y()};
 		nosVec2u yCbCrExt = GetYCbCrBufferResolution(ext, fmt, isInterlaced);
 		uint64_t bufSize = yCbCrExt.x * yCbCrExt.y * 4;
@@ -250,8 +250,8 @@ struct GammaLUTNodeContext : NodeContext
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
 		auto outputBuf = params.GetPinObject<sys::vulkan::Buffer>(NSN_LUT);
-		const auto& curve = *params.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve"));
-		const auto& dir = *params.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
+		const auto& curve = *params.GetPinValue<GammaCurve>(NOS_NAME_STATIC("GammaCurve"));
+		const auto& dir = *params.GetPinValue<GammaConversionType>(NOS_NAME_STATIC("Type"));
 		if (Curve == curve && Type == dir)
 			return NOS_RESULT_SUCCESS;
 		constexpr auto outMemoryFlags = NOS_MEMORY_FLAGS_DEVICE_MEMORY;
@@ -380,10 +380,10 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		const auto& colorSpace = *params.GetPinData<ColorSpace>(NOS_NAME_STATIC("ColorSpace"));
-		auto fmt = *params.GetPinData<YCbCrPixelFormat>(NOS_NAME_STATIC("PixelFormat"));
-		const auto& dir = *params.GetPinData<GammaConversionType>(NOS_NAME_STATIC("Type"));
-		auto narrowRange = *params.GetPinData<bool>(NOS_NAME_STATIC("NarrowRange"));
+		const auto& colorSpace = *params.GetPinValue<ColorSpace>(NOS_NAME_STATIC("ColorSpace"));
+		auto fmt = *params.GetPinValue<YCbCrPixelFormat>(NOS_NAME_STATIC("PixelFormat"));
+		const auto& dir = *params.GetPinValue<GammaConversionType>(NOS_NAME_STATIC("Type"));
+		auto narrowRange = *params.GetPinValue<bool>(NOS_NAME_STATIC("NarrowRange"));
 		glm::mat4 matrix = GetMatrix<double>(colorSpace, fmt == YCbCrPixelFormat::V210 ? 10 : 8, narrowRange);
 		if (dir == GammaConversionType::DECODE)
 			matrix = glm::inverse(matrix);
@@ -402,7 +402,7 @@ struct YUY2ToRGBANodeContext : NodeContext
 {
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto res = *params.GetPinValue<nos::fb::vec2u>(NOS_NAME("Resolution"));
 		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
 		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Input"));
 		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);
@@ -445,7 +445,7 @@ struct NV12ToRGBANodeContext : NodeContext
 {
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
-		auto res = *params.GetPinData<nos::fb::vec2u>(NOS_NAME("Resolution"));
+		auto res = *params.GetPinValue<nos::fb::vec2u>(NOS_NAME("Resolution"));
 		auto outputTex = params.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
 		auto inputBuf = params.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Input"));
 		auto inputBufInfo = sys::vulkan::GetResourceInfo(inputBuf);

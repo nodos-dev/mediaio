@@ -30,10 +30,10 @@ struct DebayerContext : NodeContext
 
 		auto left = params.GetPinObject<nos::sys::vulkan::Buffer>(NOS_NAME("SourceLeft"));
 		auto right = params.GetPinObject<nos::sys::vulkan::Buffer>(NOS_NAME("SourceRight"));
-		uint32_t bitwidth  = 8u + 2u * (*params.GetPinData<uint32_t>(NOS_NAME("BitWidth")));
-		uint32_t wb  = *params.GetPinData<uint32_t>(NOS_NAME("WhiteBalance"));
+		uint32_t bitwidth  = 8u + 2u * (*params.GetPinValue<uint32_t>(NOS_NAME("BitWidth")));
+		uint32_t wb  = *params.GetPinValue<uint32_t>(NOS_NAME("WhiteBalance"));
 
-		auto sens  = *params.GetPinData<nos::mediaio::ISOSensitivity>(NOS_NAME("ISOSensitivity"));
+		auto sens  = *params.GetPinValue<nos::mediaio::ISOSensitivity>(NOS_NAME("ISOSensitivity"));
 
         // Determine dynamic range scaling factor based on ISO sensitivity setting.
         // Lower effective ISO values yield higher dynamic range (smaller drangeScale).

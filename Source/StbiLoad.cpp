@@ -40,8 +40,8 @@ struct StbiLoadContext : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override {
 		nos::uuid outPinId = params[NSN_Out].Id;
-		bool sRGB = *params.GetPinData<bool>(NSN_sRGB);
-		std::filesystem::path FilePath = nos::Utf8ToPath(params.GetPinData<const char*>(NSN_Path));
+		bool sRGB = *params.GetPinValue<bool>(NSN_sRGB);
+		std::filesystem::path FilePath = nos::Utf8ToPath(params.GetPinValue<const char*>(NSN_Path));
 		return LoadImage(FilePath, outPinId, sRGB);
 	}
 
