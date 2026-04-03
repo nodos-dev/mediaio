@@ -1,8 +1,8 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 
-#include "GammaFunctions.glsl"
 #extension GL_EXT_shader_16bit_storage : enable
 
+#include "GammaFunctions.glsl"
 struct umat4
 {
     uvec4 x, y, z, w;
@@ -73,12 +73,15 @@ vec4  SDR_In (in vec3 c)
 
 vec4  SDR_In_N (in uvec3 c, float N) 
 { 
-    return  vec4(IDXff((ubo.Colorspace * vec4(c / N, 1)).xyz), 1); 
+    vec3 v = (ubo.Colorspace * vec4(c / N, 1)).xyz;
+    v = ubo.UseLUT ? IDXff(v) : ToLinear(v, ubo.GammaCurve);
+    return  vec4(c, 1); 
 }
 
 uvec3 SDR_Out_N(in vec3 c, float N)  
 { 
-    return uvec3(round(clamp(ubo.Colorspace * vec4(IDXff(c), 1), 0.0, 1.0).xyz * N)); 
+    c = ubo.UseLUT ? IDXff(c) : FromLinear(c, ubo.GammaCurve);
+    return uvec3(round(clamp(ubo.Colorspace * vec4(c, 1), 0.0, 1.0).xyz * N)); 
 }
 
 vec4  SDR_In_10 (in uvec3 c) { return SDR_In_N (c, N10); }
