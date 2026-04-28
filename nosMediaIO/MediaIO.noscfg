@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.8.0"
+			"version": "2.9.0"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -27,7 +27,8 @@
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
-		"Config/SensorInfo.fbs"
+		"Config/SensorInfo.fbs",
+		"Config/ANC.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"
