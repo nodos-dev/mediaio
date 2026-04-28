@@ -33,6 +33,7 @@ enum Nodes : int
 	FieldJuggler,
 	SetInterlacedFieldType,
 	Debayer,
+	ExtractTimecode,
 	Count
 };
 
@@ -50,6 +51,7 @@ nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
 nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
+nosResult RegisterExtractTimecode(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -87,6 +89,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(FieldJuggler)
 				GEN_CASE_NODE(SetInterlacedFieldType)
 				GEN_CASE_NODE(Debayer)
+				GEN_CASE_NODE(ExtractTimecode)
 			}
 		}
 		return NOS_RESULT_SUCCESS;

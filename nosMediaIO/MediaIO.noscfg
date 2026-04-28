@@ -23,7 +23,8 @@
 		"Config/SetBufferFieldType.nosdef",
 		"Config/GetLumaCoeffs.nosdef",
 		"Config/SetInterlacedFieldType.nosdef",
-		"Config/Debayer.nosdef"
+		"Config/Debayer.nosdef",
+		"Config/ExtractTimecode.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",

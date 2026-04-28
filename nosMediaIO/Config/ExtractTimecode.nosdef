@@ -1,0 +1,76 @@
+{
+    "nodes": [
+        {
+            "class_name": "ExtractTimecode",
+            "menu_info": {
+                "category": "Media IO|ANC",
+                "display_name": "Extract Timecode"
+            },
+            "node": {
+                "class_name": "ExtractTimecode",
+                "display_name": "Extract Timecode",
+                "contents_type": "Job",
+                "description": "Decodes a SMPTE ST 12-2 Ancillary Timecode (ATC) packet from an ANCFrame and emits the timecode as a string and as a frame number.",
+              "pins": [
+                {
+                  "name": "Source",
+                  "display_name": "Source",
+                  "type_name": "nos.mediaio.ATCSource",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used when converting HH:MM:SS:FF to a frame number and applying drop-frame correction. Leave at 0 to auto-infer from the executing path's timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "HH:MM:SS:FF (':' separator), or HH:MM:SS;FF when drop-frame.",
+                  "type_name": "string",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "FrameNumber",
+                  "display_name": "Frame Number",
+                  "description": "Total frames since 00:00:00:00, with SMPTE drop-frame correction applied for 29.97/59.94 streams when the drop-frame flag is set.",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "Valid",
+                  "display_name": "Valid",
+                  "description": "True if a matching ATC packet was found and decoded this tick.",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "DropFrame",
+                  "display_name": "Drop Frame",
+                  "description": "Drop-frame flag from the decoded ATC packet (DBB2 bit 7 for ATC_LTC, frame-tens nibble bit 2 for VITC).",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "ANCFrame",
+                  "display_name": "ANC Frame",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ]
+}

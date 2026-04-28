@@ -24,6 +24,17 @@ enum ANCDataLink : uint
     B = 2,
 }
 
+// SDI sub-stream identifier in multi-stream signals (quad-link 4K, 12G-SDI).
+// Orthogonal to ANCDataLink (which selects the dual-link 1.5G physical link).
+enum ANCDataStream : uint
+{
+    Unknown = 0,
+    DS1 = 1,
+    DS2 = 2,
+    DS3 = 3,
+    DS4 = 4,
+}
+
 // A single SMPTE 291 ancillary data packet.
 // Variable-length payload (DC = payload.size()) — flatbuffers requires a table for this.
 table ANCPacket
@@ -35,6 +46,7 @@ table ANCPacket
     space: ANCDataSpace;
     channel: ANCDataChannel;
     link: ANCDataLink;
+    stream: ANCDataStream; // Logical SDI sub-stream (DS1..DS4) in quad-link / 12G
     is_field2: bool;       // True if this packet belongs to field 2 (interlaced sources)
     payload: [ubyte];      // SMPTE 291 user data words, one per byte
 }
@@ -43,4 +55,14 @@ table ANCPacket
 table ANCFrame
 {
     packets: [ANCPacket];
+}
+
+// SMPTE ST 12-2 Ancillary Timecode flavor selector. Encoded in DBB1 bits 2-0
+// of the ATC packet (DID=0x60, SDID=0x60).
+enum ATCSource : uint
+{
+    Auto = 0,    // Pick the first valid ATC packet found, preferring LTC.
+    ATC_LTC = 1,
+    ATC_VITC1 = 2,
+    ATC_VITC2 = 3,
 }
