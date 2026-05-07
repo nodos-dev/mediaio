@@ -299,6 +299,20 @@ struct GammaLUTNodeContext : NodeContext
                         : [](double c) -> double { return (c <= 0.0031308) ? (c * 12.92) : (pow(c, 1.0/2.4) * 1.055 - 0.055); };
         case GammaCurve::IDENTITY:
             return [](double c) { return c; };
+		case GammaCurve::SLOG3:
+			// Sony S-Log3 (full-range, normalized 0..1 code value).
+			// Linear breakpoint 0.01125 → code 171.2102946929/1023 ≈ 0.16739.
+			return toLinear
+				? [](double c) -> double {
+					return (c >= 171.2102946929 / 1023.0)
+						? (pow(10.0, (c * 1023.0 - 420.0) / 261.5) * 0.19 - 0.01)
+						: ((c * 1023.0 - 95.0) * 0.01125 / (171.2102946929 - 95.0));
+				}
+				: [](double c) -> double {
+					return (c >= 0.01125)
+						? ((420.0 + log10((c + 0.01) / 0.19) * 261.5) / 1023.0)
+						: ((c * (171.2102946929 - 95.0) / 0.01125 + 95.0) / 1023.0);
+				};
 		}
 	}
 
@@ -308,7 +322,8 @@ struct GammaLUTNodeContext : NodeContext
 		auto fn = GetLUTFunction(toLinear, curve);
 		for (uint32_t i = 0; i < 1 << bits; ++i)
 		{
-			re[i] = uint16_t(double((1 << 16) - 1) * fn(double(i) / double((1 << bits) - 1)) + 0.5);
+			double v = glm::clamp(fn(double(i) / double((1 << bits) - 1)), 0.0, 1.0);
+			re[i] = uint16_t(double((1 << 16) - 1) * v + 0.5);
 		}
 		return re;
 	}
@@ -334,6 +349,13 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 			return { .299, .114 };
 		case ColorSpace::REC2020:
 			return { .2627, .0593 };
+		// Sony S-Gamut3 / S-Gamut3.Cine luma (R, B) coefficients, derived from the
+		// published primaries against D65 white. Blue is negative because the blue
+		// primary lies outside the spectral locus.
+		case ColorSpace::SGAMUT3:
+			return { 0.2709805, -0.0575869 };
+		case ColorSpace::SGAMUT3CINE:
+			return { 0.2150825, -0.1001485 };
 		case ColorSpace::REC709:
 		default:
 			return { .2126, .0722 };
@@ -396,6 +418,49 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions* funcs)
 {
 	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.ColorSpaceMatrix"), ColorSpaceMatrixNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+struct SLog3GammaPassNodeContext : NodeContext
+{
+	using NodeContext::NodeContext;
+
+	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	{
+		nos::NodeExecuteParams execParams(params);
+		auto input = vkss::DeserializeTextureInfo(execParams[NOS_NAME_STATIC("Source")].Data->Data);
+		auto& output = *InterpretPinValue<sys::vulkan::Texture>(execParams[NOS_NAME_STATIC("Output")].Data->Data);
+
+		constexpr auto reqFormat = NOS_FORMAT_R16G16B16A16_SFLOAT;
+		const uint32_t w = input.Info.Texture.Width;
+		const uint32_t h = input.Info.Texture.Height;
+		if (output.width() != w || output.height() != h || (nosFormat)output.format() != reqFormat)
+		{
+			nosResourceShareInfo tex{.Info = {
+				.Type = NOS_RESOURCE_TYPE_TEXTURE,
+				.Texture = {
+					.Width = w,
+					.Height = h,
+					.Format = reqFormat,
+					.FieldType = input.Info.Texture.FieldType,
+				}}};
+			nosEngine.SetPinValueByName(NodeId, NOS_NAME_STATIC("Output"), nos::Buffer::From(vkss::ConvertTextureInfo(tex)));
+		}
+		nosEngine.SetPinValue(execParams[NOS_NAME_STATIC("DispatchSize")].Id,
+			nos::Buffer::From(nosVec2u(uint32_t(glm::ceil(w / 16.0f)), uint32_t(glm::ceil(h / 16.0f)))));
+		return nosVulkan->ExecuteGPUNode(this, params);
+	}
+};
+
+nosResult RegisterSLog3ToLinear(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.SLog3ToLinear"), SLog3GammaPassNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+nosResult RegisterLinearToSLog3(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.LinearToSLog3"), SLog3GammaPassNodeContext, funcs);
 	return NOS_RESULT_SUCCESS;
 }
 

@@ -1,0 +1,18 @@
+// Copyright MediaZ Teknoloji A.S. All Rights Reserved.
+
+#version 450
+#include "GammaFunctions.glsl"
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout (binding = 0) uniform sampler2D Source;
+layout (binding = 1, rgba16f) uniform writeonly image2D Output;
+
+void main()
+{
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = textureSize(Source, 0);
+    if (coord.x >= size.x || coord.y >= size.y) return;
+    vec4 c = texelFetch(Source, coord, 0);
+    imageStore(Output, coord, vec4(LinearToSLog3(c.rgb), c.a));
+}

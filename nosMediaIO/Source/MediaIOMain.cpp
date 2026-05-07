@@ -34,6 +34,8 @@ enum Nodes : int
 	SetInterlacedFieldType,
 	Debayer,
 	ExtractTimecode,
+	SLog3ToLinear,
+	LinearToSLog3,
 	Count
 };
 
@@ -52,6 +54,8 @@ nosResult RegisterFieldJuggler(nosNodeFunctions*);
 nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
 nosResult RegisterExtractTimecode(nosNodeFunctions*);
+nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
+nosResult RegisterLinearToSLog3(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -90,6 +94,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(SetInterlacedFieldType)
 				GEN_CASE_NODE(Debayer)
 				GEN_CASE_NODE(ExtractTimecode)
+				GEN_CASE_NODE(SLog3ToLinear)
+				GEN_CASE_NODE(LinearToSLog3)
 			}
 		}
 		return NOS_RESULT_SUCCESS;

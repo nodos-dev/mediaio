@@ -6,6 +6,8 @@ enum ColorSpace : uint {
     REC709  = 0,
     REC601  = 1,
     REC2020 = 2,
+    SGAMUT3 = 3,
+    SGAMUT3CINE = 4,
 }
 
 // must match GammaFunctions.glsl
@@ -15,6 +17,7 @@ enum GammaCurve : uint {
     ST2084 = 2,
     SRGB = 3,
     IDENTITY = 4,
+    SLOG3 = 5,
 }
 
 enum GammaConversionType : uint {
