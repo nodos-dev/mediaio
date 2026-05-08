@@ -24,7 +24,8 @@
 		"Config/GetLumaCoeffs.nosdef",
 		"Config/SetInterlacedFieldType.nosdef",
 		"Config/Debayer.nosdef",
-		"Config/ExtractTimecode.nosdef"
+		"Config/ExtractTimecode.nosdef",
+		"Config/InjectTimecode.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
