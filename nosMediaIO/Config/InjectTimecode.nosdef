@@ -12,68 +12,68 @@
                 "contents_type": "Job",
                 "always_execute": true,
                 "description": "Encodes a SMPTE ST 12-2 Ancillary Timecode (ATC) packet from a frame number and injects it into\nan ANCFrame. Existing ATC packets matching the selected source flavor (ATC_LTC/VITC1/VITC2) are\nstripped and replaced; all other packets pass through unchanged. If the input ANCFrame is empty\nor unset, a fresh ANCFrame containing only the encoded ATC packet is produced. Also outputs the\nencoded HH:MM:SS:FF (or HH:MM:SS;FF for drop-frame) string for inspection.",
-                "pins": [
-                    {
-                        "name": "ANCFrame",
-                        "display_name": "ANC Frame",
-                        "description": "Optional source ANC frame. Packets other than the selected ATC flavor are forwarded verbatim.\nLeave unconnected to emit a fresh frame containing only the timecode packet.",
-                        "type_name": "nos.mediaio.ANCFrame",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "FrameNumber",
-                        "display_name": "Frame Number",
-                        "description": "Total frames since 00:00:00:00. Converted to HH:MM:SS:FF using FrameRateOverride (or\nauto-inferred rate) with SMPTE drop-frame correction applied when DropFrame is true.",
-                        "type_name": "uint",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": 0
-                    },
-                    {
-                        "name": "FrameRateOverride",
-                        "display_name": "Frame Rate Override",
-                        "description": "Optional override for the frame rate used when converting frame number to HH:MM:SS:FF. Leave at\n0 to auto-infer from the executing path's fixed-step timing.",
-                        "type_name": "float",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": 0.0,
-                        "min": "0"
-                    },
-                    {
-                        "name": "DropFrame",
-                        "display_name": "Drop Frame",
-                        "description": "When true, encodes the drop-frame flag in the ATC payload and applies SMPTE drop-frame math on\nthe frame-number-to-timecode conversion. Use for 29.97/59.94 streams.",
-                        "type_name": "bool",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": false
-                    },
-                    {
-                        "name": "Source",
-                        "display_name": "Source",
-                        "description": "ATC flavor encoded in DBB1 bits 2-0. Auto is treated as ATC_LTC for injection.",
-                        "type_name": "nos.mediaio.ATCSource",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": 1
-                    },
-                    {
-                        "name": "Out",
-                        "display_name": "Out",
-                        "type_name": "nos.mediaio.ANCFrame",
-                        "show_as": "OUTPUT_PIN",
-                        "can_show_as": "OUTPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "Timecode",
-                        "display_name": "Timecode",
-                        "description": "HH:MM:SS:FF (':' separator), or HH:MM:SS;FF when DropFrame is true. Reflects what was encoded\ninto the injected ATC packet.",
-                        "type_name": "string",
-                        "show_as": "OUTPUT_PIN",
-                        "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
-                    }
-                ]
+              "pins": [
+                {
+                  "name": "FrameNumber",
+                  "display_name": "Frame Number",
+                  "description": "Total frames since 00:00:00:00. Converted to HH:MM:SS:FF using FrameRateOverride (or\nauto-inferred rate) with SMPTE drop-frame correction applied when DropFrame is true.",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used when converting frame number to HH:MM:SS:FF. Leave at\n0 to auto-infer from the executing path's fixed-step timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "DropFrame",
+                  "display_name": "Drop Frame",
+                  "description": "When true, encodes the drop-frame flag in the ATC payload and applies SMPTE drop-frame math on\nthe frame-number-to-timecode conversion. Use for 29.97/59.94 streams.",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": false
+                },
+                {
+                  "name": "Source",
+                  "display_name": "Source",
+                  "description": "ATC flavor encoded in DBB1 bits 2-0. Auto is treated as ATC_LTC for injection.",
+                  "type_name": "nos.mediaio.ATCSource",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 1
+                },
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "HH:MM:SS:FF (':' separator), or HH:MM:SS;FF when DropFrame is true. Reflects what was encoded\ninto the injected ATC packet.",
+                  "type_name": "string",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "Out",
+                  "display_name": "Out",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                },
+                {
+                  "name": "ANCFrame",
+                  "display_name": "ANC Frame",
+                  "description": "Optional source ANC frame. Packets other than the selected ATC flavor are forwarded verbatim.\nLeave unconnected to emit a fresh frame containing only the timecode packet.",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY"
+                }
+              ]
             }
         }
     ]
