@@ -25,6 +25,7 @@ struct DecodedTC
 	bool DropFrame;
 	bool ColorFrame;
 	uint8_t DBB1Type; // bits 2-0 of DBB1: 0=LTC, 1=VITC1, 2=VITC2, ...
+	uint8_t FieldID;  // HFR pair-encoding field flag (0/1); always 0 below 40 fps.
 };
 
 // SMPTE ST 12-2 ATC payload layout (16 user data words, one byte per UDW).
@@ -39,7 +40,15 @@ struct DecodedTC
 //   [10] minute tens + BG flag  [11] BG6
 //   [12] hour units             [13] BG7
 //   [14] hour tens + flags      [15] BG8
-bool DecodeATCPayload(const uint8_t* p, size_t n, DecodedTC& out)
+//
+// HFR FieldID (frame rates >= 40 fps, ST 12-1:2014 Section 12.1): the wire
+// frame field carries half the actual frame count (0..30) and a 1-bit
+// FieldID picks even/odd of the pair. Symmetric with InjectTimecode's
+// EncodeATCPayload — bit position depends on family and DBB1Type:
+//   PAL family (25/50) + VITC carriage (DBB1=1/2): bit 7 of UDW2  (out[2])
+//   PAL family (25/50) + LTC carriage  (DBB1=0):   bit 7 of UDW14 (out[14])
+//   NTSC family / 48:                              bit 7 of UDW6  (out[6])
+bool DecodeATCPayload(const uint8_t* p, size_t n, int fpsRound, DecodedTC& out)
 {
 	if (!p || n < 16)
 		return false;
@@ -48,7 +57,7 @@ bool DecodeATCPayload(const uint8_t* p, size_t n, DecodedTC& out)
 	const uint8_t secTens   = hi(6);
 	const uint8_t minTens   = hi(10);
 	const uint8_t hourTens  = hi(14);
-	out.Frames     = uint8_t(hi(0)  + (frameTens & 0x3) * 10);
+	uint8_t frames = uint8_t(hi(0) + (frameTens & 0x3) * 10);
 	out.DropFrame  = (frameTens & 0x4) != 0;
 	out.ColorFrame = (frameTens & 0x8) != 0;
 	out.Seconds    = uint8_t(hi(4)  + (secTens   & 0x7) * 10);
@@ -65,7 +74,27 @@ bool DecodeATCPayload(const uint8_t* p, size_t n, DecodedTC& out)
 	}
 	out.DBB1Type = uint8_t(dbb1 & 0x07);
 
-	return out.Hours < 24 && out.Minutes < 60 && out.Seconds < 60 && out.Frames < 60;
+	if (fpsRound >= 40)
+	{
+		const bool isPalFamily = (fpsRound == 25 || fpsRound == 50);
+		const bool isVITC = (out.DBB1Type == 1 || out.DBB1Type == 2);
+		uint8_t fieldID = 0;
+		if (isPalFamily && isVITC)
+			fieldID = (p[2]  & 0x80) ? 1u : 0u;
+		else if (isPalFamily)
+			fieldID = (p[14] & 0x80) ? 1u : 0u;
+		else
+			fieldID = (p[6]  & 0x80) ? 1u : 0u;
+		out.FieldID = fieldID;
+		out.Frames  = uint8_t(frames * 2 + fieldID);
+	}
+	else
+	{
+		out.FieldID = 0;
+		out.Frames  = frames;
+	}
+
+	return out.Hours < 24 && out.Minutes < 60 && out.Seconds < 60 && out.Frames < uint8_t(fpsRound);
 }
 
 uint32_t TCToFrameNumber(const DecodedTC& tc, float fps)
@@ -138,6 +167,15 @@ struct ExtractTimecodeNode : NodeContext
 			}
 		}
 
+		const int fpsRound = std::max(1, int(std::lround(frameRate)));
+		// Drop-frame is only defined for the NTSC fractional rates (29.97 /
+		// 59.94). If a foreign device misencodes DF=1 on an integer-rate
+		// timeline, ignore the flag for frame-number arithmetic so we don't
+		// apply NTSC drop-math to a non-NTSC stream.
+		const bool isNtscFamily =
+			std::abs(frameRate - 29.97f) < 0.05f ||
+			std::abs(frameRate - 59.94f) < 0.05f;
+
 		DecodedTC best{};
 		int bestPriority = INT_MAX;
 		bool found = false;
@@ -153,7 +191,7 @@ struct ExtractTimecodeNode : NodeContext
 				if (!payload)
 					continue;
 				DecodedTC tc{};
-				if (!DecodeATCPayload(payload->data(), payload->size(), tc))
+				if (!DecodeATCPayload(payload->data(), payload->size(), fpsRound, tc))
 					continue;
 				if (!MatchesSource(tc.DBB1Type, source))
 					continue;
@@ -171,13 +209,17 @@ struct ExtractTimecodeNode : NodeContext
 
 		if (found)
 		{
+			const bool effectiveDropFrame = best.DropFrame && isNtscFamily;
+			DecodedTC forFrameNumber = best;
+			forFrameNumber.DropFrame = effectiveDropFrame;
+
 			char buf[16];
 			std::snprintf(buf, sizeof(buf), "%02u:%02u:%02u%c%02u",
 				unsigned(best.Hours), unsigned(best.Minutes), unsigned(best.Seconds),
-				best.DropFrame ? ';' : ':', unsigned(best.Frames));
+				effectiveDropFrame ? ';' : ':', unsigned(best.Frames));
 			SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer(buf, std::strlen(buf) + 1));
-			SetPinValue(NOS_NAME_STATIC("FrameNumber"), nos::Buffer::From(TCToFrameNumber(best, frameRate)));
-			SetPinValue(NOS_NAME_STATIC("DropFrame"), nos::Buffer::From(best.DropFrame));
+			SetPinValue(NOS_NAME_STATIC("FrameNumber"), nos::Buffer::From(TCToFrameNumber(forFrameNumber, frameRate)));
+			SetPinValue(NOS_NAME_STATIC("DropFrame"), nos::Buffer::From(effectiveDropFrame));
 			SetPinValue(NOS_NAME_STATIC("Valid"), nos::Buffer::From(true));
 		}
 		else
