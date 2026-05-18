@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 #include <vector>
 
@@ -16,45 +15,6 @@ namespace nos::mediaio
 
 namespace
 {
-struct EncodedTC
-{
-	uint8_t Hours;
-	uint8_t Minutes;
-	uint8_t Seconds;
-	uint8_t Frames;
-	bool DropFrame;
-};
-
-// Frame-number to HH:MM:SS:FF, with SMPTE drop-frame correction when requested.
-// Standard Andrew Duncan formulation: project N onto a non-DF timeline by adding
-// back the dropped frames, then do plain modular arithmetic with fpsRound.
-EncodedTC FrameNumberToTC(uint32_t n, float fps, bool dropFrame)
-{
-	const int fpsRound = std::max(1, int(std::lround(fps)));
-	uint32_t projected = n;
-	if (dropFrame)
-	{
-		const int dropPerMin = int(std::lround(fps * 0.066666f));
-		const int framesPerMin = fpsRound * 60 - dropPerMin;
-		const int framesPer10Min = framesPerMin * 10 + dropPerMin;
-		const uint32_t d = n / uint32_t(framesPer10Min);
-		const uint32_t m = n % uint32_t(framesPer10Min);
-		uint32_t addend = uint32_t(dropPerMin) * 9u * d;
-		if (m > uint32_t(dropPerMin))
-			addend += uint32_t(dropPerMin) * ((m - uint32_t(dropPerMin)) / uint32_t(framesPerMin));
-		projected = n + addend;
-	}
-	EncodedTC tc{};
-	tc.DropFrame = dropFrame;
-	tc.Frames    = uint8_t(projected % uint32_t(fpsRound));
-	const uint32_t totalSec = projected / uint32_t(fpsRound);
-	tc.Seconds   = uint8_t(totalSec % 60u);
-	const uint32_t totalMin = totalSec / 60u;
-	tc.Minutes   = uint8_t(totalMin % 60u);
-	tc.Hours     = uint8_t((totalMin / 60u) % 24u);
-	return tc;
-}
-
 uint8_t SourceToDBB1Type(ATCSource source)
 {
 	switch (source)
@@ -67,17 +27,16 @@ uint8_t SourceToDBB1Type(ATCSource source)
 	}
 }
 
-// Inverse of DecodeATCPayload (see ExtractTimecode.cpp). 16-byte SMPTE ST 12-2
-// payload: TC nibbles in HIGH nibble of even bytes, BG nibbles in HIGH nibble
-// of odd bytes (we leave BG zero), DBB1 packed across bytes 0-7 / DBB2 across
-// 8-15 — bit 3 of each UDW, LSB first.
+// 16-byte SMPTE ST 12-2 payload: TC nibbles in HIGH nibble of even bytes, BG
+// nibbles in HIGH nibble of odd bytes (we leave BG zero), DBB1 packed across
+// bytes 0-7 / DBB2 across 8-15 — bit 3 of each UDW, LSB first.
 //
 // For frame rates >= 40 fps (SMPTE ST 12-1:2014 Section 12.1, HFR pair
 // encoding), the on-wire frame field can only represent 0..30, so each TC
 // value is shared by two consecutive video frames and a Field Identification
-// bit toggles between them. The wire frame number is `tc.Frames / 2`, and
-// the FieldID (= `tc.Frames % 2`) goes at a bit position that depends on
-// both frame family and carriage (LTC vs VITC):
+// bit toggles between them. The wire frame number is `frames / 2`, and the
+// FieldID (= `frames % 2`) goes at a bit position that depends on both frame
+// family and carriage (LTC vs VITC):
 //
 //   PAL family (25/50 fps):
 //     - LTC carriage    (DBB1Type=0): LTC  bit 59 → UDW14 bit 7  [Table 3]
@@ -86,30 +45,31 @@ uint8_t SourceToDBB1Type(ATCSource source)
 //     - LTC and VITC both land at UDW6 bit 7 (LTC bit 27 / VITC bit 35).
 //
 // AJA's AJAAncillaryData_Timecode::SetFieldIdFlag uses the LTC bit position
-// regardless of DBB1Type, which ST 12-1 Section 12.2 (Informative) calls
-// out as one of "various implementations" that exist. We follow strict
-// ST 12-1 here so spec-conformant receivers will decode VITC field flag.
-void EncodeATCPayload(const EncodedTC& tc, uint8_t dbb1Type, int fpsRound, bool isPalFamily, uint8_t out[16])
+// regardless of DBB1Type, which ST 12-1 Section 12.2 (Informative) calls out
+// as one of "various implementations" that exist. We follow strict ST 12-1
+// here so spec-conformant receivers will decode VITC field flag.
+void EncodeATCPayload(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t frames,
+	bool dropFrame, uint8_t dbb1Type, int fpsRound, bool isPalFamily, uint8_t out[16])
 {
 	std::memset(out, 0, 16);
 
 	const bool isHFR = fpsRound >= 40;
-	uint8_t wireFrames = tc.Frames;
+	uint8_t wireFrames = frames;
 	uint8_t fieldID = 0;
 	if (isHFR)
 	{
-		fieldID = uint8_t(tc.Frames & 0x1);
-		wireFrames = uint8_t(tc.Frames / 2);
+		fieldID = uint8_t(frames & 0x1);
+		wireFrames = uint8_t(frames / 2);
 	}
 
 	const uint8_t frameUnits = uint8_t(wireFrames % 10);
-	const uint8_t frameTens  = uint8_t((wireFrames / 10) & 0x3) | (tc.DropFrame ? 0x4 : 0x0);
-	const uint8_t secUnits   = uint8_t(tc.Seconds % 10);
-	const uint8_t secTens    = uint8_t((tc.Seconds / 10) & 0x7);
-	const uint8_t minUnits   = uint8_t(tc.Minutes % 10);
-	const uint8_t minTens    = uint8_t((tc.Minutes / 10) & 0x7);
-	const uint8_t hourUnits  = uint8_t(tc.Hours % 10);
-	const uint8_t hourTens   = uint8_t((tc.Hours / 10) & 0x3);
+	const uint8_t frameTens  = uint8_t((wireFrames / 10) & 0x3) | (dropFrame ? 0x4 : 0x0);
+	const uint8_t secUnits   = uint8_t(seconds % 10);
+	const uint8_t secTens    = uint8_t((seconds / 10) & 0x7);
+	const uint8_t minUnits   = uint8_t(minutes % 10);
+	const uint8_t minTens    = uint8_t((minutes / 10) & 0x7);
+	const uint8_t hourUnits  = uint8_t(hours % 10);
+	const uint8_t hourTens   = uint8_t((hours / 10) & 0x3);
 
 	out[0]  = uint8_t(frameUnits << 4);
 	out[2]  = uint8_t(frameTens  << 4);
@@ -148,9 +108,9 @@ struct InjectTimecodeNode : NodeContext
 	{
 		nos::NodeExecuteParams execParams(params);
 		const ANCFrame* in = execParams.GetPinData<ANCFrame>(NOS_NAME_STATIC("ANCFrame"));
-		const uint32_t frameNumber = *execParams.GetPinData<uint32_t>(NOS_NAME_STATIC("FrameNumber"));
-		const bool dropFrame = *execParams.GetPinData<bool>(NOS_NAME_STATIC("DropFrame"));
-		const auto source = *execParams.GetPinData<ATCSource>(NOS_NAME_STATIC("Source"));
+		const Timecode* tc = execParams.GetPinData<Timecode>(NOS_NAME_STATIC("Timecode"));
+		if (!tc)
+			return NOS_RESULT_FAILED;
 
 		float frameRate = *execParams.GetPinData<float>(NOS_NAME_STATIC("FrameRateOverride"));
 		if (frameRate <= 0.0f)
@@ -164,27 +124,16 @@ struct InjectTimecodeNode : NodeContext
 			}
 		}
 
-		const uint8_t dbb1Type = SourceToDBB1Type(source);
+		const uint8_t dbb1Type = SourceToDBB1Type(tc->source());
 		const int fpsRound = std::max(1, int(std::lround(frameRate)));
 		// PAL family per CRP188::FormatIsPAL (25/50 fps) puts the HFR FieldID
 		// at LTC bit 59; everything else (including 48 and 60) puts it at LTC
 		// bit 27. Only matters when fpsRound >= 40.
 		const bool isPalFamily = (fpsRound == 25 || fpsRound == 50);
-		// Drop-frame is only defined for the NTSC fractional rates (29.97 /
-		// 59.94). ST 12-1 Table 3/7: at 24/25/30.0/48/50/60.0 the DF bit is
-		// "unused" and "shall be set to logical zero by Original Sources."
-		// Gate on the actual fractional rate (not the rounded value) so a
-		// user at exactly 30.0 or 60.0 fps with DropFrame=true does not get
-		// NTSC drop-math silently applied to an integer-rate timeline.
-		const bool isNtscFamily =
-			std::abs(frameRate - 29.97f) < 0.05f ||
-			std::abs(frameRate - 59.94f) < 0.05f;
-		const bool effectiveDropFrame = dropFrame && isNtscFamily;
-
-		const EncodedTC tc = FrameNumberToTC(frameNumber, frameRate, effectiveDropFrame);
 
 		uint8_t payload[16];
-		EncodeATCPayload(tc, dbb1Type, fpsRound, isPalFamily, payload);
+		EncodeATCPayload(tc->hours(), tc->minutes(), tc->seconds(), tc->frames(),
+			tc->drop_frame(), dbb1Type, fpsRound, isPalFamily, payload);
 
 		// SMPTE ST 12-2 / RP-188 places ATC on a single field per packet:
 		//   LTC   (DBB1=0): F1 — describes the whole frame.
@@ -275,13 +224,6 @@ struct InjectTimecodeNode : NodeContext
 		fbb.Finish(frameBuilder.Finish());
 
 		SetPinValue(NOS_NAME_STATIC("Out"), nos::Buffer(fbb.Release()));
-
-		char buf[16];
-		std::snprintf(buf, sizeof(buf), "%02u:%02u:%02u%c%02u",
-			unsigned(tc.Hours), unsigned(tc.Minutes), unsigned(tc.Seconds),
-			tc.DropFrame ? ';' : ':', unsigned(tc.Frames));
-		SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer(buf, std::strlen(buf) + 1));
-
 		return NOS_RESULT_SUCCESS;
 	}
 };

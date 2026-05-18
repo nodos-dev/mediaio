@@ -78,3 +78,26 @@ enum ATCSource : uint
     ATC_VITC1 = 2,
     ATC_VITC2 = 3,
 }
+
+// Decoded SMPTE timecode. Self-contained — no frame number, no frame rate;
+// senders and receivers agree on rate via the executing path's fixed-step
+// timing or an explicit rate-override pin. Convert to/from a frame number
+// with TimecodeFromFrameNumber / TimecodeToFrameNumber.
+struct Timecode
+{
+    hours: ubyte;       // 0..23
+    minutes: ubyte;     // 0..59
+    seconds: ubyte;     // 0..59
+    // 0..(fpsRound-1). For high frame rates (>=40 fps) this is the full
+    // 0..59 value, not the wire-halved 0..30 that ST 12-1 carries on a
+    // single ATC packet.
+    frames: ubyte;
+    // Drop-frame flag. Only defined for 29.97/59.94; ignored at integer
+    // rates by consumers that follow ST 12-1.
+    drop_frame: bool;
+    // ATC carriage. ATC_LTC / ATC_VITC1 / ATC_VITC2 select what DBB1 bits 2-0
+    // are encoded as. Auto means "pick the best available" on read; on write
+    // it is treated as ATC_LTC. Flatbuffers struct fields cannot have default
+    // values — the .nosdef defaults handle initial pin state instead.
+    source: ATCSource;
+}

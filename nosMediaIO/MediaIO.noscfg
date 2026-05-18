@@ -25,7 +25,10 @@
 		"Config/SetInterlacedFieldType.nosdef",
 		"Config/Debayer.nosdef",
 		"Config/ExtractTimecode.nosdef",
-		"Config/InjectTimecode.nosdef"
+		"Config/InjectTimecode.nosdef",
+		"Config/TimecodeFromFrameNumber.nosdef",
+		"Config/TimecodeToFrameNumber.nosdef",
+		"Config/TimecodeToString.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",

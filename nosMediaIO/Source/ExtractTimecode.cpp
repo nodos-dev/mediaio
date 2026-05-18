@@ -6,8 +6,6 @@
 #include <climits>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
 
 #include "ANC_generated.h"
 
@@ -97,25 +95,6 @@ bool DecodeATCPayload(const uint8_t* p, size_t n, int fpsRound, DecodedTC& out)
 	return out.Hours < 24 && out.Minutes < 60 && out.Seconds < 60 && out.Frames < uint8_t(fpsRound);
 }
 
-uint32_t TCToFrameNumber(const DecodedTC& tc, float fps)
-{
-	const int fpsRound = std::max(1, int(std::lround(fps)));
-	const uint32_t totalSec = (uint32_t(tc.Hours) * 60u + tc.Minutes) * 60u + tc.Seconds;
-	if (!tc.DropFrame)
-		return totalSec * uint32_t(fpsRound) + tc.Frames;
-
-	// SMPTE drop-frame: drop 2 frames at the start of every minute except every
-	// 10th minute (29.97). Scales linearly with rate (4 dropped per minute at 59.94).
-	const int dropPerMin = int(std::lround(fps * 0.066666f));
-	const int framesPerMin = fpsRound * 60 - dropPerMin;
-	const int framesPer10Min = framesPerMin * 10 + dropPerMin;
-	const int totalMin = int(tc.Hours) * 60 + tc.Minutes;
-	return uint32_t(framesPer10Min) * uint32_t(totalMin / 10)
-		+ uint32_t(framesPerMin) * uint32_t(totalMin % 10)
-		+ uint32_t(tc.Seconds) * uint32_t(fpsRound)
-		+ tc.Frames;
-}
-
 bool MatchesSource(uint8_t dbb1Type, ATCSource source)
 {
 	switch (source)
@@ -137,6 +116,16 @@ int AutoPriority(uint8_t dbb1Type)
 	case 1: return 1;
 	case 2: return 2;
 	default: return 3;
+	}
+}
+
+ATCSource DBB1TypeToSource(uint8_t dbb1Type)
+{
+	switch (dbb1Type)
+	{
+	case 1:  return ATCSource::ATC_VITC1;
+	case 2:  return ATCSource::ATC_VITC2;
+	default: return ATCSource::ATC_LTC;
 	}
 }
 } // namespace
@@ -170,7 +159,7 @@ struct ExtractTimecodeNode : NodeContext
 		const int fpsRound = std::max(1, int(std::lround(frameRate)));
 		// Drop-frame is only defined for the NTSC fractional rates (29.97 /
 		// 59.94). If a foreign device misencodes DF=1 on an integer-rate
-		// timeline, ignore the flag for frame-number arithmetic so we don't
+		// timeline, ignore the flag in the emitted Timecode so consumers don't
 		// apply NTSC drop-math to a non-NTSC stream.
 		const bool isNtscFamily =
 			std::abs(frameRate - 29.97f) < 0.05f ||
@@ -210,24 +199,13 @@ struct ExtractTimecodeNode : NodeContext
 		if (found)
 		{
 			const bool effectiveDropFrame = best.DropFrame && isNtscFamily;
-			DecodedTC forFrameNumber = best;
-			forFrameNumber.DropFrame = effectiveDropFrame;
-
-			char buf[16];
-			std::snprintf(buf, sizeof(buf), "%02u:%02u:%02u%c%02u",
-				unsigned(best.Hours), unsigned(best.Minutes), unsigned(best.Seconds),
-				effectiveDropFrame ? ';' : ':', unsigned(best.Frames));
-			SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer(buf, std::strlen(buf) + 1));
-			SetPinValue(NOS_NAME_STATIC("FrameNumber"), nos::Buffer::From(TCToFrameNumber(forFrameNumber, frameRate)));
-			SetPinValue(NOS_NAME_STATIC("DropFrame"), nos::Buffer::From(effectiveDropFrame));
+			Timecode out(best.Hours, best.Minutes, best.Seconds, best.Frames,
+				effectiveDropFrame, DBB1TypeToSource(best.DBB1Type));
+			SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer::From(out));
 			SetPinValue(NOS_NAME_STATIC("Valid"), nos::Buffer::From(true));
 		}
 		else
 		{
-			const char empty[] = "";
-			SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer(empty, sizeof(empty)));
-			SetPinValue(NOS_NAME_STATIC("FrameNumber"), nos::Buffer::From(uint32_t(0)));
-			SetPinValue(NOS_NAME_STATIC("DropFrame"), nos::Buffer::From(false));
 			SetPinValue(NOS_NAME_STATIC("Valid"), nos::Buffer::From(false));
 		}
 		return NOS_RESULT_SUCCESS;

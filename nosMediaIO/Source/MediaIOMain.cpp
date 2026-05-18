@@ -35,6 +35,9 @@ enum Nodes : int
 	Debayer,
 	ExtractTimecode,
 	InjectTimecode,
+	TimecodeFromFrameNumber,
+	TimecodeToFrameNumber,
+	TimecodeToString,
 	SLog3ToLinear,
 	LinearToSLog3,
 	Count
@@ -56,6 +59,9 @@ nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
 nosResult RegisterExtractTimecode(nosNodeFunctions*);
 nosResult RegisterInjectTimecode(nosNodeFunctions*);
+nosResult RegisterTimecodeFromFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToString(nosNodeFunctions*);
 nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
 
@@ -97,6 +103,9 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(Debayer)
 				GEN_CASE_NODE(ExtractTimecode)
 				GEN_CASE_NODE(InjectTimecode)
+				GEN_CASE_NODE(TimecodeFromFrameNumber)
+				GEN_CASE_NODE(TimecodeToFrameNumber)
+				GEN_CASE_NODE(TimecodeToString)
 				GEN_CASE_NODE(SLog3ToLinear)
 				GEN_CASE_NODE(LinearToSLog3)
 			}
