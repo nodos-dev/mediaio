@@ -40,6 +40,8 @@ enum Nodes : int
 	TimecodeToString,
 	SLog3ToLinear,
 	LinearToSLog3,
+	RecordClip,
+	PlaybackClip,
 	Count
 };
 
@@ -64,6 +66,8 @@ nosResult RegisterTimecodeToFrameNumber(nosNodeFunctions*);
 nosResult RegisterTimecodeToString(nosNodeFunctions*);
 nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
+nosResult RegisterRecordClip(nosNodeFunctions*);
+nosResult RegisterPlaybackClip(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -108,6 +112,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(TimecodeToString)
 				GEN_CASE_NODE(SLog3ToLinear)
 				GEN_CASE_NODE(LinearToSLog3)
+				GEN_CASE_NODE(RecordClip)
+				GEN_CASE_NODE(PlaybackClip)
 			}
 		}
 		return NOS_RESULT_SUCCESS;

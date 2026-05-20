@@ -1,0 +1,63 @@
+{
+    "nodes": [
+        {
+            "class_name": "RecordClip",
+            "menu_info": {
+                "category": "Media IO|Recording",
+                "display_name": "Record Clip",
+                "name_aliases": [ "record texture", "texture recorder", "capture clip" ]
+            },
+            "node": {
+                "class_name": "RecordClip",
+                "display_name": "Record Clip",
+                "contents_type": "Job",
+                "always_execute": true,
+                "description": "Records the input Texture to disk as an uncompressed DPX sequence while Record is\ntrue. Each execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE\ntimecode embedded in its header - under Path. Writing a frame is a fixed header plus\nthe pixels verbatim: no compression, no per-pixel work. The GPU is flushed before each\nreadback so the captured frame is complete; readback and the disk write are synchronous\n- drive the cadence from the graph (e.g. a Schedule Request node). The input Texture is\npassed through to the Output pin so the node can sit inline.\nPlay the result back with the Playback Clip node.",
+                "pins": [
+                    {
+                        "name": "Texture",
+                        "display_name": "Texture",
+                        "description": "Texture to record. Stored uncompressed; must be R8G8B8A8 (8-bit) or\nR16G16B16A16_UNORM (16-bit) - other formats are rejected with an error.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Timecode",
+                        "display_name": "Timecode",
+                        "description": "SMPTE timecode for the current frame. Names the file 'HH-MM-SS-FF.dpx' and is\nembedded in the DPX header.",
+                        "type_name": "nos.mediaio.Timecode",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Path",
+                        "display_name": "Path",
+                        "description": "Output directory for the recorded .dpx sequence. Created if it does not exist.",
+                        "type_name": "string",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "visualizer": { "type": "FOLDER_PICKER" }
+                    },
+                    {
+                        "name": "Record",
+                        "display_name": "Record",
+                        "description": "While true, every executed frame is written to disk. While false, nothing is written.",
+                        "type_name": "bool",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": false
+                    },
+                    {
+                        "name": "Output",
+                        "display_name": "Texture",
+                        "description": "Pass-through of the input Texture, so the recorder can be inserted inline.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        }
+    ]
+}

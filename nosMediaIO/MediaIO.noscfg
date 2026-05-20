@@ -28,7 +28,9 @@
 		"Config/InjectTimecode.nosdef",
 		"Config/TimecodeFromFrameNumber.nosdef",
 		"Config/TimecodeToFrameNumber.nosdef",
-		"Config/TimecodeToString.nosdef"
+		"Config/TimecodeToString.nosdef",
+		"Config/RecordClip.nosdef",
+		"Config/PlaybackClip.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
