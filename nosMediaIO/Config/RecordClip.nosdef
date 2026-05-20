@@ -12,7 +12,7 @@
                 "display_name": "Record Clip",
                 "contents_type": "Job",
                 "always_execute": true,
-                "description": "Records the input Texture to disk as an uncompressed DPX sequence while Record is\ntrue. Each execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE\ntimecode embedded in its header - under Path. Writing a frame is a fixed header plus\nthe pixels verbatim: no compression, no per-pixel work. The GPU is flushed before each\nreadback so the captured frame is complete; readback and the disk write are synchronous\n- drive the cadence from the graph (e.g. a Schedule Request node). The input Texture is\npassed through to the Output pin so the node can sit inline.\nPlay the result back with the Playback Clip node.",
+                "description": "Records the input Texture to disk as an uncompressed DPX sequence while Record is\ntrue. Each execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE\ntimecode embedded in its header - under Path. Gamma Curve picks the output transfer:\nSRGB encodes the graph's linear pixels so the files look correct in ordinary viewers;\nIDENTITY writes them verbatim. The GPU is flushed before each readback so the captured\nframe is complete; readback and the disk write are synchronous - drive the cadence from\nthe graph (e.g. a Schedule Request node). The input Texture is passed through to the\nOutput pin so the node can sit inline. Play the result back with the Playback Clip node.",
                 "pins": [
                     {
                         "name": "Texture",
@@ -47,6 +47,15 @@
                         "show_as": "INPUT_PIN",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY",
                         "data": false
+                    },
+                    {
+                        "name": "GammaCurve",
+                        "display_name": "Gamma Curve",
+                        "description": "Transfer curve the saved frames are encoded with. IDENTITY records the graph's\nlinear pixels verbatim; SRGB encodes them (free GPU blit) so files look correct in\nordinary viewers. Other curves are unsupported - convert upstream and use IDENTITY.\nSRGB requires an 8-bit input; 16-bit textures must use IDENTITY.",
+                        "type_name": "nos.mediaio.GammaCurve",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "SRGB"
                     },
                     {
                         "name": "Output",

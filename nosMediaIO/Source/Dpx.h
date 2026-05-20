@@ -18,13 +18,18 @@ namespace nos::mediaio::dpx
 // The DPX header is a fixed 2048 bytes; image data follows immediately after.
 constexpr uint32_t HEADER_SIZE = 2048;
 
+// DPX transfer characteristic codes used by Record/Playback Clip.
+constexpr uint8_t TRANSFER_USER_DEFINED = 0; // our marker for sRGB-encoded pixels
+constexpr uint8_t TRANSFER_LINEAR = 2;       // SMPTE 268M "linear"
+
 // Pixel layout of the DPX image element that Record/Playback Clip handle.
 struct ImageDesc
 {
 	uint32_t Width = 0;
 	uint32_t Height = 0;
-	uint8_t Channels = 0; // 3 = RGB, 4 = RGBA
-	uint8_t BitDepth = 0; // 8 or 16
+	uint8_t Channels = 0;                 // 3 = RGB, 4 = RGBA
+	uint8_t BitDepth = 0;                 // 8 or 16
+	uint8_t Transfer = TRANSFER_LINEAR;   // transfer characteristic (see codes above)
 };
 
 inline uint64_t ImageDataSize(const ImageDesc& d)
@@ -92,7 +97,7 @@ inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc)
 	PutU32(e + 12, d.BitDepth == 16 ? 65535u : 255u); // reference high data
 	PutF32(e + 16, 1.0f);                         // reference high quantity
 	e[20] = d.Channels == 4 ? 51 : 50;            // descriptor - RGBA / RGB
-	e[21] = 2;                                    // transfer characteristic - linear
+	e[21] = d.Transfer;                           // transfer characteristic
 	e[22] = 2;                                    // colorimetric - linear
 	e[23] = d.BitDepth;                           // bit depth
 	PutU16(e + 24, 0);                            // packing - packed
@@ -133,6 +138,7 @@ inline bool ReadHeader(const uint8_t* hdr, ImageDesc& d, uint32_t& dataOffset, b
 	if (bitDepth != 8 && bitDepth != 16)
 		return false;
 	d.BitDepth = bitDepth;
+	d.Transfer = e[21];
 	return d.Width != 0 && d.Height != 0;
 }
 

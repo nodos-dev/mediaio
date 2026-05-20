@@ -9,19 +9,21 @@
 #include <string>
 
 #include "ANC_generated.h"
+#include "Conversion_generated.h"
 #include "Dpx.h"
 
 namespace nos::mediaio
 {
 
 // Records the input texture to disk as an uncompressed DPX sequence, one file per
-// timecode, while the Record pin is true. The GPU is flushed (submit and wait) before
-// the readback so the captured frame is complete - see RepeatingJunction / WriteImage /
-// RingBuffer for the same pattern. Writing a frame is a fixed header plus the readback
-// buffer verbatim - no compression, no per-pixel work. The readback and disk write run
-// synchronously on the execution path; drive the cadence from the node graph.
-// The input Texture is also passed straight through to the Output pin. Progress and
-// errors are surfaced on the node status.
+// timecode, while the Record pin is true. The GammaCurve pin chooses the output transfer
+// curve: IDENTITY writes the graph's linear pixels verbatim; SRGB encodes them to sRGB
+// (a free GPU format-blit) so the files look correct in ordinary viewers. The GPU is
+// flushed (submit and wait) before the readback so the captured frame is complete - see
+// RepeatingJunction / WriteImage / RingBuffer for the same pattern. Readback and the disk
+// write run synchronously on the execution path; drive the cadence from the node graph.
+// The input Texture is passed straight through to the Output pin. Progress and errors are
+// surfaced on the node status.
 struct RecordClipNode : NodeContext
 {
 	std::string StatusText;
@@ -46,6 +48,17 @@ struct RecordClipNode : NodeContext
 	{
 		nosGPUEvent event{};
 		nosCmd cmd = vkss::BeginCmd(NOS_NAME("RecordClip Flush"), NodeId);
+		nosCmdEndParams endParams{ .ForceSubmit = true, .OutGPUEventHandle = &event };
+		nosVulkan->End(cmd, &endParams);
+		nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
+	}
+
+	// Records one Copy into the host-visible readback buffer, waiting for it to finish.
+	void CopyToReadback(const nosResourceShareInfo& src, const nosResourceShareInfo& dst)
+	{
+		nosGPUEvent event{};
+		nosCmd cmd = vkss::BeginCmd(NOS_NAME("RecordClip Copy"), NodeId);
+		nosVulkan->Copy(cmd, &src, &dst, nullptr);
 		nosCmdEndParams endParams{ .ForceSubmit = true, .OutGPUEventHandle = &event };
 		nosVulkan->End(cmd, &endParams);
 		nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
@@ -97,33 +110,53 @@ struct RecordClipNode : NodeContext
 			return NOS_RESULT_SUCCESS;
 		}
 
-		// DPX stores RGB/RGBA in native channel order, so these formats need no swizzle.
-		dpx::ImageDesc desc{};
-		desc.Width = inputTex.Info.Texture.Width;
-		desc.Height = inputTex.Info.Texture.Height;
-		switch (inputTex.Info.Texture.Format)
+		nosFormat inFormat = inputTex.Info.Texture.Format;
+		bool input8 = inFormat == NOS_FORMAT_R8G8B8A8_UNORM || inFormat == NOS_FORMAT_R8G8B8A8_SRGB;
+		bool input16 = inFormat == NOS_FORMAT_R16G16B16A16_UNORM;
+		if (!input8 && !input16)
 		{
-		case NOS_FORMAT_R8G8B8A8_UNORM:
-		case NOS_FORMAT_R8G8B8A8_SRGB:
-			desc.Channels = 4; desc.BitDepth = 8; break;
-		case NOS_FORMAT_R16G16B16A16_UNORM:
-			desc.Channels = 4; desc.BitDepth = 16; break;
-		default:
 			ShowStatus("Unsupported texture format - need R8G8B8A8 or R16G16B16A16_UNORM",
 				fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
+
+		// GammaCurve picks the transfer curve the file is encoded with.
+		GammaCurve curve = GammaCurve::SRGB;
+		if (auto* c = execParams.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve")))
+			curve = *c;
+		bool encodeSrgb;
+		if (curve == GammaCurve::SRGB)
+			encodeSrgb = true;
+		else if (curve == GammaCurve::IDENTITY)
+			encodeSrgb = false;
+		else
+		{
+			ShowStatus("Gamma curve not supported - use IDENTITY or SRGB (convert others "
+					   "with a gamma node upstream)", fb::NodeStatusMessageType::FAILURE);
+			return NOS_RESULT_FAILED;
+		}
+		if (encodeSrgb && !input8)
+		{
+			ShowStatus("SRGB output needs an 8-bit input texture - record 16-bit as IDENTITY",
+				fb::NodeStatusMessageType::FAILURE);
+			return NOS_RESULT_FAILED;
+		}
+
+		dpx::ImageDesc desc{};
+		desc.Width = inputTex.Info.Texture.Width;
+		desc.Height = inputTex.Info.Texture.Height;
+		desc.Channels = 4;
+		desc.BitDepth = (encodeSrgb || input8) ? 8 : 16;
+		desc.Transfer = encodeSrgb ? dpx::TRANSFER_USER_DEFINED : dpx::TRANSFER_LINEAR;
 		uint64_t dataSize = dpx::ImageDataSize(desc);
 
 		// Flush the GPU so the input texture holds a complete frame before we read it.
 		SubmitAndWait();
 
-		// Copy the input texture into a host-visible buffer and read it back.
 		nosBufferInfo bufInfo = {};
 		bufInfo.Size = uint32_t(dataSize);
 		bufInfo.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_TRANSFER_DST);
 		bufInfo.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_DOWNLOAD);
-
 		auto readback = vkss::Resource::Create(bufInfo, "RecordClip Readback");
 		if (!readback)
 		{
@@ -132,12 +165,32 @@ struct RecordClipNode : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 
-		nosGPUEvent event{};
-		nosCmd cmd = vkss::BeginCmd(NOS_NAME("RecordClip Readback Copy"), NodeId);
-		nosVulkan->Copy(cmd, &inputTex, &*readback, nullptr);
-		nosCmdEndParams endParams{ .ForceSubmit = true, .OutGPUEventHandle = &event };
-		nosVulkan->End(cmd, &endParams);
-		nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
+		if (encodeSrgb)
+		{
+			// Blit the linear input into an sRGB-format texture; the hardware store
+			// applies the linear->sRGB encode for free, then read that back.
+			nosResourceShareInfo srgbInfo = {};
+			srgbInfo.Info.Type = NOS_RESOURCE_TYPE_TEXTURE;
+			srgbInfo.Info.Texture.Width = desc.Width;
+			srgbInfo.Info.Texture.Height = desc.Height;
+			srgbInfo.Info.Texture.Format = NOS_FORMAT_R8G8B8A8_SRGB;
+			srgbInfo.Info.Texture.Usage =
+				nosImageUsage(NOS_IMAGE_USAGE_TRANSFER_SRC | NOS_IMAGE_USAGE_TRANSFER_DST);
+			auto srgbTex = vkss::Resource::Create(srgbInfo, "RecordClip sRGB Encode");
+			if (!srgbTex)
+			{
+				nosEngine.LogE("RecordClip: failed to allocate sRGB encode texture");
+				ShowStatus("Failed to allocate sRGB encode texture",
+					fb::NodeStatusMessageType::FAILURE);
+				return NOS_RESULT_FAILED;
+			}
+			CopyToReadback(inputTex, *srgbTex);  // linear -> sRGB (blit encodes)
+			CopyToReadback(*srgbTex, *readback); // sRGB texture -> host buffer (raw)
+		}
+		else
+		{
+			CopyToReadback(inputTex, *readback);
+		}
 
 		uint8_t* pixels = nosVulkan->Map(&*readback);
 		if (!pixels)

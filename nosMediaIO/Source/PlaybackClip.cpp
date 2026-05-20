@@ -17,8 +17,10 @@ namespace nos::mediaio
 {
 
 // Plays back a clip recorded by RecordClip: for the incoming timecode it loads the
-// matching 'HH-MM-SS-FF.dpx' frame from Path and emits it on the Texture output. When
-// no frame matches the timecode, the last loaded frame is held. Progress and errors are
+// matching 'HH-MM-SS-FF.dpx' frame from Path and emits it on the Texture output. The
+// output texture format follows the DPX transfer tag - an sRGB-encoded file becomes an
+// _SRGB texture so the graph's sampler decodes it back to linear automatically. When no
+// frame matches the timecode, the last loaded frame is held. Progress and errors are
 // surfaced on the node status.
 struct PlaybackClipNode : NodeContext
 {
@@ -106,11 +108,20 @@ struct PlaybackClipNode : NodeContext
 			return false;
 		}
 
+		// An sRGB-encoded file loads into an _SRGB texture so the sampler decodes it back
+		// to the graph's linear space; a linear file loads into a plain _UNORM texture.
+		bool linear = desc.Transfer == dpx::TRANSFER_LINEAR;
 		nosFormat format = NOS_FORMAT_NONE;
 		if (desc.Channels == 4)
-			format = desc.BitDepth == 16 ? NOS_FORMAT_R16G16B16A16_UNORM : NOS_FORMAT_R8G8B8A8_UNORM;
+		{
+			if (desc.BitDepth == 16) format = NOS_FORMAT_R16G16B16A16_UNORM;
+			else format = linear ? NOS_FORMAT_R8G8B8A8_UNORM : NOS_FORMAT_R8G8B8A8_SRGB;
+		}
 		else if (desc.Channels == 3)
-			format = desc.BitDepth == 16 ? NOS_FORMAT_R16G16B16_UNORM : NOS_FORMAT_R8G8B8_UNORM;
+		{
+			if (desc.BitDepth == 16) format = NOS_FORMAT_R16G16B16_UNORM;
+			else format = linear ? NOS_FORMAT_R8G8B8_UNORM : NOS_FORMAT_R8G8B8_SRGB;
+		}
 		if (format == NOS_FORMAT_NONE)
 		{
 			nosEngine.LogE("PlaybackClip: unsupported DPX pixel layout in %s", utf8Path.c_str());
