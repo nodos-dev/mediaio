@@ -8,6 +8,8 @@
 #include <optional>
 #include <string>
 
+#include <nosUtil/Stopwatch.hpp>
+
 #include "ANC_generated.h"
 #include "Conversion_generated.h"
 #include "Dpx.h"
@@ -31,6 +33,12 @@ struct RecordClipNode : NodeContext
 	int StatusType = -1;
 	bool WasRecording = false;
 	uint64_t RecordedFrames = 0;
+
+	// Reused across frames; reallocated only when the frame size/resolution changes.
+	std::optional<vkss::Resource> Readback;
+	uint64_t ReadbackSize = 0;
+	std::optional<vkss::Resource> SrgbTex;
+	uint32_t SrgbWidth = 0, SrgbHeight = 0;
 
 	RecordClipNode(nosFbNodePtr node) : NodeContext(node) {}
 
@@ -65,9 +73,58 @@ struct RecordClipNode : NodeContext
 		nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
 	}
 
+	// Reused readback buffer; reallocated only when the required size changes.
+	vkss::Resource* EnsureReadback(uint64_t size)
+	{
+		if (!Readback || ReadbackSize != size)
+		{
+			nosBufferInfo bufInfo = {};
+			bufInfo.Size = uint32_t(size);
+			bufInfo.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_TRANSFER_DST);
+			bufInfo.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_DOWNLOAD);
+			Readback = vkss::Resource::Create(bufInfo, "RecordClip Readback");
+			ReadbackSize = Readback ? size : 0;
+		}
+		return Readback ? &*Readback : nullptr;
+	}
+
+	// Reused sRGB encode texture; reallocated only when the resolution changes.
+	vkss::Resource* EnsureSrgbTex(uint32_t width, uint32_t height)
+	{
+		if (!SrgbTex || SrgbWidth != width || SrgbHeight != height)
+		{
+			nosResourceShareInfo info = {};
+			info.Info.Type = NOS_RESOURCE_TYPE_TEXTURE;
+			info.Info.Texture.Width = width;
+			info.Info.Texture.Height = height;
+			info.Info.Texture.Format = NOS_FORMAT_R8G8B8A8_SRGB;
+			info.Info.Texture.Usage = nosImageUsage(NOS_IMAGE_USAGE_TRANSFER_SRC | NOS_IMAGE_USAGE_TRANSFER_DST);
+			SrgbTex = vkss::Resource::Create(info, "RecordClip sRGB Encode");
+			SrgbWidth = SrgbTex ? width : 0;
+			SrgbHeight = SrgbTex ? height : 0;
+		}
+		return SrgbTex ? &*SrgbTex : nullptr;
+	}
+
+	// Frees the reused GPU resources when idle.
+	void ReleaseResources()
+	{
+		Readback.reset();
+		SrgbTex.reset();
+		ReadbackSize = 0;
+		SrgbWidth = SrgbHeight = 0;
+	}
+
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
+
+		// Per-section timing surfaced on the watch panel as "<node> <section>".
+		nos::util::Stopwatch total, section;
+		auto lap = [&](const char* name) {
+			nosEngine.WatchLog((NodeName.AsString() + " " + name).c_str(),
+				section.ElapsedStringAndReset().c_str());
+		};
 
 		// Pass the input texture straight through, whether or not we are recording.
 		auto& texPin = execParams[NOS_NAME_STATIC("Texture")];
@@ -78,6 +135,8 @@ struct RecordClipNode : NodeContext
 		bool recording = record && *record;
 		if (recording && !WasRecording)
 			RecordedFrames = 0; // rising edge: restart the frame count
+		if (!recording && WasRecording)
+			ReleaseResources(); // falling edge: free the reused buffers while idle
 		WasRecording = recording;
 		if (!recording)
 		{
@@ -150,34 +209,26 @@ struct RecordClipNode : NodeContext
 		desc.BitDepth = (encodeSrgb || input8) ? 8 : 16;
 		desc.Transfer = encodeSrgb ? dpx::TRANSFER_USER_DEFINED : dpx::TRANSFER_LINEAR;
 		uint64_t dataSize = dpx::ImageDataSize(desc);
+		lap("Setup");
 
 		// Flush the GPU so the input texture holds a complete frame before we read it.
 		SubmitAndWait();
+		lap("SubmitAndWait");
 
-		nosBufferInfo bufInfo = {};
-		bufInfo.Size = uint32_t(dataSize);
-		bufInfo.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_TRANSFER_DST);
-		bufInfo.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_DOWNLOAD);
-		auto readback = vkss::Resource::Create(bufInfo, "RecordClip Readback");
+		vkss::Resource* readback = EnsureReadback(dataSize);
 		if (!readback)
 		{
 			nosEngine.LogE("RecordClip: failed to allocate readback buffer");
 			ShowStatus("Failed to allocate readback buffer", fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
+		lap("EnsureReadback");
 
 		if (encodeSrgb)
 		{
 			// Blit the linear input into an sRGB-format texture; the hardware store
 			// applies the linear->sRGB encode for free, then read that back.
-			nosResourceShareInfo srgbInfo = {};
-			srgbInfo.Info.Type = NOS_RESOURCE_TYPE_TEXTURE;
-			srgbInfo.Info.Texture.Width = desc.Width;
-			srgbInfo.Info.Texture.Height = desc.Height;
-			srgbInfo.Info.Texture.Format = NOS_FORMAT_R8G8B8A8_SRGB;
-			srgbInfo.Info.Texture.Usage =
-				nosImageUsage(NOS_IMAGE_USAGE_TRANSFER_SRC | NOS_IMAGE_USAGE_TRANSFER_DST);
-			auto srgbTex = vkss::Resource::Create(srgbInfo, "RecordClip sRGB Encode");
+			vkss::Resource* srgbTex = EnsureSrgbTex(desc.Width, desc.Height);
 			if (!srgbTex)
 			{
 				nosEngine.LogE("RecordClip: failed to allocate sRGB encode texture");
@@ -192,14 +243,16 @@ struct RecordClipNode : NodeContext
 		{
 			CopyToReadback(inputTex, *readback);
 		}
+		lap("CopyToReadback");
 
-		uint8_t* pixels = nosVulkan->Map(&*readback);
+		uint8_t* pixels = nosVulkan->Map(readback);
 		if (!pixels)
 		{
 			nosEngine.LogE("RecordClip: failed to map readback buffer");
 			ShowStatus("Failed to map readback buffer", fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
+		lap("Map");
 
 		std::filesystem::path dir = nos::Utf8ToPath(std::string(pathC));
 		std::string fileName = dpx::TimecodeToFileName(*tc);
@@ -231,6 +284,8 @@ struct RecordClipNode : NodeContext
 			ShowStatus("Failed to write " + fileName, fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
+		lap("DiskWrite");
+		nosEngine.WatchLog((NodeName.AsString() + " | Total").c_str(), total.ElapsedString().c_str());
 
 		++RecordedFrames;
 		// "Recording 1920x1080 @ 59.94 FPS - 123 frames" (FPS omitted on variable-step paths).
