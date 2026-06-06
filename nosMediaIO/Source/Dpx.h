@@ -12,6 +12,9 @@
 // Minimal DPX (SMPTE ST 268M) reader/writer for uncompressed RGB/RGBA frames.
 // Files are written little-endian so header fields and pixel data go to disk with no
 // byte-swapping, and the pixel data is the texture readback buffer verbatim.
+// Header field offsets follow the DPX V2.0 spec (SMPTE ST 268M); see the field/offset table in
+// FADGI "Guidelines for Embedded Metadata within DPX Files":
+// https://www.digitizationguidelines.gov/audio-visual/documents/DPX_Embed_Guideline_20180507.pdf
 namespace nos::mediaio::dpx
 {
 
@@ -22,6 +25,13 @@ constexpr uint32_t HEADER_SIZE = 2048;
 constexpr uint8_t TRANSFER_USER_DEFINED = 0; // our marker for sRGB-encoded pixels
 constexpr uint8_t TRANSFER_LINEAR = 2;       // SMPTE 268M "linear"
 
+// Frame-rate field offsets. DPX has two standard R32 (float) frame-rate fields and no integer
+// rational: the motion-picture film header's (the canonical rate most DPX tools read) and the
+// television header's (companion to the timecode, which also lives in the TV header). Fractional
+// rates (59.94, 29.97) round to the nearest float, so playback compares them with a small tolerance.
+constexpr uint32_t FILM_FRAME_RATE_OFFSET = 1724; // film header R32 frame rate (FPS), canonical
+constexpr uint32_t TV_FRAME_RATE_OFFSET = 1940;   // television header R32 frame rate (FPS)
+
 // Pixel layout of the DPX image element that Record/Playback Clip handle.
 struct ImageDesc
 {
@@ -30,6 +40,7 @@ struct ImageDesc
 	uint8_t Channels = 0;                 // 3 = RGB, 4 = RGBA
 	uint8_t BitDepth = 0;                 // 8 or 16
 	uint8_t Transfer = TRANSFER_LINEAR;   // transfer characteristic (see codes above)
+	float FrameRate = 0.0f;               // frames per second; 0 when the file records no rate
 };
 
 inline uint64_t ImageDataSize(const ImageDesc& d)
@@ -64,11 +75,13 @@ inline uint16_t GetU16(const uint8_t* p, bool be)
 {
 	return be ? uint16_t(uint16_t(p[0]) << 8 | p[1]) : uint16_t(uint16_t(p[1]) << 8 | p[0]);
 }
+inline float GetF32(const uint8_t* p, bool be) { uint32_t v = GetU32(p, be); float f; std::memcpy(&f, &v, 4); return f; }
 } // namespace detail
 
 // Builds a little-endian DPX header into `out` (HEADER_SIZE bytes), embedding `tc` as the
-// SMPTE timecode in the television header.
-inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc)
+// SMPTE timecode in the television header. `frameRate` (FPS) is written to both standard
+// frame-rate fields so the HH:MM:SS:FF timecode is unambiguous; pass <= 0 to leave it unset.
+inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc, float frameRate)
 {
 	using namespace detail;
 	std::memset(out, 0, HEADER_SIZE);
@@ -110,6 +123,13 @@ inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc)
 	auto bcd = [](unsigned v) { return uint32_t(((v / 10) << 4) | (v % 10)); };
 	PutU32(out + 1920, (bcd(tc.hours()) << 24) | (bcd(tc.minutes()) << 16)
 					   | (bcd(tc.seconds()) << 8) | bcd(tc.frames()));
+	// Frame rate the FF field counts against, written to both standard R32 fields (the film
+	// header's canonical field and the television header's). 0 means unknown (variable-step).
+	if (frameRate > 0.0f)
+	{
+		PutF32(out + FILM_FRAME_RATE_OFFSET, frameRate);
+		PutF32(out + TV_FRAME_RATE_OFFSET, frameRate);
+	}
 }
 
 // Parses a DPX header (`hdr` must hold at least HEADER_SIZE bytes). Returns false for a
@@ -139,6 +159,7 @@ inline bool ReadHeader(const uint8_t* hdr, ImageDesc& d, uint32_t& dataOffset, b
 		return false;
 	d.BitDepth = bitDepth;
 	d.Transfer = e[21];
+	d.FrameRate = GetF32(hdr + FILM_FRAME_RATE_OFFSET, bigEndian); // canonical frame rate (0 when unset)
 	return d.Width != 0 && d.Height != 0;
 }
 

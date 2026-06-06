@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "ANC_generated.h"
+#include "Timing.hpp"
 
 namespace nos::mediaio
 {
@@ -55,15 +56,7 @@ struct TimecodeFromFrameNumberNode : NodeContext
 
 		float frameRate = *execParams.GetPinData<float>(NOS_NAME_STATIC("FrameRateOverride"));
 		if (frameRate <= 0.0f)
-		{
-			frameRate = 60.0f;
-			if (params->TimingInfo.TimingMode == NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
-			{
-				const auto& ds = params->TimingInfo.FixedStepTiming.DeltaSeconds;
-				if (ds.x != 0 && ds.y != 0)
-					frameRate = float(double(ds.y) / double(ds.x));
-			}
-		}
+			frameRate = FrameRateFromTiming(params, 60.0f);
 
 		// Drop-frame is only defined for the NTSC fractional rates (29.97 /
 		// 59.94). Gate on the actual fractional rate (not the rounded value)

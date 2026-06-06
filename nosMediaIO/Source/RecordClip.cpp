@@ -11,6 +11,7 @@
 #include "ANC_generated.h"
 #include "Conversion_generated.h"
 #include "Dpx.h"
+#include "Timing.hpp"
 
 namespace nos::mediaio
 {
@@ -214,8 +215,12 @@ struct RecordClipNode : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 
+		// Frame rate for the DPX header: infer from the path's fixed-step timing; variable-step
+		// paths have no nominal rate, so leave it unset (0).
+		float frameRate = FrameRateFromTiming(params);
+
 		uint8_t header[dpx::HEADER_SIZE];
-		dpx::WriteHeader(header, desc, *tc);
+		dpx::WriteHeader(header, desc, *tc, frameRate);
 
 		std::ofstream file(filePath, std::ios::binary | std::ios::trunc);
 		if (!file
@@ -228,8 +233,12 @@ struct RecordClipNode : NodeContext
 		}
 
 		++RecordedFrames;
-		ShowStatus("Recording (" + std::to_string(RecordedFrames) + " frames)",
-			fb::NodeStatusMessageType::INFO);
+		// "Recording 1920x1080 @ 59.94 FPS - 123 frames" (FPS omitted on variable-step paths).
+		std::string status = "Recording " + std::to_string(desc.Width) + "x" + std::to_string(desc.Height);
+		if (frameRate > 0.0f)
+			status += " @ " + FrameRateToString(frameRate) + " FPS";
+		status += " - " + std::to_string(RecordedFrames) + " frames";
+		ShowStatus(status, fb::NodeStatusMessageType::INFO);
 		return NOS_RESULT_SUCCESS;
 	}
 };

@@ -8,6 +8,7 @@
 #include <cstdint>
 
 #include "ANC_generated.h"
+#include "Timing.hpp"
 
 namespace nos::mediaio
 {
@@ -140,21 +141,11 @@ struct ExtractTimecodeNode : NodeContext
 		const ANCFrame* frame = execParams.GetPinData<ANCFrame>(NOS_NAME_STATIC("ANCFrame"));
 		const auto source = *execParams.GetPinData<ATCSource>(NOS_NAME_STATIC("Source"));
 
-		// Frame rate: prefer the explicit override pin (>0). Otherwise infer from
-		// the path's fixed-step timing — DeltaSeconds is rational seconds-per-frame
-		// ({1001, 60000} == 59.94 fps). Variable-step paths have no nominal rate;
-		// fall back to 60.
+		// Frame rate: prefer the explicit override pin (>0); otherwise infer from the
+		// path's fixed-step timing, falling back to 60 on variable-step paths.
 		float frameRate = *execParams.GetPinData<float>(NOS_NAME_STATIC("FrameRateOverride"));
 		if (frameRate <= 0.0f)
-		{
-			frameRate = 60.0f;
-			if (params->TimingInfo.TimingMode == NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
-			{
-				const auto& ds = params->TimingInfo.FixedStepTiming.DeltaSeconds;
-				if (ds.x != 0 && ds.y != 0)
-					frameRate = float(double(ds.y) / double(ds.x));
-			}
-		}
+			frameRate = FrameRateFromTiming(params, 60.0f);
 
 		const int fpsRound = std::max(1, int(std::lround(frameRate)));
 		// Drop-frame is only defined for the NTSC fractional rates (29.97 /

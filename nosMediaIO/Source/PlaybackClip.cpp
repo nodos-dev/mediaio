@@ -4,6 +4,7 @@
 #include <nosVulkanSubsystem/Helpers.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -12,6 +13,7 @@
 
 #include "ANC_generated.h"
 #include "Dpx.h"
+#include "Timing.hpp"
 
 namespace nos::mediaio
 {
@@ -25,7 +27,9 @@ namespace nos::mediaio
 struct PlaybackClipNode : NodeContext
 {
 	std::optional<vkss::Resource> OutputTexture;
-	std::string LoadedFrame; // file name currently held on the output pin
+	std::string LoadedFrame;          // file name currently held on the output pin
+	nosVec2u LoadedResolution = {};   // held frame's resolution
+	float LoadedFrameRate = 0.0f;     // frame rate recorded in the held frame's header (0 = unset)
 	std::string StatusText;
 	int StatusType = -1;
 
@@ -64,7 +68,11 @@ struct PlaybackClipNode : NodeContext
 
 		std::string fileName = dpx::TimecodeToFileName(*tc);
 		if (fileName == LoadedFrame && OutputTexture)
-			return NOS_RESULT_SUCCESS; // already showing this frame
+		{
+			// Already holding this frame, but re-check timing so a cadence change still warns.
+			ReportPlaybackStatus(params, fileName);
+			return NOS_RESULT_SUCCESS;
+		}
 
 		std::filesystem::path filePath = nos::Utf8ToPath(std::string(pathC)) / fileName;
 		std::error_code ec;
@@ -78,9 +86,44 @@ struct PlaybackClipNode : NodeContext
 		if (LoadFrame(filePath))
 		{
 			LoadedFrame = fileName;
-			ShowStatus("Playing " + fileName, fb::NodeStatusMessageType::INFO);
+			ReportPlaybackStatus(params, fileName);
 		}
 		return NOS_RESULT_SUCCESS; // load failure also holds the last frame
+	}
+
+	// Shows "Playing <file> - 1920x1080 @ 59.94 FPS", warning when the executing path can't
+	// reproduce the clip's recorded frame rate. DPX stores the rate as a float, so the compare uses
+	// a small tolerance - enough to tell 59.94 from 60. A variable-step path has no fixed rate and
+	// always warns; a fixed-step path warns only when its rate differs. A clip with no recorded rate
+	// (0) and a 0/0 path delta are both left unchecked.
+	void ReportPlaybackStatus(nosNodeExecuteParams* params, const std::string& fileName)
+	{
+		// "Playing <file> - 1920x1080 @ 59.94 FPS" (FPS omitted when the clip records no rate).
+		std::string info = "Playing " + fileName + " - "
+			+ std::to_string(LoadedResolution.x) + "x" + std::to_string(LoadedResolution.y);
+		if (LoadedFrameRate > 0.0f)
+			info += " @ " + FrameRateToString(LoadedFrameRate) + " FPS";
+
+		if (LoadedFrameRate > 0.0f)
+		{
+			// A variable-step path can't reproduce a fixed recorded rate; always warn.
+			if (params->TimingInfo.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
+			{
+				ShowStatus(info + " - timing mismatch: path is variable-step",
+					fb::NodeStatusMessageType::WARNING);
+				return;
+			}
+			// 0 here means the fixed-step path has no nominal rate yet - skip the check.
+			float pathRate = FrameRateFromTiming(params);
+			if (pathRate > 0.0f && std::fabs(pathRate - LoadedFrameRate) > 0.01f)
+			{
+				ShowStatus(info + " - timing mismatch: path " + FrameRateToString(pathRate) + " FPS",
+					fb::NodeStatusMessageType::WARNING);
+				return;
+			}
+		}
+
+		ShowStatus(info, fb::NodeStatusMessageType::INFO);
 	}
 
 	bool LoadFrame(const std::filesystem::path& filePath)
@@ -165,6 +208,8 @@ struct PlaybackClipNode : NodeContext
 		nosVulkan->End(cmd, &endParams);
 
 		OutputTexture = std::move(texture);
+		LoadedResolution = {desc.Width, desc.Height};
+		LoadedFrameRate = desc.FrameRate;
 		SetPinValue(NOS_NAME_STATIC("Texture"), OutputTexture->ToPinData());
 		return true;
 	}
