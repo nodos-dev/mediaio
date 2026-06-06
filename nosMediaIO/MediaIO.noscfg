@@ -29,13 +29,15 @@
 		"Config/TimecodeFromFrameNumber.nosdef",
 		"Config/TimecodeToFrameNumber.nosdef",
 		"Config/TimecodeToString.nosdef",
+		"Config/TimecodePlayer.nosdef",
 		"Config/RecordClip.nosdef",
 		"Config/PlaybackClip.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
 		"Config/SensorInfo.fbs",
-		"Config/ANC.fbs"
+		"Config/ANC.fbs",
+		"Config/TimecodePlayer.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"

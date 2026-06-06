@@ -1,0 +1,7 @@
+namespace nos.mediaio;
+
+enum TimecodePlayerMode : uint
+{
+    Ranged = 0,      // Loop between Start Time and End Timecode.
+    Continuous = 1,  // Count up from Start Time; End Timecode ignored.
+}
