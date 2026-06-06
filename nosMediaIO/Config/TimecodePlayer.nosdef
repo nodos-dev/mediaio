@@ -11,7 +11,7 @@
                 "class_name": "TimecodePlayer",
                 "display_name": "Timecode Player",
                 "contents_type": "Job",
-                "description": "Plays a running SMPTE timecode, advancing one frame per run while playing. Rate is taken\nfrom the path's fixed-step timing. Ranged mode loops between Start Time and End Timecode;\nContinuous counts up without bound.",
+                "description": "Plays a running SMPTE timecode, advancing one frame per run while playing. Rate is taken\nfrom the path's fixed-step timing. Ranged mode runs from Start Time to End Timecode then stops;\nContinuous counts up without bound.",
                 "pins": [
                     {
                         "name": "InExe",
@@ -36,14 +36,14 @@
                     {
                         "name": "EndTimecode",
                         "display_name": "End Timecode",
-                        "description": "End of the loop range in Ranged mode. Passive in Continuous mode.",
+                        "description": "Timecode the player stops at in Ranged mode. Passive in Continuous mode.",
                         "type_name": "nos.mediaio.Timecode",
                         "show_as": "INPUT_PIN",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY"
                     },
                     {
                         "name": "Mode",
-                        "description": "Ranged loops between Start Time and End Timecode; Continuous counts up without bound.",
+                        "description": "Ranged runs from Start Time to End Timecode then stops; Continuous counts up without bound.",
                         "type_name": "nos.mediaio.TimecodePlayerMode",
                         "show_as": "PROPERTY",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY",

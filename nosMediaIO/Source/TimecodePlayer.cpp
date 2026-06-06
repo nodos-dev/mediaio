@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <unordered_map>
 
 #include "ANC_generated.h"
 #include "Timing.hpp"
@@ -68,12 +69,14 @@ enum class TimecodePlayerMode : uint32_t
 };
 
 // Plays a running timecode, advancing one frame per run while playing. Start/Stop
-// play/pause, Reset returns to Start Time; Ranged mode loops between Start and End.
+// play/pause, Reset returns to Start Time; Ranged mode runs from Start to End then stops.
 struct TimecodePlayerNode : NodeContext
 {
 	uint32_t FrameCounter = 0;
 	bool Playing = false;
 	TimecodePlayerMode Mode = TimecodePlayerMode::Ranged;
+	// Function (Start/Stop/Reset) node ids, keyed by class name, for orphaning controls.
+	std::unordered_map<nos::Name, uuid> FunctionIds;
 
 	TimecodePlayerNode(nosFbNodePtr node) : NodeContext(node)
 	{
@@ -85,7 +88,12 @@ struct TimecodePlayerNode : NodeContext
 					const void* data = pin->data()->data();
 					Mode = static_cast<TimecodePlayerMode>(*static_cast<const uint32_t*>(data));
 				}
+		if (node->functions())
+			for (auto* fn : *node->functions())
+				if (fn->class_name() && fn->id())
+					FunctionIds[nos::Name(fn->class_name()->c_str())] = *fn->id();
 		SyncEndTimecodeState();
+		SyncTransportControls();
 	}
 
 	void OnPinValueChanged(nos::Name pinName, uuid const&, nosBuffer value) override
@@ -127,14 +135,20 @@ struct TimecodePlayerNode : NodeContext
 			frameRate, effectiveDropFrame);
 
 		uint32_t frame = startFrame + FrameCounter;
+		// In Ranged mode the player runs from Start Time to End Timecode and then stops,
+		// holding the end frame. Continuous mode counts up without bound.
+		bool reachedEnd = false;
 		if (Mode == TimecodePlayerMode::Ranged)
 			if (const Timecode* end = execParams.GetPinData<Timecode>(NOS_NAME_STATIC("EndTimecode")))
 			{
 				const uint32_t endFrame = TCToFrameNumber(
 					end->hours(), end->minutes(), end->seconds(), end->frames(),
 					frameRate, effectiveDropFrame);
-				if (endFrame > startFrame)
-					frame = startFrame + FrameCounter % (endFrame - startFrame + 1);
+				if (endFrame > startFrame && frame >= endFrame)
+				{
+					frame = endFrame;
+					reachedEnd = true;
+				}
 			}
 
 		uint8_t h = 0, m = 0, s = 0, f = 0;
@@ -144,7 +158,12 @@ struct TimecodePlayerNode : NodeContext
 			start->source() == ATCSource::Auto ? ATCSource::ATC_LTC : start->source());
 		SetPinValue(NOS_NAME_STATIC("Timecode"), nos::Buffer::From(tc));
 
-		if (Playing)
+		if (reachedEnd)
+		{
+			if (Playing)
+				SetPlaying(false);
+		}
+		else if (Playing)
 			++FrameCounter;
 		return NOS_RESULT_SUCCESS;
 	}
@@ -153,6 +172,24 @@ struct TimecodePlayerNode : NodeContext
 	{
 		Playing = playing;
 		SetPinValue(NOS_NAME_STATIC("Playing"), nos::Buffer::From(playing));
+		SyncTransportControls();
+	}
+
+	// Orphan the control that does not apply to the current state: Start while playing,
+	// Stop while stopped. Node orphan state has no PASSIVE, so ORPHAN is used.
+	void SyncTransportControls()
+	{
+		SetFunctionOrphanState(NOS_NAME_STATIC("Start"),
+			Playing ? fb::NodeOrphanStateType::ORPHAN : fb::NodeOrphanStateType::ACTIVE);
+		SetFunctionOrphanState(NOS_NAME_STATIC("Stop"),
+			Playing ? fb::NodeOrphanStateType::ACTIVE : fb::NodeOrphanStateType::ORPHAN);
+	}
+
+	void SetFunctionOrphanState(nos::Name className, fb::NodeOrphanStateType type)
+	{
+		auto it = FunctionIds.find(className);
+		if (it != FunctionIds.end())
+			SetNodeOrphanState(it->second, type);
 	}
 
 	nosResult Reset(nosFunctionExecuteParams*)
@@ -163,6 +200,9 @@ struct TimecodePlayerNode : NodeContext
 
 	nosResult Start(nosFunctionExecuteParams*)
 	{
+		// Ranged mode plays once from Start to End, so each Start restarts from the beginning.
+		if (Mode == TimecodePlayerMode::Ranged)
+			FrameCounter = 0;
 		SetPlaying(true);
 		return NOS_RESULT_SUCCESS;
 	}
