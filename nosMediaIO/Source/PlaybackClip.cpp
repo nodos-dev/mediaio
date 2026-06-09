@@ -18,7 +18,7 @@
 namespace nos::mediaio
 {
 
-// Plays back a clip recorded by RecordClip: for the incoming timecode it loads the
+// Plays back a clip written by WriteDPX: for the incoming timecode it loads the
 // matching 'HH-MM-SS-FF.dpx' frame from Path and emits it on the Texture output. The
 // output texture format follows the DPX transfer tag - an sRGB-encoded file becomes an
 // _SRGB texture so the graph's sampler decodes it back to linear automatically. When no

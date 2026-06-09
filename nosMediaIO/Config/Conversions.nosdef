@@ -531,6 +531,65 @@
 			}
 		},
 		{
+			"class_name": "TextureToBuffer",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "Texture To Buffer",
+				"name_aliases": [ "record format", "pack texture", "dpx pack", "rgb to buffer" ]
+			},
+			"node": {
+				"class_name": "TextureToBuffer",
+				"contents_type": "Job",
+				"description": "Encodes the input Texture with a transfer curve (Gamma LUT or analytic) and packs it\ninto the Output buffer in the chosen pixel format. RGB-only - no colorspace matrix and\nno interlacing. The Output buffer is host-visible so a download ring + Record Clip can\nread it back and write it to disk.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/TextureToBuffer.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "GammaCurve",
+						"display_name": "Gamma Curve",
+						"type_name": "nos.mediaio.GammaCurve",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "OutputFormat",
+						"display_name": "Output Format",
+						"type_name": "nos.mediaio.RGBPixelFormat",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": "RGBA8"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 120
+						}
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		},
+		{
 			"class_name": "RGBAToBGR24Buffer",
 			"menu_info": {
 				"category": "Media IO",

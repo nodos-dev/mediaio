@@ -30,7 +30,8 @@
 		"Config/TimecodeToFrameNumber.nosdef",
 		"Config/TimecodeToString.nosdef",
 		"Config/TimecodePlayer.nosdef",
-		"Config/RecordClip.nosdef",
+		"Config/WriteDPX.nosdef",
+		"Config/RecordDPXClip.nosdef",
 		"Config/PlaybackClip.nosdef"
 	],
 	"custom_types": [

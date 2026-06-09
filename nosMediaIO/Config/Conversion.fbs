@@ -33,7 +33,22 @@ enum InterlacedFlags : uint(bit_flags) {
     INPUT_ODD = 3,
 }
 
+// TODO: Merge YCbCrPixelFormat and RGBPixelFormat into a single PixelFormat enum covering
+// both the YCbCr and RGB packed layouts, and migrate the conversion nodes to it.
 enum YCbCrPixelFormat: uint {
     YUV8,
     V210
+}
+
+// Packed pixel layout TextureToBuffer writes into its output buffer (and RecordClip
+// writes to disk). Must match the PIXEL_FORMAT_* defines in TextureToBuffer.comp.
+//   RGBA8  - 4 channels,  8-bit, one 32-bit word per pixel
+//   RGBA16 - 4 channels, 16-bit, two 32-bit words per pixel
+//   RGB10  - 3 channels, 10-bit, DPX Method A (R[31:22] G[21:12] B[11:2], 2 pad bits)
+//   RGB8   - 3 channels,  8-bit, tightly packed (3 bytes per pixel)
+enum RGBPixelFormat : uint {
+    RGBA8,
+    RGBA16,
+    RGB10,
+    RGB8
 }

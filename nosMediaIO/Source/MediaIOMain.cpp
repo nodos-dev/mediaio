@@ -26,6 +26,7 @@ enum Nodes : int
 	YUVBufferSizeCalculator,
 	GammaLUT,
 	ColorSpaceMatrix,
+	TextureToBuffer,
 	YUY2ToRGBA,
 	TextureFormatConverter,
 	NV12ToRGBA,
@@ -41,7 +42,7 @@ enum Nodes : int
 	TimecodePlayer,
 	SLog3ToLinear,
 	LinearToSLog3,
-	RecordClip,
+	WriteDPX,
 	PlaybackClip,
 	Count
 };
@@ -53,6 +54,7 @@ nosResult RegisterYCbCr2RGB(nosNodeFunctions*);
 nosResult RegisterYUVBufferSizeCalculator(nosNodeFunctions*);
 nosResult RegisterGammaLUT(nosNodeFunctions*);
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions*);
+nosResult RegisterTextureToBuffer(nosNodeFunctions*);
 nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
 nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
@@ -68,7 +70,7 @@ nosResult RegisterTimecodeToString(nosNodeFunctions*);
 nosResult RegisterTimecodePlayer(nosNodeFunctions*);
 nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
-nosResult RegisterRecordClip(nosNodeFunctions*);
+nosResult RegisterWriteDPX(nosNodeFunctions*);
 nosResult RegisterPlaybackClip(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
@@ -100,6 +102,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(YUVBufferSizeCalculator)
 				GEN_CASE_NODE(GammaLUT)
 				GEN_CASE_NODE(ColorSpaceMatrix)
+				GEN_CASE_NODE(TextureToBuffer)
 				GEN_CASE_NODE(YUY2ToRGBA)
 				GEN_CASE_NODE(TextureFormatConverter)
 				GEN_CASE_NODE(NV12ToRGBA)
@@ -115,7 +118,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(TimecodePlayer)
 				GEN_CASE_NODE(SLog3ToLinear)
 				GEN_CASE_NODE(LinearToSLog3)
-				GEN_CASE_NODE(RecordClip)
+				GEN_CASE_NODE(WriteDPX)
 				GEN_CASE_NODE(PlaybackClip)
 			}
 		}

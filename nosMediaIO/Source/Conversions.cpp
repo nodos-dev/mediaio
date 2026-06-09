@@ -594,4 +594,74 @@ nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions* funcs)
 	return NOS_RESULT_SUCCESS;
 }
 
+// Byte size of the packed output buffer for one frame in the given format. RGB8 is rounded
+// up to a whole 32-bit word because the shader writes it a word at a time.
+static uint32_t GetTextureBufferSize(RGBPixelFormat fmt, uint32_t width, uint32_t height)
+{
+	uint64_t pixels = uint64_t(width) * height;
+	switch (fmt)
+	{
+	case RGBPixelFormat::RGBA16: return uint32_t(pixels * 8);
+	case RGBPixelFormat::RGB8:   return uint32_t(((pixels * 3) + 3) & ~uint64_t(3));
+	case RGBPixelFormat::RGBA8:
+	case RGBPixelFormat::RGB10:
+	default:                       return uint32_t(pixels * 4);
+	}
+}
+
+// Workgroup count for the 16x16 shader. RGB8 packs 4 pixels per invocation in X.
+static nosVec2u GetTextureBufferDispatch(RGBPixelFormat fmt, uint32_t width, uint32_t height)
+{
+	uint32_t threadsX = (fmt == RGBPixelFormat::RGB8) ? (width + 3) / 4 : width;
+	return nosVec2u((threadsX + 15) / 16, (height + 15) / 16);
+}
+
+// Encodes the input texture with a gamma curve (LUT or analytic) and packs it into a
+// host-visible buffer in the chosen RGB* layout, so a download ring + Record Clip can read
+// it back and write it to disk. Like RGB2YCbCr but RGB-only: no colorspace matrix, no
+// interlacing. The output buffer is HOST_VISIBLE | DOWNLOAD; the compute shader writes it
+// directly.
+struct TextureToBufferNodeContext : NodeContext
+{
+	TextureToBufferNodeContext(nosFbNodePtr node) : NodeContext(node) {}
+
+	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	{
+		nos::NodeExecuteParams execParams(params);
+		const nosBuffer* inputPinData = execParams[NOS_NAME_STATIC("Source")].Data;
+		const nosBuffer* outputPinData = execParams[NOS_NAME_STATIC("Output")].Data;
+		auto fmt = *InterpretPinValue<RGBPixelFormat>(execParams[NOS_NAME_STATIC("OutputFormat")].Data->Data);
+		auto input = vkss::DeserializeTextureInfo(inputPinData->Data);
+		auto& output = *InterpretPinValue<sys::vulkan::Buffer>(outputPinData->Data);
+		output.mutate_field_type(sys::vulkan::FieldType::PROGRESSIVE);
+
+		uint32_t width = input.Info.Texture.Width, height = input.Info.Texture.Height;
+		uint32_t bufSize = GetTextureBufferSize(fmt, width, height);
+		constexpr auto outMemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_DOWNLOAD);
+		if (output.size_in_bytes() != bufSize || output.memory_flags() != (nos::sys::vulkan::MemoryFlags)(outMemoryFlags))
+		{
+			nosResourceShareInfo bufInfo = {
+				.Info = {
+					.Type = NOS_RESOURCE_TYPE_BUFFER,
+					.Buffer = nosBufferInfo{
+						.Size = bufSize,
+						.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),
+						.MemoryFlags = outMemoryFlags,
+						.FieldType = nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE,
+					}}};
+			auto bufferDesc = vkss::ConvertBufferInfo(bufInfo);
+			nosEngine.SetPinValueByName(NodeId, NOS_NAME_STATIC("Output"), Buffer::From(bufferDesc));
+		}
+		auto* dispatchSize = execParams.GetPinData<nosVec2u>(NOS_NAME_STATIC("DispatchSize"));
+		*dispatchSize = GetTextureBufferDispatch(fmt, width, height);
+		return nosVulkan->ExecuteGPUNode(this, params);
+	}
+};
+
+nosResult RegisterTextureToBuffer(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.TextureToBuffer"), TextureToBufferNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
 }

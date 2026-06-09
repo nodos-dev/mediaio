@@ -38,13 +38,16 @@ struct ImageDesc
 	uint32_t Width = 0;
 	uint32_t Height = 0;
 	uint8_t Channels = 0;                 // 3 = RGB, 4 = RGBA
-	uint8_t BitDepth = 0;                 // 8 or 16
+	uint8_t BitDepth = 0;                 // 8, 10 or 16
 	uint8_t Transfer = TRANSFER_LINEAR;   // transfer characteristic (see codes above)
 	float FrameRate = 0.0f;               // frames per second; 0 when the file records no rate
 };
 
 inline uint64_t ImageDataSize(const ImageDesc& d)
 {
+	// 10-bit RGB is stored DPX Method A: one 32-bit word per pixel (3x10 bits + 2 pad).
+	if (d.BitDepth == 10)
+		return uint64_t(d.Width) * d.Height * 4;
 	return uint64_t(d.Width) * d.Height * d.Channels * (d.BitDepth / 8);
 }
 
@@ -107,13 +110,15 @@ inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc, fl
 	PutU32(e + 0, 0);                             // data sign - unsigned
 	PutU32(e + 4, 0);                             // reference low data
 	PutF32(e + 8, 0.0f);                          // reference low quantity
-	PutU32(e + 12, d.BitDepth == 16 ? 65535u : 255u); // reference high data
+	uint32_t refHigh = d.BitDepth == 16 ? 65535u : (d.BitDepth == 10 ? 1023u : 255u);
+	PutU32(e + 12, refHigh);                      // reference high data
 	PutF32(e + 16, 1.0f);                         // reference high quantity
 	e[20] = d.Channels == 4 ? 51 : 50;            // descriptor - RGBA / RGB
 	e[21] = d.Transfer;                           // transfer characteristic
 	e[22] = 2;                                    // colorimetric - linear
 	e[23] = d.BitDepth;                           // bit depth
-	PutU16(e + 24, 0);                            // packing - packed
+	// Packing: 10-bit RGB is filled to 32-bit words (Method A); 8/16-bit are tightly packed.
+	PutU16(e + 24, d.BitDepth == 10 ? 1 : 0);     // packing
 	PutU16(e + 26, 0);                            // encoding - uncompressed
 	PutU32(e + 28, HEADER_SIZE);                  // offset to data
 	PutU32(e + 32, 0);                            // end-of-line padding
