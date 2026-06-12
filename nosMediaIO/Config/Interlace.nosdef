@@ -2,6 +2,7 @@
 	"nodes": [
 		{
 			"class_name": "Interlace",
+			"hide_in_context_menu": true,
 			"menu_info": {
 				"category": "Media IO",
 				"display_name": "Interlace"
@@ -29,6 +30,7 @@
 		},
 		{
 			"class_name": "Deinterlace",
+			"hide_in_context_menu": true	,
 			"menu_info": {
 				"category": "Media IO",
 				"display_name": "Deinterlace"

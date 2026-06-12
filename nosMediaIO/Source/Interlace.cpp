@@ -26,6 +26,8 @@ struct InterlaceNode : NodeContext
 	InterlaceNode(nosFbNodePtr node)
 		: NodeContext(node)
 	{
+		SetNodeStatusMessage("Internal — not intended for use.",
+							 fb::NodeStatusMessageType::WARNING);
 	}
 
 	~InterlaceNode()
@@ -113,11 +115,12 @@ struct DeinterlaceNode : NodeContext
 	DeinterlaceNode(nosFbNodePtr node)
 		: NodeContext(node)
 	{
+		SetNodeStatusMessage("Deprecated: low-quality single-field deinterlace.\nUse YADIF instead.",
+							 fb::NodeStatusMessageType::WARNING);
 	}
 
 	~DeinterlaceNode()
-	{
-	}
+	{}
 
 	nosResult CopyFrom(nosCopyInfo* copyInfo) override
 	{
