@@ -21,9 +21,27 @@ namespace nos::mediaio::dpx
 // The DPX header is a fixed 2048 bytes; image data follows immediately after.
 constexpr uint32_t HEADER_SIZE = 2048;
 
-// DPX transfer characteristic codes used by Record/Playback Clip.
-constexpr uint8_t TRANSFER_USER_DEFINED = 0; // our marker for sRGB-encoded pixels
-constexpr uint8_t TRANSFER_LINEAR = 2;       // SMPTE 268M "linear"
+// DPX "Transfer Characteristic" / "Colorimetric Specification" codes (SMPTE ST 268M). Both
+// header fields share this one enumeration. Values 2, 3, 11, 12 describe amplitude transfer
+// functions only and are NOT valid colorimetric specifications - the colorimetric field takes
+// user-defined (0), printing density (1), unspecified video (4), or a standard primaries code
+// (5..10). Codes match OpenImageIO's libdpx (DPXHeader.h "Characteristic").
+constexpr uint8_t CHARACTERISTIC_USER_DEFINED      = 0;
+constexpr uint8_t CHARACTERISTIC_PRINTING_DENSITY  = 1;
+constexpr uint8_t CHARACTERISTIC_LINEAR            = 2;    // transfer only
+constexpr uint8_t CHARACTERISTIC_LOGARITHMIC       = 3;    // transfer only
+constexpr uint8_t CHARACTERISTIC_UNSPECIFIED_VIDEO = 4;
+constexpr uint8_t CHARACTERISTIC_SMPTE274M         = 5;
+constexpr uint8_t CHARACTERISTIC_ITUR709           = 6;    // Rec.709 (CCIR 709-1)
+constexpr uint8_t CHARACTERISTIC_ITUR601_625       = 7;    // Rec.601 system B/G
+constexpr uint8_t CHARACTERISTIC_ITUR601_525       = 8;    // Rec.601 system M
+constexpr uint8_t CHARACTERISTIC_NTSC              = 9;
+constexpr uint8_t CHARACTERISTIC_PAL               = 10;
+constexpr uint8_t CHARACTERISTIC_UNDEFINED         = 0xFF; // field not specified
+
+// Aliases for the transfer field, kept for existing call sites.
+constexpr uint8_t TRANSFER_USER_DEFINED = CHARACTERISTIC_USER_DEFINED; // e.g. sRGB-encoded pixels
+constexpr uint8_t TRANSFER_LINEAR       = CHARACTERISTIC_LINEAR;
 
 // Frame-rate field offsets. DPX has two standard R32 (float) frame-rate fields and no integer
 // rational: the motion-picture film header's (the canonical rate most DPX tools read) and the
@@ -39,7 +57,8 @@ struct ImageDesc
 	uint32_t Height = 0;
 	uint8_t Channels = 0;                 // 3 = RGB, 4 = RGBA
 	uint8_t BitDepth = 0;                 // 8, 10 or 16
-	uint8_t Transfer = TRANSFER_LINEAR;   // transfer characteristic (see codes above)
+	uint8_t Transfer = TRANSFER_LINEAR;   // transfer characteristic (CHARACTERISTIC_*)
+	uint8_t Colorimetric = CHARACTERISTIC_UNDEFINED; // colorimetric specification (CHARACTERISTIC_*)
 	float FrameRate = 0.0f;               // frames per second; 0 when the file records no rate
 };
 
@@ -98,7 +117,7 @@ inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc, fl
 	PutU32(out + 24, 1664);                       // generic header length
 	PutU32(out + 28, 384);                        // industry header length
 	PutU32(out + 32, 0);                          // user header length
-	std::memcpy(out + 160, "Nodos Record Clip", 17); // creator
+	std::memcpy(out + 160, "Nodos WriteDPX", 14); // creator
 	PutU32(out + 660, 0xFFFFFFFFu);               // encryption key - unencrypted
 
 	// Image information header.
@@ -115,7 +134,7 @@ inline void WriteHeader(uint8_t* out, const ImageDesc& d, const Timecode& tc, fl
 	PutF32(e + 16, 1.0f);                         // reference high quantity
 	e[20] = d.Channels == 4 ? 51 : 50;            // descriptor - RGBA / RGB
 	e[21] = d.Transfer;                           // transfer characteristic
-	e[22] = 2;                                    // colorimetric - linear
+	e[22] = d.Colorimetric;                       // colorimetric specification
 	e[23] = d.BitDepth;                           // bit depth
 	// Packing: 10-bit RGB is filled to 32-bit words (Method A); 8/16-bit are tightly packed.
 	PutU16(e + 24, d.BitDepth == 10 ? 1 : 0);     // packing
@@ -164,6 +183,7 @@ inline bool ReadHeader(const uint8_t* hdr, ImageDesc& d, uint32_t& dataOffset, b
 		return false;
 	d.BitDepth = bitDepth;
 	d.Transfer = e[21];
+	d.Colorimetric = e[22];
 	d.FrameRate = GetF32(hdr + FILM_FRAME_RATE_OFFSET, bigEndian); // canonical frame rate (0 when unset)
 	return d.Width != 0 && d.Height != 0;
 }

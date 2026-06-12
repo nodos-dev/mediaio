@@ -39,9 +39,23 @@ static uint8_t DpxTransferFromCurve(GammaCurve curve)
 {
 	switch (curve)
 	{
-	case GammaCurve::IDENTITY: return dpx::TRANSFER_LINEAR;
-	case GammaCurve::REC709:   return 6; // SMPTE 268M "CCIR Recommendation 709-1"
-	default:                   return dpx::TRANSFER_USER_DEFINED;
+	case GammaCurve::IDENTITY: return dpx::CHARACTERISTIC_LINEAR;
+	case GammaCurve::REC709:   return dpx::CHARACTERISTIC_ITUR709;
+	default:                   return dpx::CHARACTERISTIC_USER_DEFINED;
+	}
+}
+
+// DPX colorimetric specification (colour primaries) implied by the encode curve. sRGB and
+// Rec.709 share Rec.709 primaries; the linear, HDR and log curves carry no primaries by
+// themselves (and DPX has no Rec.2020 / S-Gamut code), so they are left undefined rather than
+// mislabelled. Note "Linear" is a transfer code only - it is not a valid colorimetric value.
+static uint8_t DpxColorimetricFromCurve(GammaCurve curve)
+{
+	switch (curve)
+	{
+	case GammaCurve::SRGB:
+	case GammaCurve::REC709: return dpx::CHARACTERISTIC_ITUR709;
+	default:                 return dpx::CHARACTERISTIC_UNDEFINED;
 	}
 }
 
@@ -169,6 +183,7 @@ struct WriteDPXNode : NodeContext
 		desc.Height = resolution->y;
 		DpxLayoutFromFormat(fmt, desc);
 		desc.Transfer = DpxTransferFromCurve(curve);
+		desc.Colorimetric = DpxColorimetricFromCurve(curve);
 		uint64_t dataSize = dpx::ImageDataSize(desc);
 		lap("Setup");
 
