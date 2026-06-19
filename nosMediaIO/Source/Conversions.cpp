@@ -299,6 +299,20 @@ struct GammaLUTNodeContext : NodeContext
                         : [](double c) -> double { return (c <= 0.0031308) ? (c * 12.92) : (pow(c, 1.0/2.4) * 1.055 - 0.055); };
         case GammaCurve::IDENTITY:
             return [](double c) { return c; };
+		case GammaCurve::SLOG3:
+			// Sony S-Log3 (full-range, normalized 0..1 code value).
+			// Linear breakpoint 0.01125 → code 171.2102946929/1023 ≈ 0.16739.
+			return toLinear
+				? [](double c) -> double {
+					return (c >= 171.2102946929 / 1023.0)
+						? (pow(10.0, (c * 1023.0 - 420.0) / 261.5) * 0.19 - 0.01)
+						: ((c * 1023.0 - 95.0) * 0.01125 / (171.2102946929 - 95.0));
+				}
+				: [](double c) -> double {
+					return (c >= 0.01125)
+						? ((420.0 + log10((c + 0.01) / 0.19) * 261.5) / 1023.0)
+						: ((c * (171.2102946929 - 95.0) / 0.01125 + 95.0) / 1023.0);
+				};
 		}
 	}
 
@@ -308,7 +322,8 @@ struct GammaLUTNodeContext : NodeContext
 		auto fn = GetLUTFunction(toLinear, curve);
 		for (uint32_t i = 0; i < 1 << bits; ++i)
 		{
-			re[i] = uint16_t(double((1 << 16) - 1) * fn(double(i) / double((1 << bits) - 1)) + 0.5);
+			double v = glm::clamp(fn(double(i) / double((1 << bits) - 1)), 0.0, 1.0);
+			re[i] = uint16_t(double((1 << 16) - 1) * v + 0.5);
 		}
 		return re;
 	}
@@ -334,6 +349,13 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 			return { .299, .114 };
 		case ColorSpace::REC2020:
 			return { .2627, .0593 };
+		// Sony S-Gamut3 / S-Gamut3.Cine luma (R, B) coefficients, derived from the
+		// published primaries against D65 white. Blue is negative because the blue
+		// primary lies outside the spectral locus.
+		case ColorSpace::SGAMUT3:
+			return { 0.2709805, -0.0575869 };
+		case ColorSpace::SGAMUT3CINE:
+			return { 0.2150825, -0.1001485 };
 		case ColorSpace::REC709:
 		default:
 			return { .2126, .0722 };
@@ -396,6 +418,49 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions* funcs)
 {
 	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.ColorSpaceMatrix"), ColorSpaceMatrixNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+struct SLog3GammaPassNodeContext : NodeContext
+{
+	using NodeContext::NodeContext;
+
+	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	{
+		nos::NodeExecuteParams execParams(params);
+		auto input = vkss::DeserializeTextureInfo(execParams[NOS_NAME_STATIC("Source")].Data->Data);
+		auto& output = *InterpretPinValue<sys::vulkan::Texture>(execParams[NOS_NAME_STATIC("Output")].Data->Data);
+
+		constexpr auto reqFormat = NOS_FORMAT_R16G16B16A16_SFLOAT;
+		const uint32_t w = input.Info.Texture.Width;
+		const uint32_t h = input.Info.Texture.Height;
+		if (output.width() != w || output.height() != h || (nosFormat)output.format() != reqFormat)
+		{
+			nosResourceShareInfo tex{.Info = {
+				.Type = NOS_RESOURCE_TYPE_TEXTURE,
+				.Texture = {
+					.Width = w,
+					.Height = h,
+					.Format = reqFormat,
+					.FieldType = input.Info.Texture.FieldType,
+				}}};
+			nosEngine.SetPinValueByName(NodeId, NOS_NAME_STATIC("Output"), nos::Buffer::From(vkss::ConvertTextureInfo(tex)));
+		}
+		nosEngine.SetPinValue(execParams[NOS_NAME_STATIC("DispatchSize")].Id,
+			nos::Buffer::From(nosVec2u(uint32_t(glm::ceil(w / 16.0f)), uint32_t(glm::ceil(h / 16.0f)))));
+		return nosVulkan->ExecuteGPUNode(this, params);
+	}
+};
+
+nosResult RegisterSLog3ToLinear(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.SLog3ToLinear"), SLog3GammaPassNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+nosResult RegisterLinearToSLog3(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.LinearToSLog3"), SLog3GammaPassNodeContext, funcs);
 	return NOS_RESULT_SUCCESS;
 }
 
@@ -526,6 +591,76 @@ struct RGBA2BGR24BufferNodeContext : NodeContext
 nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions* funcs)
 {
 	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.RGBAToBGR24Buffer"), RGBA2BGR24BufferNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+// Byte size of the packed output buffer for one frame in the given format. RGB8 is rounded
+// up to a whole 32-bit word because the shader writes it a word at a time.
+static uint32_t GetTextureBufferSize(RGBPixelFormat fmt, uint32_t width, uint32_t height)
+{
+	uint64_t pixels = uint64_t(width) * height;
+	switch (fmt)
+	{
+	case RGBPixelFormat::RGBA16: return uint32_t(pixels * 8);
+	case RGBPixelFormat::RGB8:   return uint32_t(((pixels * 3) + 3) & ~uint64_t(3));
+	case RGBPixelFormat::RGBA8:
+	case RGBPixelFormat::RGB10:
+	default:                       return uint32_t(pixels * 4);
+	}
+}
+
+// Workgroup count for the 16x16 shader. RGB8 packs 4 pixels per invocation in X.
+static nosVec2u GetTextureBufferDispatch(RGBPixelFormat fmt, uint32_t width, uint32_t height)
+{
+	uint32_t threadsX = (fmt == RGBPixelFormat::RGB8) ? (width + 3) / 4 : width;
+	return nosVec2u((threadsX + 15) / 16, (height + 15) / 16);
+}
+
+// Encodes the input texture with a gamma curve (LUT or analytic) and packs it into a
+// host-visible buffer in the chosen RGB* layout, so a download ring + Record Clip can read
+// it back and write it to disk. Like RGB2YCbCr but RGB-only: no colorspace matrix, no
+// interlacing. The output buffer is HOST_VISIBLE | DOWNLOAD; the compute shader writes it
+// directly.
+struct TextureToBufferNodeContext : NodeContext
+{
+	TextureToBufferNodeContext(nosFbNodePtr node) : NodeContext(node) {}
+
+	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	{
+		nos::NodeExecuteParams execParams(params);
+		const nosBuffer* inputPinData = execParams[NOS_NAME_STATIC("Source")].Data;
+		const nosBuffer* outputPinData = execParams[NOS_NAME_STATIC("Output")].Data;
+		auto fmt = *InterpretPinValue<RGBPixelFormat>(execParams[NOS_NAME_STATIC("OutputFormat")].Data->Data);
+		auto input = vkss::DeserializeTextureInfo(inputPinData->Data);
+		auto& output = *InterpretPinValue<sys::vulkan::Buffer>(outputPinData->Data);
+		output.mutate_field_type(sys::vulkan::FieldType::PROGRESSIVE);
+
+		uint32_t width = input.Info.Texture.Width, height = input.Info.Texture.Height;
+		uint32_t bufSize = GetTextureBufferSize(fmt, width, height);
+		constexpr auto outMemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_DOWNLOAD);
+		if (output.size_in_bytes() != bufSize || output.memory_flags() != (nos::sys::vulkan::MemoryFlags)(outMemoryFlags))
+		{
+			nosResourceShareInfo bufInfo = {
+				.Info = {
+					.Type = NOS_RESOURCE_TYPE_BUFFER,
+					.Buffer = nosBufferInfo{
+						.Size = bufSize,
+						.Usage = nosBufferUsage(NOS_BUFFER_USAGE_TRANSFER_SRC | NOS_BUFFER_USAGE_STORAGE_BUFFER),
+						.MemoryFlags = outMemoryFlags,
+						.FieldType = nosTextureFieldType::NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE,
+					}}};
+			auto bufferDesc = vkss::ConvertBufferInfo(bufInfo);
+			nosEngine.SetPinValueByName(NodeId, NOS_NAME_STATIC("Output"), Buffer::From(bufferDesc));
+		}
+		auto* dispatchSize = execParams.GetPinData<nosVec2u>(NOS_NAME_STATIC("DispatchSize"));
+		*dispatchSize = GetTextureBufferDispatch(fmt, width, height);
+		return nosVulkan->ExecuteGPUNode(this, params);
+	}
+};
+
+nosResult RegisterTextureToBuffer(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.TextureToBuffer"), TextureToBufferNodeContext, funcs);
 	return NOS_RESULT_SUCCESS;
 }
 

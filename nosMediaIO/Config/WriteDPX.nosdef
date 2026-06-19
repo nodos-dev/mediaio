@@ -1,0 +1,96 @@
+{
+    "nodes": [
+        {
+            "class_name": "WriteDPX",
+            "menu_info": {
+                "category": "Media IO|Recording",
+                "display_name": "Write DPX",
+                "name_aliases": [ "record clip", "record buffer", "buffer recorder", "capture clip", "dpx writer", "dpx sequence" ]
+            },
+            "node": {
+                "class_name": "WriteDPX",
+                "display_name": "Write DPX",
+                "contents_type": "Job",
+                "description": "Writes the input Buffer to disk as an uncompressed DPX sequence while Write is true.\nEach execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE timecode\nembedded in its header - under Path. The pixels are produced upstream by a Texture To\nBuffer node (encoding + packing) and made host-visible by a download ring, so this node\ndoes no GPU work: it maps the buffer and writes the bytes. Resolution, Output Format and\nTransfer describe the buffer for the DPX header and must match the Texture To Buffer node.\nDrive it through the In/Out exe pins to schedule it. Play the result back with the\nPlayback Clip node.",
+                "pins": [
+                    {
+                        "name": "InExe",
+                        "type_name": "nos.exe",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "OutExe",
+                        "type_name": "nos.exe",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Buffer",
+                        "display_name": "Buffer",
+                        "description": "Host-visible buffer of packed pixels to record, from a Texture To Buffer node via a\ndownload ring. Written to disk verbatim after the DPX header.",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Timecode",
+                        "display_name": "Timecode",
+                        "description": "SMPTE timecode for the current frame. Names the file 'HH-MM-SS-FF.dpx' and is\nembedded in the DPX header.",
+                        "type_name": "nos.mediaio.Timecode",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Path",
+                        "display_name": "Path",
+                        "description": "Output directory for the recorded .dpx sequence. Created if it does not exist.",
+                        "type_name": "string",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "visualizer": { "type": "FOLDER_PICKER" }
+                    },
+                    {
+                        "name": "Write",
+                        "display_name": "Write",
+                        "description": "While true, every executed frame is written to disk. While false, nothing is written.",
+                        "type_name": "bool",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": false
+                    },
+                    {
+                        "name": "Resolution",
+                        "display_name": "Resolution",
+                        "description": "Frame size of the buffer in pixels. Must match the texture the Texture To Buffer\nnode packed; drives the DPX header and how many bytes are written.",
+                        "type_name": "nos.fb.vec2u",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 1920,
+                            "y": 1080
+                        }
+                    },
+                    {
+                        "name": "OutputFormat",
+                        "display_name": "Output Format",
+                        "description": "Packed pixel layout of the buffer. Must match the Texture To Buffer node's Output\nFormat: RGBA8 / RGBA16 / RGB10 (DPX Method A) / RGB8.",
+                        "type_name": "nos.mediaio.RGBPixelFormat",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "RGBA8"
+                    },
+                    {
+                        "name": "Transfer",
+                        "display_name": "Transfer",
+                        "description": "Transfer curve the buffer was encoded with upstream, recorded in the DPX header's\ntransfer characteristic. IDENTITY -> linear, REC709 -> CCIR 709; other curves are\ntagged user-defined.",
+                        "type_name": "nos.mediaio.GammaCurve",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "SRGB"
+                    }
+                ]
+            }
+        }
+    ]
+}

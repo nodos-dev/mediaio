@@ -1,0 +1,62 @@
+{
+    "nodes": [
+        {
+            "class_name": "ExtractTimecode",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Extract Timecode"
+            },
+            "node": {
+                "class_name": "ExtractTimecode",
+                "display_name": "Extract Timecode",
+                "contents_type": "Job",
+                "description": "Decodes a SMPTE ST 12-2 Ancillary Timecode (ATC) packet from an ANCFrame and emits the decoded\nTimecode struct (HH:MM:SS:FF + drop-frame flag + ATC source) along with a Valid flag.\n\nFor SDI input via AJA, the AJA In node's Timecode output pin is the recommended source — the\nAJA hardware extracts RP188 ATC through its dedicated path. Use this node on ANCFrame data\nfrom non-AJA inputs (2110, file readers) or when you specifically need to decode an ATC packet\nthat reached you as ANC data.",
+              "pins": [
+                {
+                  "name": "Source",
+                  "display_name": "Source",
+                  "description": "ATC carriage to accept. Auto picks the highest-priority match (LTC > VITC1 > VITC2).\nExplicit selections (ATC_LTC / ATC_VITC1 / ATC_VITC2) reject other flavors.",
+                  "type_name": "nos.mediaio.ATCSource",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used to validate the decoded frame field and decode HFR\n(>=40 fps) pair-encoded ATC packets. Leave at 0 to auto-infer from the executing path's\nfixed-step timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "Decoded SMPTE timecode. Only meaningful when Valid is true; left at its previous value when\nno matching ATC packet was found this tick.",
+                  "type_name": "nos.mediaio.Timecode",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                },
+                {
+                  "name": "Valid",
+                  "display_name": "Valid",
+                  "description": "True if a matching, well-formed ATC packet was found and decoded this tick.",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                },
+                {
+                  "name": "ANCFrame",
+                  "display_name": "ANC Frame",
+                  "description": "Input ANC frame to scan for ATC packets (DID=0x60, SDID=0x60).",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ]
+}

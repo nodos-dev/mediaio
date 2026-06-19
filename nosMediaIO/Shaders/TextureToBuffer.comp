@@ -1,0 +1,108 @@
+// Copyright MediaZ Teknoloji A.S. All Rights Reserved.
+
+// Encodes the input RGB texture with a transfer curve (gamma LUT or analytic) and packs it
+// into the output buffer in one of the RGBPixelFormat layouts. No colorspace matrix and no
+// interlacing - a focused texture->buffer pack for the Record Clip path. The output buffer is
+// host-visible so it can be read back (via a download ring) and written to disk verbatim.
+
+#version 450
+
+#include "GammaFunctions.glsl"
+
+// Must match nos.mediaio.RGBPixelFormat in Conversion.fbs.
+#define PIXEL_FORMAT_RGBA8  0
+#define PIXEL_FORMAT_RGBA16 1
+#define PIXEL_FORMAT_RGB10  2
+#define PIXEL_FORMAT_RGB8   3
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout (binding = 0) uniform sampler2D Source;
+layout (binding = 1) writeonly buffer OutputBuffer
+{
+    uint Pixels[];
+} Output;
+layout (binding = 2) uniform UBO
+{
+    uint GammaCurve;
+    uint OutputFormat;
+} ubo;
+
+#define N16 ((1 << 16) - 1)
+#define N10 ((1 << 10) - 1)
+
+// Linear RGB -> encoded RGB in [0,1] via the analytic transfer curve.
+vec3 EncodeGamma(vec3 c)
+{
+    c = clamp(c, 0.0, 1.0);
+    return clamp(FromLinear(c, ubo.GammaCurve), 0.0, 1.0);
+}
+
+// 3 channels, 8-bit, tightly packed: 4 pixels (12 bytes) per invocation so each owns whole
+// 32-bit words and adjacent invocations never race on a shared word.
+void packRGB8(ivec2 size)
+{
+    ivec2 coord = ivec2(gl_GlobalInvocationID.x * 4, gl_GlobalInvocationID.y);
+    if (coord.x >= size.x || coord.y >= size.y)
+        return;
+
+    uvec3 px[4];
+    for (uint i = 0; i < 4; ++i)
+    {
+        uint xc = uint(coord.x) + i;
+        px[i] = (xc < uint(size.x))
+            ? uvec3(round(EncodeGamma(texelFetch(Source, ivec2(xc, coord.y), 0).rgb) * 255.0))
+            : uvec3(0);
+    }
+
+    uint word = (uint(coord.y) * uint(size.x) + uint(coord.x)) * 3 / 4; // byte offset / 4
+    uint vals[3] = uint[3](0u, 0u, 0u);
+    for (uint b = 0; b < 12; ++b)
+    {
+        uint comp = px[b / 3][b % 3] & 0xFFu;
+        vals[b / 4] |= comp << (24 - ((3 - (b % 4)) * 8));
+    }
+    Output.Pixels[word]     = vals[0];
+    Output.Pixels[word + 1] = vals[1];
+    Output.Pixels[word + 2] = vals[2];
+}
+
+void main()
+{
+    ivec2 size = textureSize(Source, 0);
+
+    if (ubo.OutputFormat == PIXEL_FORMAT_RGB8)
+    {
+        packRGB8(size);
+        return;
+    }
+
+    // Word-aligned formats: one pixel per invocation, each owns its own word(s).
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+    if (coord.x >= size.x || coord.y >= size.y)
+        return;
+
+    vec4 texel = texelFetch(Source, coord, 0);
+    vec3 e = EncodeGamma(texel.rgb);
+    float a = clamp(texel.a, 0.0, 1.0);
+    uint idx = uint(coord.y) * uint(size.x) + uint(coord.x);
+
+    if (ubo.OutputFormat == PIXEL_FORMAT_RGBA8)
+    {
+        uvec3 c = uvec3(round(e * 255.0));
+        uint av = uint(round(a * 255.0));
+        Output.Pixels[idx] = (av << 24) | (c.b << 16) | (c.g << 8) | c.r;
+    }
+    else if (ubo.OutputFormat == PIXEL_FORMAT_RGBA16)
+    {
+        uvec3 c = uvec3(round(e * float(N16)));
+        uint av = uint(round(a * float(N16)));
+        Output.Pixels[idx * 2]     = (c.g << 16) | c.r;
+        Output.Pixels[idx * 2 + 1] = (av << 16) | c.b;
+    }
+    else // PIXEL_FORMAT_RGB10, DPX Method A: R[31:22] G[21:12] B[11:2], 2 LSB pad
+    {
+        uvec3 c = uvec3(round(e * float(N10)));
+        Output.Pixels[idx] = (c.r << 22) | (c.g << 12) | (c.b << 2);
+    }
+}

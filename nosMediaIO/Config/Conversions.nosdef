@@ -339,6 +339,94 @@
 			}
 		},
 		{
+			"class_name": "SLog3ToLinear",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "S-Log3 to Linear",
+				"name_aliases": [ "slog3", "s-log3", "log to linear", "decode log" ]
+			},
+			"node": {
+				"class_name": "SLog3ToLinear",
+				"contents_type": "Job",
+				"description": "Decodes Sony S-Log3 RGB to scene-linear RGB. Output is R16G16B16A16_SFLOAT to preserve sub-black and HDR highlights.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/SLog3ToLinear.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 68
+						}
+					}
+				]
+			}
+		},
+		{
+			"class_name": "LinearToSLog3",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "Linear to S-Log3",
+				"name_aliases": [ "slog3", "s-log3", "linear to log", "encode log" ]
+			},
+			"node": {
+				"class_name": "LinearToSLog3",
+				"contents_type": "Job",
+				"description": "Encodes scene-linear RGB to Sony S-Log3. Output is R16G16B16A16_SFLOAT.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/LinearToSLog3.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 68
+						}
+					}
+				]
+			}
+		},
+		{
 			"class_name": "YUY2ToRGBA",
 			"menu_info": {
 				"category": "Media IO",
@@ -438,6 +526,65 @@
 							"x": 120,
 							"y": 135
 						}
+					}
+				]
+			}
+		},
+		{
+			"class_name": "TextureToBuffer",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "Texture To Buffer",
+				"name_aliases": [ "record format", "pack texture", "dpx pack", "rgb to buffer" ]
+			},
+			"node": {
+				"class_name": "TextureToBuffer",
+				"contents_type": "Job",
+				"description": "Encodes the input Texture with a transfer curve (Gamma LUT or analytic) and packs it\ninto the Output buffer in the chosen pixel format. RGB-only - no colorspace matrix and\nno interlacing. The Output buffer is host-visible so a download ring + Record Clip can\nread it back and write it to disk.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/TextureToBuffer.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "GammaCurve",
+						"display_name": "Gamma Curve",
+						"type_name": "nos.mediaio.GammaCurve",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "OutputFormat",
+						"display_name": "Output Format",
+						"type_name": "nos.mediaio.RGBPixelFormat",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": "RGBA8"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 120
+						}
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
 					}
 				]
 			}

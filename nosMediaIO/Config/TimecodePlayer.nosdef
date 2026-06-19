@@ -1,0 +1,92 @@
+{
+    "nodes": [
+        {
+            "class_name": "TimecodePlayer",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Timecode Player",
+                "name_aliases": [ "timecode", "play", "clock", "generator" ]
+            },
+            "node": {
+                "class_name": "TimecodePlayer",
+                "display_name": "Timecode Player",
+                "contents_type": "Job",
+                "description": "Plays a running SMPTE timecode, advancing one frame per run while playing. Rate is taken\nfrom the path's fixed-step timing. Ranged mode runs from Start Time to End Timecode then stops;\nContinuous counts up without bound.",
+                "pins": [
+                    {
+                        "name": "InExe",
+                        "type_name": "nos.exe",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "OutExe",
+                        "type_name": "nos.exe",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "StartTime",
+                        "display_name": "Start Time",
+                        "description": "Timecode the player starts from; its drop-frame flag and source carry into the output.",
+                        "type_name": "nos.mediaio.Timecode",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "EndTimecode",
+                        "display_name": "End Timecode",
+                        "description": "Timecode the player stops at in Ranged mode. Passive in Continuous mode.",
+                        "type_name": "nos.mediaio.Timecode",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                    },
+                    {
+                        "name": "Mode",
+                        "description": "Ranged runs from Start Time to End Timecode then stops; Continuous counts up without bound.",
+                        "type_name": "nos.mediaio.TimecodePlayerMode",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "Ranged"
+                    },
+                    {
+                        "name": "Timecode",
+                        "display_name": "Timecode",
+                        "description": "Current SMPTE timecode.",
+                        "type_name": "nos.mediaio.Timecode",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Playing",
+                        "description": "True while playing, false when stopped.",
+                        "type_name": "bool",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY",
+                        "data": false
+                    }
+                ],
+                "functions": [
+                    {
+                        "class_name": "Reset",
+                        "contents_type": "Job",
+                        "description": "Returns to Start Time.",
+                        "pins": []
+                    },
+                    {
+                        "class_name": "Start",
+                        "contents_type": "Job",
+                        "description": "Resumes playback.",
+                        "pins": []
+                    },
+                    {
+                        "class_name": "Stop",
+                        "contents_type": "Job",
+                        "description": "Pauses, holding the current timecode.",
+                        "pins": []
+                    }
+                ]
+            }
+        }
+    ]
+}

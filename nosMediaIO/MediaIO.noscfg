@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.8.1"
+			"version": "2.9.0"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -23,11 +23,22 @@
 		"Config/SetBufferFieldType.nosdef",
 		"Config/GetLumaCoeffs.nosdef",
 		"Config/SetInterlacedFieldType.nosdef",
-		"Config/Debayer.nosdef"
+		"Config/Debayer.nosdef",
+		"Config/ExtractTimecode.nosdef",
+		"Config/InjectTimecode.nosdef",
+		"Config/TimecodeFromFrameNumber.nosdef",
+		"Config/TimecodeToFrameNumber.nosdef",
+		"Config/TimecodeToString.nosdef",
+		"Config/TimecodePlayer.nosdef",
+		"Config/WriteDPX.nosdef",
+		"Config/RecordDPXClip.nosdef",
+		"Config/PlaybackClip.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
-		"Config/SensorInfo.fbs"
+		"Config/SensorInfo.fbs",
+		"Config/ANC.fbs",
+		"Config/TimecodePlayer.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"

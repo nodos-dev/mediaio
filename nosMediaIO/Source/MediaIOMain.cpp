@@ -26,6 +26,7 @@ enum Nodes : int
 	YUVBufferSizeCalculator,
 	GammaLUT,
 	ColorSpaceMatrix,
+	TextureToBuffer,
 	YUY2ToRGBA,
 	TextureFormatConverter,
 	NV12ToRGBA,
@@ -33,6 +34,16 @@ enum Nodes : int
 	FieldJuggler,
 	SetInterlacedFieldType,
 	Debayer,
+	ExtractTimecode,
+	InjectTimecode,
+	TimecodeFromFrameNumber,
+	TimecodeToFrameNumber,
+	TimecodeToString,
+	TimecodePlayer,
+	SLog3ToLinear,
+	LinearToSLog3,
+	WriteDPX,
+	PlaybackClip,
 	Count
 };
 
@@ -43,6 +54,7 @@ nosResult RegisterYCbCr2RGB(nosNodeFunctions*);
 nosResult RegisterYUVBufferSizeCalculator(nosNodeFunctions*);
 nosResult RegisterGammaLUT(nosNodeFunctions*);
 nosResult RegisterColorSpaceMatrix(nosNodeFunctions*);
+nosResult RegisterTextureToBuffer(nosNodeFunctions*);
 nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
 nosResult RegisterTextureFormatConverter(nosNodeFunctions* fn);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
@@ -50,6 +62,16 @@ nosResult RegisterRGBAToBGR24Buffer(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
 nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
+nosResult RegisterExtractTimecode(nosNodeFunctions*);
+nosResult RegisterInjectTimecode(nosNodeFunctions*);
+nosResult RegisterTimecodeFromFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToString(nosNodeFunctions*);
+nosResult RegisterTimecodePlayer(nosNodeFunctions*);
+nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
+nosResult RegisterLinearToSLog3(nosNodeFunctions*);
+nosResult RegisterWriteDPX(nosNodeFunctions*);
+nosResult RegisterPlaybackClip(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -80,6 +102,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(YUVBufferSizeCalculator)
 				GEN_CASE_NODE(GammaLUT)
 				GEN_CASE_NODE(ColorSpaceMatrix)
+				GEN_CASE_NODE(TextureToBuffer)
 				GEN_CASE_NODE(YUY2ToRGBA)
 				GEN_CASE_NODE(TextureFormatConverter)
 				GEN_CASE_NODE(NV12ToRGBA)
@@ -87,6 +110,16 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(FieldJuggler)
 				GEN_CASE_NODE(SetInterlacedFieldType)
 				GEN_CASE_NODE(Debayer)
+				GEN_CASE_NODE(ExtractTimecode)
+				GEN_CASE_NODE(InjectTimecode)
+				GEN_CASE_NODE(TimecodeFromFrameNumber)
+				GEN_CASE_NODE(TimecodeToFrameNumber)
+				GEN_CASE_NODE(TimecodeToString)
+				GEN_CASE_NODE(TimecodePlayer)
+				GEN_CASE_NODE(SLog3ToLinear)
+				GEN_CASE_NODE(LinearToSLog3)
+				GEN_CASE_NODE(WriteDPX)
+				GEN_CASE_NODE(PlaybackClip)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
