@@ -8,6 +8,7 @@ enum ColorSpace : uint {
     REC2020 = 2,
 }
 
+// must match GammaFunctions.glsl
 enum GammaCurve : uint {
     REC709  = 0,
     HLG  = 1,
