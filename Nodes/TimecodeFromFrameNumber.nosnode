@@ -1,0 +1,66 @@
+{
+    "nodes": [
+        {
+            "class_name": "TimecodeFromFrameNumber",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Timecode From Frame Number"
+            },
+            "node": {
+                "class_name": "TimecodeFromFrameNumber",
+                "display_name": "Timecode From Frame Number",
+                "contents_type": "Job",
+                "always_execute": true,
+                "description": "Converts a frame number (frames since 00:00:00:00) to a decoded SMPTE Timecode struct. Applies\nSMPTE drop-frame correction when DropFrame is true and the frame rate is 29.97 or 59.94. The\nresulting Timecode struct can be fed directly into AJA Out (Timecode pin) or InjectTimecode\n(to embed as an ATC packet in an ANCFrame).",
+              "pins": [
+                {
+                  "name": "FrameNumber",
+                  "display_name": "Frame Number",
+                  "description": "Total frames since 00:00:00:00. Converted to HH:MM:SS:FF using FrameRateOverride (or the\nauto-inferred rate) with SMPTE drop-frame correction applied when DropFrame is true.",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used when converting frame number to HH:MM:SS:FF. Leave\nat 0 to auto-infer from the executing path's fixed-step timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "DropFrame",
+                  "display_name": "Drop Frame",
+                  "description": "When true, SMPTE drop-frame math is applied to the frame-number-to-timecode conversion and\nthe drop-frame flag is propagated into the output Timecode. Drop-frame is only defined for\n29.97/59.94; consumers should ignore the flag at integer rates.",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": false
+                },
+                {
+                  "name": "Source",
+                  "display_name": "Source",
+                  "description": "ATC carriage to encode in the output Timecode's source field (DBB1 bits 2-0 when serialized\nto ATC). Auto is treated as ATC_LTC.",
+                  "type_name": "nos.mediaio.ATCSource",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 1
+                },
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "Decoded SMPTE timecode (HH:MM:SS:FF + drop-frame flag + ATC source).",
+                  "type_name": "nos.mediaio.Timecode",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}

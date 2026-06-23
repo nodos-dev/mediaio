@@ -1,0 +1,36 @@
+{
+    "nodes": [
+        {
+            "class_name": "TimecodeToString",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Timecode To String"
+            },
+            "node": {
+                "class_name": "TimecodeToString",
+                "display_name": "Timecode To String",
+                "contents_type": "Job",
+                "description": "Formats a decoded SMPTE Timecode struct as HH:MM:SS:FF (':' separator), or HH:MM:SS;FF when\nthe drop-frame flag is set.",
+              "pins": [
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "Decoded SMPTE timecode to format.",
+                  "type_name": "nos.mediaio.Timecode",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "TimecodeStr",
+                  "display_name": "Timecode String",
+                  "description": "HH:MM:SS:FF (':' separator), or HH:MM:SS;FF when the input Timecode's drop-frame flag is set.",
+                  "type_name": "string",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}

@@ -1,0 +1,103 @@
+namespace nos.mediaio;
+
+// SMPTE 291M ancillary data space.
+enum ANCDataSpace : uint
+{
+    Unknown = 0,
+    HANC = 1,
+    VANC = 2,
+}
+
+// Which video stream component a packet was carried in.
+enum ANCDataChannel : uint
+{
+    Both = 0, // Packet is component-agnostic / unknown
+    Y = 1,    // Luma
+    C = 2,    // Chroma
+}
+
+// Dual-link / quad-link physical link (A=primary, B=secondary).
+enum ANCDataLink : uint
+{
+    Unknown = 0,
+    A = 1,
+    B = 2,
+}
+
+// SDI sub-stream identifier in multi-stream signals (quad-link 4K, 12G-SDI).
+// Orthogonal to ANCDataLink (which selects the dual-link 1.5G physical link).
+enum ANCDataStream : uint
+{
+    Unknown = 0,
+    DS1 = 1,
+    DS2 = 2,
+    DS3 = 3,
+    DS4 = 4,
+}
+
+// SMPTE 291 coding type. Mirrors AJAAncDataCoding in the AJA SDK.
+// Digital is the SMPTE-291 packet format used on nearly all SDI/2110 ANC;
+// Raw is for digitized analog waveforms (CEA-608 captions, VITC) typically
+// captured from HDMI ingest paths.
+enum ANCDataCoding : ubyte
+{
+    Digital = 0,
+    Raw = 1,
+    Unknown = 2,
+}
+
+// A single SMPTE 291 ancillary data packet.
+// Variable-length payload (DC = payload.size()) — flatbuffers requires a table for this.
+table ANCPacket
+{
+    did: ubyte;            // Data ID (0x00..0xFF)
+    sdid: ubyte;           // Secondary Data ID
+    line_number: uint16;   // SMPTE line number; 0 if unspecified
+    horiz_offset: uint16;  // SMPTE-291 horizontal offset (0 = anywhere)
+    space: ANCDataSpace;
+    channel: ANCDataChannel;
+    link: ANCDataLink;
+    stream: ANCDataStream; // Logical SDI sub-stream (DS1..DS4) in quad-link / 12G
+    is_field2: bool;       // True if this packet belongs to field 2 (interlaced sources)
+    coding: ANCDataCoding = Digital; // SMPTE-291 coding type; default Digital so pre-existing buffers decode unchanged.
+    payload: [ubyte];      // SMPTE 291 user data words, one per byte
+}
+
+// All ancillary packets captured/destined for a single video frame.
+table ANCFrame
+{
+    packets: [ANCPacket];
+}
+
+// SMPTE ST 12-2 Ancillary Timecode flavor selector. Encoded in DBB1 bits 2-0
+// of the ATC packet (DID=0x60, SDID=0x60).
+enum ATCSource : uint
+{
+    Auto = 0,    // Pick the first valid ATC packet found, preferring LTC.
+    ATC_LTC = 1,
+    ATC_VITC1 = 2,
+    ATC_VITC2 = 3,
+}
+
+// Decoded SMPTE timecode. Self-contained — no frame number, no frame rate;
+// senders and receivers agree on rate via the executing path's fixed-step
+// timing or an explicit rate-override pin. Convert to/from a frame number
+// with TimecodeFromFrameNumber / TimecodeToFrameNumber.
+struct Timecode
+{
+    hours: ubyte;       // 0..23
+    minutes: ubyte;     // 0..59
+    seconds: ubyte;     // 0..59
+    // 0..(fpsRound-1). For high frame rates (>=40 fps) this is the full
+    // 0..59 value, not the wire-halved 0..30 that ST 12-1 carries on a
+    // single ATC packet.
+    frames: ubyte;
+    // Drop-frame flag. Only defined for 29.97/59.94; ignored at integer
+    // rates by consumers that follow ST 12-1.
+    drop_frame: bool;
+    // ATC carriage. ATC_LTC / ATC_VITC1 / ATC_VITC2 select what DBB1 bits 2-0
+    // are encoded as. Auto means "pick the best available" on read; on write
+    // it is treated as ATC_LTC. Flatbuffers struct fields cannot have default
+    // values — the .nosdef defaults handle initial pin state instead.
+    source: ATCSource;
+}
