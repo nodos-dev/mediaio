@@ -1,0 +1,55 @@
+{
+    "nodes": [
+        {
+            "class_name": "InjectTimecode",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Inject Timecode"
+            },
+            "node": {
+                "class_name": "InjectTimecode",
+                "display_name": "Inject Timecode",
+                "contents_type": "Job",
+                "always_execute": true,
+                "description": "Encodes a SMPTE ST 12-2 Ancillary Timecode (ATC) packet from a decoded Timecode struct and\ninjects it into an ANCFrame. Existing ATC packets matching the same flavor (LTC/VITC1/VITC2)\non the same field are stripped and replaced; all other packets pass through unchanged. If the\ninput ANCFrame is empty or unset, a fresh ANCFrame containing only the encoded ATC packet is\nproduced.\n\nFor SDI output via AJA, prefer wiring Timecode directly into the AJA Out node's Timecode pin\n— the AJA hardware drives RP188 ATC through the dedicated emitter and the inserter path is\nfor vendor packets. Use this node for non-AJA outputs (2110, file writers) or when you need\nthe ATC packet as data inside an ANCFrame.",
+              "pins": [
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "Decoded SMPTE timecode to encode into a SMPTE ST 12-2 ATC packet (DID=0x60, SDID=0x60). The\ntimecode's source field selects ATC carriage (LTC / VITC1 / VITC2); Auto is treated as ATC_LTC.",
+                  "type_name": "nos.mediaio.Timecode",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used to select the HFR (>=40 fps) field-bit encoding and\nthe PAL/NTSC family. Leave at 0 to auto-infer from the executing path's fixed-step timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "Out",
+                  "display_name": "Out",
+                  "description": "Output ANC frame with the encoded ATC packet appended at VANC line 10, channel Y, link A.",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                },
+                {
+                  "name": "ANCFrame",
+                  "display_name": "ANC Frame",
+                  "description": "Optional source ANC frame. Packets other than the selected ATC flavor on the same field are\nforwarded verbatim. Leave unconnected to emit a fresh frame containing only the timecode packet.",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}

@@ -27,10 +27,21 @@ enum Nodes : int
 	YUVBufferSizeCalculator,
 	GammaLUT,
 	ColorSpaceMatrix,
+	TextureToBuffer,
 	YUY2ToRGBA,
 	NV12ToRGBA,
 	FieldJuggler,
 	Debayer,
+	ExtractTimecode,
+	InjectTimecode,
+	TimecodeFromFrameNumber,
+	TimecodeToFrameNumber,
+	TimecodeToString,
+	TimecodePlayer,
+	SLog3ToLinear,
+	LinearToSLog3,
+	WriteDPX,
+	PlaybackClip,
 	StbiLoad,
 	WriteImage,
 	LoadCubeLUT,
@@ -49,6 +60,17 @@ nosResult RegisterYUY2ToRGBA(nosNodeFunctions*);
 nosResult RegisterNV12ToRGBA(nosNodeFunctions*);
 nosResult RegisterFieldJuggler(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
+nosResult RegisterTextureToBuffer(nosNodeFunctions*);
+nosResult RegisterExtractTimecode(nosNodeFunctions*);
+nosResult RegisterInjectTimecode(nosNodeFunctions*);
+nosResult RegisterTimecodeFromFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToFrameNumber(nosNodeFunctions*);
+nosResult RegisterTimecodeToString(nosNodeFunctions*);
+nosResult RegisterTimecodePlayer(nosNodeFunctions*);
+nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
+nosResult RegisterLinearToSLog3(nosNodeFunctions*);
+nosResult RegisterWriteDPX(nosNodeFunctions*);
+nosResult RegisterPlaybackClip(nosNodeFunctions*);
 
 } // namespace nos::mediaio
 
@@ -91,10 +113,21 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(YUVBufferSizeCalculator)
 				GEN_CASE_NODE(GammaLUT)
 				GEN_CASE_NODE(ColorSpaceMatrix)
+				GEN_CASE_NODE(TextureToBuffer)
 				GEN_CASE_NODE(YUY2ToRGBA)
 				GEN_CASE_NODE(NV12ToRGBA)
 				GEN_CASE_NODE(FieldJuggler)
 				GEN_CASE_NODE(Debayer)
+				GEN_CASE_NODE(ExtractTimecode)
+				GEN_CASE_NODE(InjectTimecode)
+				GEN_CASE_NODE(TimecodeFromFrameNumber)
+				GEN_CASE_NODE(TimecodeToFrameNumber)
+				GEN_CASE_NODE(TimecodeToString)
+				GEN_CASE_NODE(TimecodePlayer)
+				GEN_CASE_NODE(SLog3ToLinear)
+				GEN_CASE_NODE(LinearToSLog3)
+				GEN_CASE_NODE(WriteDPX)
+				GEN_CASE_NODE(PlaybackClip)
 				GEN_CASE_NODE(StbiLoad)
 				GEN_CASE_NODE(WriteImage)
 				GEN_CASE_NODE(LoadCubeLUT)

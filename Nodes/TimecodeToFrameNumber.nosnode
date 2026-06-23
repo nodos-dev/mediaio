@@ -1,0 +1,46 @@
+{
+    "nodes": [
+        {
+            "class_name": "TimecodeToFrameNumber",
+            "menu_info": {
+                "category": "Media IO|Timecode",
+                "display_name": "Timecode To Frame Number"
+            },
+            "node": {
+                "class_name": "TimecodeToFrameNumber",
+                "display_name": "Timecode To Frame Number",
+                "contents_type": "Job",
+                "description": "Converts a decoded SMPTE Timecode struct to a frame number (frames since 00:00:00:00). SMPTE\ndrop-frame correction is applied when the Timecode's drop-frame flag is set and the frame rate\nis 29.97/59.94. For a human-readable HH:MM:SS:FF string use TimecodeToString.",
+              "pins": [
+                {
+                  "name": "Timecode",
+                  "display_name": "Timecode",
+                  "description": "Decoded SMPTE timecode to convert.",
+                  "type_name": "nos.mediaio.Timecode",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY"
+                },
+                {
+                  "name": "FrameRateOverride",
+                  "display_name": "Frame Rate Override",
+                  "description": "Optional override for the frame rate used to convert HH:MM:SS:FF back to a frame number.\nLeave at 0 to auto-infer from the executing path's fixed-step timing.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "FrameNumber",
+                  "display_name": "Frame Number",
+                  "description": "Total frames since 00:00:00:00. SMPTE drop-frame correction is applied when the input\nTimecode's drop-frame flag is set and the frame rate is 29.97/59.94.",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}
