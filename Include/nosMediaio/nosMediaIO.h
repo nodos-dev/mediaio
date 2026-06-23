@@ -162,6 +162,21 @@ typedef struct nosMediaIOVideoScanTypeList {
 	nosMediaIOVideoScanType ScanTypes[2];
 } nosMediaIOVideoScanTypeList;
 
+typedef enum nosMediaIOVideoConnectionType
+{
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MIN = NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_INVALID,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_SDI,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_OPTICAL_ETHERNET,
+	NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_MAX = NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_OPTICAL_ETHERNET
+} nosMediaIOVideoConnectionType;
+
+inline const char* NOS_MEDIAIO_VIDEO_CONNECTION_TYPE_NAMES[] = {
+	"INVALID",
+	"SDI",
+	"Optical Ethernet",
+};
+
 typedef enum nosMediaIOInterlacedFieldType
 {
 	NOS_MEDIAIO_INTERLACED_FIELD_TYPE_INVALID,
@@ -182,6 +197,8 @@ typedef struct nosMediaIOAPI {
 	nosResult (NOSAPI_CALL* Get2DFrameResolution)(nosMediaIOFrameGeometry geometry, nosVec2u* outResolution);
 	const char* (NOSAPI_CALL* GetVideoScanTypeName)(nosMediaIOVideoScanType scanType);
 	nosMediaIOVideoScanType (NOSAPI_CALL* GetVideoScanTypeFromString)(const char* str);
+	nosMediaIOVideoConnectionType (NOSAPI_CALL* GetVideoConnectionTypeFromString)(const char* str);
+	const char* (NOSAPI_CALL* GetVideoConnectionTypeName)(nosMediaIOVideoConnectionType connectionType);
 } nosMediaIOAPI;
 
 #pragma region Helper Declarations & Macros
