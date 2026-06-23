@@ -22,6 +22,12 @@ struct InterlaceNode : NodeContext
 {
 	nosTextureFieldType Field;
 
+	nosResult OnCreate(nosFbNodePtr node) override
+	{
+		SetNodeStatusMessage("Internal - not intended for use.", fb::NodeStatusMessageType::WARNING);
+		return NOS_RESULT_SUCCESS;
+	}
+
 	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
 		nosVulkan->SetResourceFieldType(*copyInfo->PinObjectHandle, Field);
@@ -85,6 +91,13 @@ struct FieldJugglerNode : NodeContext
 
 struct DeinterlaceNode : NodeContext
 {
+	nosResult OnCreate(nosFbNodePtr node) override
+	{
+		SetNodeStatusMessage("Deprecated: low-quality single-field deinterlace.\nUse YADIF instead.",
+							 fb::NodeStatusMessageType::WARNING);
+		return NOS_RESULT_SUCCESS;
+	}
+
 	nosResult CopyFrom(nosCopyFromInfo* copyInfo) override
 	{
 		nosVulkan->SetResourceFieldType(*copyInfo->PinObjectHandle, NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE);
