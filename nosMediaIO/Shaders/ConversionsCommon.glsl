@@ -67,24 +67,17 @@ Out:
 
 
 vec4  SDR_In (in vec3 c) 
-{ 
-    return  vec4(IDXff((ubo.Colorspace * vec4(c, 1)).xyz), 1); 
-}
-
-vec4  SDR_In_N (in uvec3 c, float N) 
-{ 
-    vec3 v = (ubo.Colorspace * vec4(c / N, 1)).xyz;
+{
+    vec3 v = (ubo.Colorspace * vec4(c, 1)).xyz;
     v = ubo.UseLUT ? IDXff(v) : ToLinear(v, ubo.GammaCurve);
-    return  vec4(c, 1); 
+    return  vec4(v, 1); 
 }
 
 uvec3 SDR_Out_N(in vec3 c, float N)  
-{ 
+{
     c = ubo.UseLUT ? IDXff(c) : FromLinear(c, ubo.GammaCurve);
     return uvec3(round(clamp(ubo.Colorspace * vec4(c, 1), 0.0, 1.0).xyz * N)); 
 }
 
-vec4  SDR_In_10 (in uvec3 c) { return SDR_In_N (c, N10); }
-vec4  SDR_In_8  (in uvec3 c) { return SDR_In_N (c, N8); }
 uvec3 SDR_Out_10(in vec3 c)  { return SDR_Out_N(c, N10); }
 uvec3 SDR_Out_8 (in vec3 c)  { return SDR_Out_N(c, N8); }
