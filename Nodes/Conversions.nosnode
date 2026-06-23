@@ -25,6 +25,23 @@
 						"can_show_as": "INPUT_PIN_ONLY"
 					},
 					{
+						"name": "GammaCurve",
+						"display name": "Gamma Curve",
+						"type_name": "nos.mediaio.GammaCurve",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "UseLUT",
+						"display name": "Use LUT",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"advanced_property": true,
+						"data": true,
+						"def": true
+					},
+					{
 						"name": "GammaLUT",
 						"type_name": "nos.sys.vulkan.Buffer",
 						"show_as": "INPUT_PIN",
@@ -111,6 +128,23 @@
 						"type_name": "nos.sys.vulkan.Buffer",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "GammaCurve",
+						"display name": "Gamma Curve",
+						"type_name": "nos.mediaio.GammaCurve",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "UseLUT",
+						"display name": "Use LUT",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"advanced_property": true,
+						"data": true,
+						"def": true
 					},
 					{
 						"name": "GammaLUT",
