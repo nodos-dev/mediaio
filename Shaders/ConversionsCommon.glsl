@@ -68,7 +68,9 @@ Out:
 
 vec4  SDR_In (in vec3 c)
 {
-    return  vec4(IDXff((ubo.Colorspace * vec4(c, 1)).xyz), 1);
+    vec3 v = (ubo.Colorspace * vec4(c, 1)).xyz;
+    v = ubo.UseLUT ? IDXff(v) : ToLinear(v, ubo.GammaCurve);
+    return  vec4(v, 1);
 }
 
 uvec3 SDR_Out_N(in vec3 c, float N)
