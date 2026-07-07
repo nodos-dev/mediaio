@@ -1,0 +1,63 @@
+{
+    "nodes": [
+        {
+            "class_name": "InjectHDRMetadata",
+            "menu_info": {
+                "category": "Media IO|HDR",
+                "display_name": "Inject HDR Metadata"
+            },
+            "node": {
+                "class_name": "InjectHDRMetadata",
+                "display_name": "Inject HDR Metadata",
+                "contents_type": "Job",
+                "description": "Builds a SMPTE ST 2108-1 HDR/WCG static-metadata Ancillary Data packet (DID=0x41,\nSDID=0x0C) from HDR10 mastering-display and content-light-level values, and injects it into\nan ANCFrame. Carries the HEVC mastering_display_colour_volume (SEI 137) and\ncontent_light_level_info (SEI 144) messages per ST 2086 / CTA-861.3. Existing ST 2108-1\npackets are stripped and replaced; all other packets pass through unchanged. If the input\nANCFrame is empty or unset, a fresh ANCFrame containing only the HDR packet is produced.\n\nWire Out into the AJA Out node's ANC In pin (with Enable ANC on) to signal HDR10 over SDI.\nComplements the VPID transfer/colorimetry signalling on the AJA Out node — set both.",
+              "pins": [
+                {
+                  "name": "Metadata",
+                  "display_name": "Metadata",
+                  "description": "HDR10 static metadata in physical units (CIE xy chromaticities, nits). Defaults describe a\nRec.2020 / D65 / 1000-nit mastering display. The node applies the ST 2086 scaling.",
+                  "type_name": "nos.mediaio.HDRMetadata",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": {
+                    "red_x": 0.708, "red_y": 0.292,
+                    "green_x": 0.170, "green_y": 0.797,
+                    "blue_x": 0.131, "blue_y": 0.046,
+                    "white_x": 0.3127, "white_y": 0.3290,
+                    "max_luminance": 1000.0,
+                    "min_luminance": 0.0001,
+                    "max_cll": 1000,
+                    "max_fall": 400
+                  }
+                },
+                {
+                  "name": "LineNumber",
+                  "display_name": "VANC Line",
+                  "description": "SMPTE line number in the vertical ancillary space to carry the HDR metadata packet.",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 9,
+                  "min": "9"
+                },
+                {
+                  "name": "Out",
+                  "display_name": "Out",
+                  "description": "Output ANC frame with the ST 2108-1 HDR metadata packet appended at the selected VANC line.",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                },
+                {
+                  "name": "ANCFrame",
+                  "display_name": "ANC Frame",
+                  "description": "Optional source ANC frame. Packets other than ST 2108-1 (DID=0x41/SDID=0x0C) are forwarded\nverbatim. Leave unconnected to emit a fresh frame containing only the HDR metadata packet.",
+                  "type_name": "nos.mediaio.ANCFrame",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ]
+}

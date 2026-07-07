@@ -1,0 +1,83 @@
+{
+    "nodes": [
+        {
+            "class_name": "EncodeHDRMetadata",
+            "menu_info": {
+                "category": "Media IO|HDR",
+                "display_name": "Encode HDR Metadata"
+            },
+            "node": {
+                "class_name": "EncodeHDRMetadata",
+                "display_name": "Encode HDR Metadata",
+                "contents_type": "Job",
+                "description": "Assembles HDR10 static metadata (HDRMetadata) from a colour space and gamma curve. The\ncolour space selects the mastering-display primaries and white point (exact, standard values).\nThe gamma curve only seeds the luminance defaults (SDR ~100-nit, HDR ~1000-nit) — it has no\nfield of its own in SMPTE ST 2086. Feed the output into Inject HDR Metadata.\n\nMastering luminance is a real property of your grading/monitoring display: leave Max/Min\nLuminance at 0 to take the gamma-curve default, or set them explicitly. MaxCLL/MaxFALL are\nMEASURED content properties that cannot be derived — they default to 0, the CTA-861.3\n'unknown' value. Only set them if you have measured or upstream values; never invent them.",
+              "pins": [
+                {
+                  "name": "ColorSpace",
+                  "display_name": "Color Space",
+                  "description": "Selects the mastering-display primaries and white point (D65). REC2020 for wide-gamut HDR.",
+                  "type_name": "nos.mediaio.ColorSpace",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "REC2020"
+                },
+                {
+                  "name": "GammaCurve",
+                  "display_name": "Gamma Curve",
+                  "description": "Only seeds the luminance defaults: REC709/SRGB are treated as SDR (100-nit), everything else\nas HDR (1000-nit). Has no field in ST 2086 itself. Signal the actual curve via the AJA Out\nnode's Gamma Curve (VPID) pin.",
+                  "type_name": "nos.mediaio.GammaCurve",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "ST2084"
+                },
+                {
+                  "name": "MaxLuminance",
+                  "display_name": "Max Luminance (nits)",
+                  "description": "Mastering-display peak luminance in cd/m^2. 0 = use the gamma-curve default (SDR 100 / HDR\n1000); any positive value overrides. Set this to match your actual grading display.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "MinLuminance",
+                  "display_name": "Min Luminance (nits)",
+                  "description": "Mastering-display black level in cd/m^2. 0 = use the gamma-curve default (SDR 0.1 / HDR\n0.0001); any positive value overrides.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0,
+                  "min": "0"
+                },
+                {
+                  "name": "MaxCLL",
+                  "display_name": "MaxCLL (nits)",
+                  "description": "Maximum Content Light Level: the brightest pixel in the content. A MEASURED value — leave at\n0 (CTA-861.3 'unknown') unless you have real measured or upstream data. Not derived.",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "MaxFALL",
+                  "display_name": "MaxFALL (nits)",
+                  "description": "Maximum Frame-Average Light Level: the brightest frame-average in the content. A MEASURED\nvalue — leave at 0 (CTA-861.3 'unknown') unless you have real data. Not derived.",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0
+                },
+                {
+                  "name": "Out",
+                  "display_name": "Out",
+                  "description": "HDR10 static metadata assembled from the inputs. Wire into Inject HDR Metadata's Metadata pin.",
+                  "type_name": "nos.mediaio.HDRMetadata",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ]
+}

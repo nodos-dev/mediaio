@@ -36,6 +36,8 @@ enum Nodes : int
 	Debayer,
 	ExtractTimecode,
 	InjectTimecode,
+	InjectHDRMetadata,
+	EncodeHDRMetadata,
 	TimecodeFromFrameNumber,
 	TimecodeToFrameNumber,
 	TimecodeToString,
@@ -64,6 +66,8 @@ nosResult RegisterSetInterlacedFieldType(nosNodeFunctions*);
 nosResult RegisterDebayer(nosNodeFunctions*);
 nosResult RegisterExtractTimecode(nosNodeFunctions*);
 nosResult RegisterInjectTimecode(nosNodeFunctions*);
+nosResult RegisterInjectHDRMetadata(nosNodeFunctions*);
+nosResult RegisterEncodeHDRMetadata(nosNodeFunctions*);
 nosResult RegisterTimecodeFromFrameNumber(nosNodeFunctions*);
 nosResult RegisterTimecodeToFrameNumber(nosNodeFunctions*);
 nosResult RegisterTimecodeToString(nosNodeFunctions*);
@@ -112,6 +116,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(Debayer)
 				GEN_CASE_NODE(ExtractTimecode)
 				GEN_CASE_NODE(InjectTimecode)
+				GEN_CASE_NODE(InjectHDRMetadata)
+				GEN_CASE_NODE(EncodeHDRMetadata)
 				GEN_CASE_NODE(TimecodeFromFrameNumber)
 				GEN_CASE_NODE(TimecodeToFrameNumber)
 				GEN_CASE_NODE(TimecodeToString)
