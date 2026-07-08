@@ -34,13 +34,15 @@
 		"Config/TimecodePlayer.nosdef",
 		"Config/WriteDPX.nosdef",
 		"Config/RecordDPXClip.nosdef",
-		"Config/PlaybackClip.nosdef"
+		"Config/PlaybackClip.nosdef",
+		"Config/ReadEXR.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
 		"Config/SensorInfo.fbs",
 		"Config/ANC.fbs",
-		"Config/TimecodePlayer.fbs"
+		"Config/TimecodePlayer.fbs",
+		"Config/ReadEXR.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"

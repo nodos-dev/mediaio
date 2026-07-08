@@ -46,6 +46,7 @@ enum Nodes : int
 	LinearToSLog3,
 	WriteDPX,
 	PlaybackClip,
+	ReadEXR,
 	Count
 };
 
@@ -76,6 +77,7 @@ nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
 nosResult RegisterWriteDPX(nosNodeFunctions*);
 nosResult RegisterPlaybackClip(nosNodeFunctions*);
+nosResult RegisterReadEXR(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -126,6 +128,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(LinearToSLog3)
 				GEN_CASE_NODE(WriteDPX)
 				GEN_CASE_NODE(PlaybackClip)
+				GEN_CASE_NODE(ReadEXR)
 			}
 		}
 		return NOS_RESULT_SUCCESS;

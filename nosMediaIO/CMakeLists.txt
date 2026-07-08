@@ -18,7 +18,12 @@ nos_get_module("nos.sys.vulkan" "6.0" NOS_SYS_VULKAN_TARGET)
 nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Config" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" "" nosMediaIO_generated)
 set(DEPENDENCIES nosMediaIO_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_PLUGIN_SDK_TARGET})
 
-nos_add_plugin("nosMediaIO" "${DEPENDENCIES}" "")
+# tinyexr (with its bundled miniz) lives in the External/tinyexr submodule. Put the
+# header dir and miniz dir on the include path (tinyexr does `#include <miniz.h>`); miniz.c
+# sits outside Source/ so the plugin glob won't pick it up - add it to the target directly.
+set(TINYEXR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/External/tinyexr")
+nos_add_plugin("nosMediaIO" "${DEPENDENCIES}" "${TINYEXR_DIR};${TINYEXR_DIR}/deps/miniz")
+target_sources(nosMediaIO PRIVATE "${TINYEXR_DIR}/deps/miniz/miniz.c")
 
 # Project generation
 nos_group_targets("nosMediaIO" "NOS Plugins")
