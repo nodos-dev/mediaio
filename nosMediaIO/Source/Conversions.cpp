@@ -400,13 +400,45 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 	{
 
 	}
+
+	// Before 2.10 the pin was a bool named "NarrowRange"; rename it to
+	// "SignalRange" and retype it to the enum (true -> Narrow, false -> Full)
+	// so older graphs keep loading.
+	static nosResult MigrateNode(nosFbNodePtr node, nosBuffer* outBuffer)
+	{
+		auto pv = node->plugin_version();
+		const bool needsMigration = !pv || (pv->major() == 2 && pv->minor() < 10);
+		if (!needsMigration)
+			return NOS_RESULT_SUCCESS;
+
+		fb::TNode cur;
+		node->UnPackTo(&cur);
+		bool changed = false;
+		for (auto& pin : cur.pins)
+		{
+			if (pin->name != "NarrowRange" || pin->type_name != "bool")
+				continue;
+			const bool narrow = pin->data.empty() ? true : (pin->data[0] != 0);
+			const uint32_t range = narrow ? 0u /*SignalRange::Narrow*/ : 1u /*SignalRange::Full*/;
+			pin->name = "SignalRange";
+			pin->type_name = "nos.mediaio.SignalRange";
+			pin->data.assign(reinterpret_cast<const uint8_t*>(&range),
+			                 reinterpret_cast<const uint8_t*>(&range) + sizeof(range));
+			changed = true;
+		}
+		if (!changed)
+			return NOS_RESULT_SUCCESS;
+		auto nodeBuffer = nos::EngineBuffer::CopyFrom(cur);
+		*outBuffer = nodeBuffer.Release();
+		return NOS_RESULT_SUCCESS;
+	}
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
 		nos::NodeExecuteParams execParams(params);
 		const auto& colorSpace = *InterpretPinValue<ColorSpace>(execParams[NOS_NAME_STATIC("ColorSpace")].Data->Data);
 		auto fmt = *InterpretPinValue<YCbCrPixelFormat>(execParams[NOS_NAME_STATIC("PixelFormat")].Data->Data);
 		const auto& dir = *InterpretPinValue<GammaConversionType>(execParams[NOS_NAME_STATIC("Type")].Data->Data);
-		auto narrowRange = *InterpretPinValue<bool>(execParams[NOS_NAME_STATIC("NarrowRange")].Data->Data);
+		auto narrowRange = *InterpretPinValue<SignalRange>(execParams[NOS_NAME_STATIC("SignalRange")].Data->Data) == SignalRange::Narrow;
 		glm::mat4 matrix = GetMatrix<double>(colorSpace, fmt == YCbCrPixelFormat::V210 ? 10 : 8, narrowRange);
 		if(dir == GammaConversionType::DECODE)
 			matrix = glm::inverse(matrix);
