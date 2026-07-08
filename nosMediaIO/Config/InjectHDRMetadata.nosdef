@@ -26,8 +26,8 @@
                     "white_x": 0.3127, "white_y": 0.3290,
                     "max_luminance": 1000.0,
                     "min_luminance": 0.0001,
-                    "max_cll": 1000,
-                    "max_fall": 400
+                    "max_cll": 0,
+                    "max_fall": 0
                   }
                 },
                 {
