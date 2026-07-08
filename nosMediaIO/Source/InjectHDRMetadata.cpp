@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ANC_generated.h"
+#include "ANCUtils.hpp"
 #include "Conversion_generated.h"
 
 namespace nos::mediaio
@@ -127,20 +128,7 @@ struct InjectHDRMetadataNode : NodeContext
 					continue;
 				if (src->did() == S2108_DID && src->sdid() == S2108_SDID)
 					continue;
-				const auto* p = src->payload();
-				auto payloadOffset = fbb.CreateVector(p ? p->data() : nullptr, p ? p->size() : 0);
-				ANCPacketBuilder pb(fbb);
-				pb.add_did(src->did());
-				pb.add_sdid(src->sdid());
-				pb.add_line_number(src->line_number());
-				pb.add_horiz_offset(src->horiz_offset());
-				pb.add_space(src->space());
-				pb.add_channel(src->channel());
-				pb.add_link(src->link());
-				pb.add_stream(src->stream());
-				pb.add_is_field2(src->is_field2());
-				pb.add_payload(payloadOffset);
-				packets.push_back(pb.Finish());
+				packets.push_back(CloneANCPacket(fbb, src));
 			}
 		}
 		else
