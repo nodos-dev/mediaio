@@ -25,6 +25,45 @@ enum GammaConversionType : uint {
     DECODE, // From non-linear to linear
 }
 
+// SMPTE 352 (VPID) luminance signalling for HDR output.
+enum VPIDLuminance : uint {
+    YCbCr = 0,
+    ICtCp = 1,
+}
+
+// Quantization range signalling (VPID / SMPTE narrow vs full).
+enum SignalRange : uint {
+    Narrow = 0,
+    Full = 1,
+}
+
+// How EncodeHDRMetadata fills the luminance / content-light-level fields.
+enum HDRMetadataMode : uint {
+    Auto = 0,   // Derive from the gamma curve; the value pins are read-only.
+    Custom = 1, // Enter the values manually.
+}
+
+// HDR10 static metadata: SMPTE ST 2086 mastering-display colour volume plus
+// CTA-861.3 content light levels. Consumed by InjectHDRMetadata to build a
+// SMPTE ST 2108-1 ANC packet. Values are in physical units (CIE xy, nits);
+// the node applies the ST 2086 scaling. Struct fields can't carry defaults —
+// the InjectHDRMetadata nosdef seeds Rec2020 / D65 / 1000-nit defaults.
+struct HDRMetadata {
+    // CIE 1931 xy chromaticity of the mastering-display primaries.
+    red_x: float;   red_y: float;
+    green_x: float; green_y: float;
+    blue_x: float;  blue_y: float;
+    // CIE 1931 xy chromaticity of the mastering-display white point.
+    white_x: float; white_y: float;
+    // Mastering-display luminance, cd/m^2 (nits).
+    max_luminance: float;
+    min_luminance: float;
+    // Content light level, cd/m^2 (nits): brightest pixel (MaxCLL) and
+    // brightest frame-average (MaxFALL). 0 signals "unknown" per CTA-861.3.
+    max_cll: uint;
+    max_fall: uint;
+}
+
 enum InterlacedFlags : uint(bit_flags) {
     // Interlaced
     OUTPUT_EVEN = 0,
