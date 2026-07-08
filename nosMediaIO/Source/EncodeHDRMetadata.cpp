@@ -40,6 +40,15 @@ bool IsSDR(GammaCurve g)
 	return g == GammaCurve::REC709 || g == GammaCurve::SRGB;
 }
 
+// Mastering luminance can't be inferred from the transfer curve exactly, but
+// SDR ~100-nit vs HDR ~1000-nit is the sensible convention for the Auto default.
+void AutoLuminance(GammaCurve g, float& outMax, float& outMin)
+{
+	const bool sdr = IsSDR(g);
+	outMax = sdr ? 100.0f : 1000.0f;
+	outMin = sdr ? 0.1f : 0.0001f;
+}
+
 // ST 2086 stores each chromaticity as a uint16 in 0.00002 units, so only
 // coordinates in [0, 1.3107] survive. Camera gamuts like S-Gamut3 use virtual
 // primaries with negative coordinates — not representable, and not a
@@ -55,7 +64,50 @@ bool Encodable(const Primaries& p)
 
 struct EncodeHDRMetadataNode : NodeContext
 {
+	HDRMetadataMode Mode = HDRMetadataMode::Auto;
+	GammaCurve Gamma = GammaCurve::ST2084;
+
 	EncodeHDRMetadataNode(nosFbNodePtr node) : NodeContext(node) {}
+
+	// Fill the value pins with the Auto-derived values. Luminance follows the
+	// gamma curve; content light levels are unknown for a live signal, so 0.
+	void PopulateAuto()
+	{
+		float maxLum, minLum;
+		AutoLuminance(Gamma, maxLum, minLum);
+		uint32_t zero = 0;
+		SetPinValue(NOS_NAME_STATIC("MaxLuminance"), nosBuffer{.Data = &maxLum, .Size = sizeof(maxLum)});
+		SetPinValue(NOS_NAME_STATIC("MinLuminance"), nosBuffer{.Data = &minLum, .Size = sizeof(minLum)});
+		SetPinValue(NOS_NAME_STATIC("MaxCLL"), nosBuffer{.Data = &zero, .Size = sizeof(zero)});
+		SetPinValue(NOS_NAME_STATIC("MaxFALL"), nosBuffer{.Data = &zero, .Size = sizeof(zero)});
+	}
+
+	// Auto: value pins are read-only and show the derived values. Custom: editable.
+	void ApplyMode()
+	{
+		const bool readOnly = (Mode == HDRMetadataMode::Auto);
+		ChangePinReadOnly(NOS_NAME_STATIC("MaxLuminance"), readOnly);
+		ChangePinReadOnly(NOS_NAME_STATIC("MinLuminance"), readOnly);
+		ChangePinReadOnly(NOS_NAME_STATIC("MaxCLL"), readOnly);
+		ChangePinReadOnly(NOS_NAME_STATIC("MaxFALL"), readOnly);
+		if (readOnly)
+			PopulateAuto();
+	}
+
+	void OnPinValueChanged(nos::Name pinName, uuid const& pinId, nosBuffer value) override
+	{
+		if (pinName == NOS_NAME_STATIC("Mode"))
+		{
+			Mode = *InterpretPinValue<HDRMetadataMode>(value);
+			ApplyMode();
+		}
+		else if (pinName == NOS_NAME_STATIC("GammaCurve"))
+		{
+			Gamma = *InterpretPinValue<GammaCurve>(value);
+			if (Mode == HDRMetadataMode::Auto)
+				PopulateAuto();
+		}
+	}
 
 	nosResult ExecuteNode(nosNodeExecuteParams* params) override
 	{
@@ -64,11 +116,10 @@ struct EncodeHDRMetadataNode : NodeContext
 		ColorSpace colorSpace = ColorSpace::REC2020;
 		if (auto* p = execParams.GetPinData<ColorSpace>(NOS_NAME_STATIC("ColorSpace")))
 			colorSpace = *p;
-		GammaCurve gammaCurve = GammaCurve::ST2084;
-		if (auto* p = execParams.GetPinData<GammaCurve>(NOS_NAME_STATIC("GammaCurve")))
-			gammaCurve = *p;
 
-		float maxLuminance = 0.0f, minLuminance = 0.0f;
+		// Read the value pins directly: in Auto they hold the derived values we
+		// populated, in Custom they hold what the user entered.
+		float maxLuminance = 1000.0f, minLuminance = 0.0001f;
 		if (auto* p = execParams.GetPinData<float>(NOS_NAME_STATIC("MaxLuminance")))
 			maxLuminance = *p;
 		if (auto* p = execParams.GetPinData<float>(NOS_NAME_STATIC("MinLuminance")))
@@ -79,16 +130,6 @@ struct EncodeHDRMetadataNode : NodeContext
 			maxCLL = *p;
 		if (auto* p = execParams.GetPinData<uint32_t>(NOS_NAME_STATIC("MaxFALL")))
 			maxFALL = *p;
-
-		// Luminance: 0 means "use the GammaCurve default" (mastering luminance
-		// can't be inferred from the curve exactly, but SDR ~100-nit vs HDR
-		// ~1000-nit is the sensible convention). Any positive value overrides.
-		// MaxCLL/MaxFALL are NOT derived — 0 is the honest CTA-861.3 "unknown".
-		const bool sdr = IsSDR(gammaCurve);
-		if (maxLuminance <= 0.0f)
-			maxLuminance = sdr ? 100.0f : 1000.0f;
-		if (minLuminance <= 0.0f)
-			minLuminance = sdr ? 0.1f : 0.0001f;
 
 		Primaries pr = PrimariesFor(colorSpace);
 		if (!Encodable(pr))

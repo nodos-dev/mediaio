@@ -10,8 +10,17 @@
                 "class_name": "EncodeHDRMetadata",
                 "display_name": "Encode HDR Metadata",
                 "contents_type": "Job",
-                "description": "Assembles HDR10 static metadata (HDRMetadata) from a colour space and gamma curve. The\ncolour space selects the mastering-display primaries and white point (exact, standard values).\nThe gamma curve only seeds the luminance defaults (SDR ~100-nit, HDR ~1000-nit) — it has no\nfield of its own in SMPTE ST 2086. Feed the output into Inject HDR Metadata.\n\nMastering luminance is a real property of your grading/monitoring display: leave Max/Min\nLuminance at 0 to take the gamma-curve default, or set them explicitly. MaxCLL/MaxFALL are\nMEASURED content properties that cannot be derived — they default to 0, the CTA-861.3\n'unknown' value. Only set them if you have measured or upstream values; never invent them.",
+                "description": "Assembles HDR10 static metadata (HDRMetadata) from a colour space and gamma curve. The\ncolour space selects the mastering-display primaries and white point (exact, standard values).\nFeed the output into Inject HDR Metadata.\n\nMode = Auto derives the luminance from the gamma curve (SDR ~100-nit, HDR ~1000-nit) and\nleaves MaxCLL/MaxFALL at 0 (CTA-861.3 'unknown', the honest value for a live signal); the\nvalue pins are read-only and show what will be sent. Mode = Custom unlocks them so you can\nenter your real mastering-display luminance and measured content light levels. Never invent\nMaxCLL/MaxFALL — a display tone-maps against whatever you claim.",
               "pins": [
+                {
+                  "name": "Mode",
+                  "display_name": "Mode",
+                  "description": "Auto: luminance is derived from the gamma curve and the value pins below are read-only.\nCustom: the value pins become editable for real mastering / measured values.",
+                  "type_name": "nos.mediaio.HDRMetadataMode",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "Auto"
+                },
                 {
                   "name": "ColorSpace",
                   "display_name": "Color Space",
@@ -24,7 +33,7 @@
                 {
                   "name": "GammaCurve",
                   "display_name": "Gamma Curve",
-                  "description": "Only seeds the luminance defaults: REC709/SRGB are treated as SDR (100-nit), everything else\nas HDR (1000-nit). Has no field in ST 2086 itself. Signal the actual curve via the AJA Out\nnode's Gamma Curve (VPID) pin.",
+                  "description": "In Auto mode, selects the luminance defaults (REC709/SRGB = SDR 100-nit, else HDR 1000-nit).\nHas no field in ST 2086 itself and is ignored in Custom mode. Signal the actual curve via the\nAJA Out node's Gamma Curve (VPID) pin.",
                   "type_name": "nos.mediaio.GammaCurve",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
@@ -33,40 +42,44 @@
                 {
                   "name": "MaxLuminance",
                   "display_name": "Max Luminance (nits)",
-                  "description": "Mastering-display peak luminance in cd/m^2. 0 = use the gamma-curve default (SDR 100 / HDR\n1000); any positive value overrides. Set this to match your actual grading display.",
+                  "description": "Mastering-display peak luminance in cd/m^2. Read-only in Auto (derived from the gamma curve);\nset it to your actual grading display's peak in Custom mode.",
                   "type_name": "float",
                   "show_as": "PROPERTY",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "data": 0.0,
-                  "min": "0"
+                  "data": 1000.0,
+                  "min": "0",
+                  "readonly": true
                 },
                 {
                   "name": "MinLuminance",
                   "display_name": "Min Luminance (nits)",
-                  "description": "Mastering-display black level in cd/m^2. 0 = use the gamma-curve default (SDR 0.1 / HDR\n0.0001); any positive value overrides.",
+                  "description": "Mastering-display black level in cd/m^2. Read-only in Auto (derived from the gamma curve);\nset it to your actual grading display's black level in Custom mode.",
                   "type_name": "float",
                   "show_as": "PROPERTY",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "data": 0.0,
-                  "min": "0"
+                  "data": 0.0001,
+                  "min": "0",
+                  "readonly": true
                 },
                 {
                   "name": "MaxCLL",
                   "display_name": "MaxCLL (nits)",
-                  "description": "Maximum Content Light Level: the brightest pixel in the content. A MEASURED value — leave at\n0 (CTA-861.3 'unknown') unless you have real measured or upstream data. Not derived.",
+                  "description": "Maximum Content Light Level: the brightest pixel in the content. A MEASURED value — 0 means\n'unknown' per CTA-861.3 (the honest default for live). Editable only in Custom mode.",
                   "type_name": "uint",
                   "show_as": "PROPERTY",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "data": 0
+                  "data": 0,
+                  "readonly": true
                 },
                 {
                   "name": "MaxFALL",
                   "display_name": "MaxFALL (nits)",
-                  "description": "Maximum Frame-Average Light Level: the brightest frame-average in the content. A MEASURED\nvalue — leave at 0 (CTA-861.3 'unknown') unless you have real data. Not derived.",
+                  "description": "Maximum Frame-Average Light Level: the brightest frame-average in the content. A MEASURED\nvalue — 0 means 'unknown' per CTA-861.3. Editable only in Custom mode.",
                   "type_name": "uint",
                   "show_as": "PROPERTY",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "data": 0
+                  "data": 0,
+                  "readonly": true
                 },
                 {
                   "name": "Out",
