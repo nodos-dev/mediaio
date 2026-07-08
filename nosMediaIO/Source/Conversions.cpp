@@ -406,8 +406,12 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 	// so older graphs keep loading.
 	static nosResult MigrateNode(nosFbNodePtr node, nosBuffer* outBuffer)
 	{
+		if (!node || !outBuffer)
+			return NOS_RESULT_SUCCESS;
 		auto pv = node->plugin_version();
-		const bool needsMigration = !pv || (pv->major() == 2 && pv->minor() < 10);
+		// Migrate every graph saved before 2.10 — including version-less
+		// snapshots (major 0) and the 1.x line, not just the 2.0-2.9 range.
+		const bool needsMigration = !pv || pv->major() < 2 || (pv->major() == 2 && pv->minor() < 10);
 		if (!needsMigration)
 			return NOS_RESULT_SUCCESS;
 
@@ -416,7 +420,7 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 		bool changed = false;
 		for (auto& pin : cur.pins)
 		{
-			if (pin->name != "NarrowRange" || pin->type_name != "bool")
+			if (!pin || pin->name != "NarrowRange" || pin->type_name != "bool")
 				continue;
 			const bool narrow = pin->data.empty() ? true : (pin->data[0] != 0);
 			const uint32_t range = narrow ? 0u /*SignalRange::Narrow*/ : 1u /*SignalRange::Full*/;
