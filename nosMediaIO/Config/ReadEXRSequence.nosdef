@@ -11,7 +11,7 @@
                 "class_name": "ReadEXRSequence",
                 "display_name": "Read EXR Sequence",
                 "contents_type": "Job",
-                "description": "Reads frame Index of an OpenEXR image sequence in real time. A pool of worker threads\nreads and decodes frames ahead of the current Index - in parallel across frames - into a\nbounded GPU cache; each execution just hands out the already-decoded frame for Index.\nBecause the slow per-frame read+decode happens ahead of the playhead, playback does not\nstall on it as long as the workers stay ahead. Index wraps modulo the file count and the\nprefetch window wraps with it, so a free-running counter loops the clip without a stutter\nat the seam. Drive Index from a frame counter to play (see the Play EXR graph node), or\nset it directly to scrub. Outputs the frame's Texture, its Z as Depth, and its header on\nMetadata; holds the last frame while the current one is still buffering.",
+                "description": "Reads frame Index of an OpenEXR image sequence in real time. A pool of worker threads\nreads and decodes frames ahead of the current Index - in parallel across frames - into a\nbounded GPU cache; each execution hands out the frame for Index, blocking until it is\ndecoded and uploaded, so the path paces on real throughput and never repeats a stale\nframe. Because the slow per-frame read+decode happens ahead of the playhead, that wait is\nnormally zero. Index wraps modulo the file count and the prefetch window wraps with it,\nso a free-running counter loops the clip without a stutter at the seam. Drive Index from\na frame counter to play (see the Play EXR graph node), or set it directly to scrub.\nOutputs the frame's Texture, its Z as Depth, and its header on Metadata; only a failed\nframe holds the last good one while it retries.",
                 "pins": [
                     {
                         "name": "Index",
@@ -34,9 +34,20 @@
                         "max": 128
                     },
                     {
+                        "name": "UploadAhead",
+                        "display_name": "Upload Ahead",
+                        "description": "How many decoded frames ahead of Index the uploader threads copy to the GPU early, so\nshowing a frame never waits on its transfer. A larger runway banks uploads and rides out\nsingle uploads running longer than a frame interval, at the cost of that many frames of\nextra VRAM and CPU memory held in flight. The default covers ordinary jitter; raise it\nfor graphs with longer transfer stalls.",
+                        "type_name": "ulong",
+                        "show_as": "INPUT_PIN_OR_PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 4,
+                        "min": 1,
+                        "max": 128
+                    },
+                    {
                         "name": "Texture",
                         "display_name": "Texture",
-                        "description": "Current frame. RGBA16F for HALF files, RGBA32F for FLOAT / UINT files. Holds the\nprevious frame while the current one is still being read/decoded.",
+                        "description": "Current frame. RGBA16F for HALF files, RGBA32F for FLOAT / UINT files. Execution waits\nfor the frame, so this always carries Files[Index]; only a failed frame holds the\nprevious texture while it retries.",
                         "type_name": "nos.sys.vulkan.Texture",
                         "show_as": "OUTPUT_PIN",
                         "can_show_as": "OUTPUT_PIN_ONLY"

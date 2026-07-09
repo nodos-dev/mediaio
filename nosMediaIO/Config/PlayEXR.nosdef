@@ -7,12 +7,12 @@
           "name_aliases": [ "exr player", "play exr", "exr sequence", "read exr sequence", "play exr sequence" ]
       },
       "node": {
-        "id": "85308e18-1c79-401b-a638-69d6c730d77e",
+        "id": "a1ab552c-3662-466a-9d70-f7b804c9ebb9",
         "name": "PlayEXR",
         "class_name": "nos.mediaio.PlayEXR",
         "pins": [
           {
-            "id": "cd33520a-4c62-426e-a09b-1c6317281c53",
+            "id": "b948f863-af82-4b27-95ff-f60b44270f71",
             "name": "Output_A",
             "type_name": "nos.sys.vulkan.Texture",
             "show_as": "OUTPUT_PIN",
@@ -39,11 +39,11 @@
             ],
             "live": true,
             "contents_type": "PortalPin",
-            "contents": { "source_id": "923cc8bd-9e9c-44e1-ab12-c67775ad65c2" },
+            "contents": { "source_id": "fd4f8054-c54a-4626-9483-f3d18e5b3184" },
             "display_name": "Texture"
           },
           {
-            "id": "c831cbb6-501f-4d35-ad1d-6b126bdccb41",
+            "id": "51bf30f3-c74f-4f71-8211-60a078de8b32",
             "name": "Output_B",
             "type_name": "nos.sys.vulkan.Texture",
             "show_as": "OUTPUT_PIN",
@@ -70,11 +70,11 @@
             ],
             "live": true,
             "contents_type": "PortalPin",
-            "contents": { "source_id": "a09bd893-4158-40e7-8993-46496e59466a" },
+            "contents": { "source_id": "12e5b61d-8c71-400f-8f56-643e47f1398a" },
             "display_name": "Depth"
           },
           {
-            "id": "38888a06-1cac-4394-99cf-a33a60237a2b",
+            "id": "75e9ab5c-89e2-4dc1-853a-edfcb16e53c0",
             "name": "Directory",
             "type_name": "string",
             "show_as": "INPUT_PIN",
@@ -85,11 +85,11 @@
             "data": "",
             "def": "",
             "contents_type": "PortalPin",
-            "contents": { "source_id": "b4c9d444-cd55-48a3-89f6-5ce25bdd7af6" },
+            "contents": { "source_id": "358e109d-943a-4445-aed2-4248eb10e957" },
             "description": "Directory to list the files of."
           },
           {
-            "id": "1958326a-c1df-4d0f-8bdf-7f996dd16894",
+            "id": "75f6d43d-b0b2-4c4f-a624-77b5d2bb68dc",
             "name": "SortBy",
             "type_name": "nos.utilities.ListDirectorySortBy",
             "show_as": "PROPERTY",
@@ -97,15 +97,15 @@
             "visualizer": {
             },
             "data": "Name",
-            "min": "Name",
-            "max": "Name",
+            "min": 1835093538,
+            "max": 1835093538,
             "def": "Name",
             "contents_type": "PortalPin",
-            "contents": { "source_id": "1647165d-5745-4700-bacc-15af466496b0" },
+            "contents": { "source_id": "db63e7c1-a11d-4432-a7c8-2b7c8119bfbd" },
             "description": "Field the output Paths are sorted by."
           },
           {
-            "id": "83287253-4840-44fa-a191-f868fb1b5e88",
+            "id": "62f453f4-4a41-47b1-8e57-684fdad6c092",
             "name": "SortDescending",
             "type_name": "bool",
             "show_as": "PROPERTY",
@@ -115,11 +115,11 @@
             "data": false,
             "def": false,
             "contents_type": "PortalPin",
-            "contents": { "source_id": "fdf3a43d-e511-40d1-b515-a480c69cb19c" },
+            "contents": { "source_id": "418d1788-4896-4dcc-99c4-689e77bd75df" },
             "description": "Reverses the sort order of Paths."
           },
           {
-            "id": "a329e43e-043e-444d-b5fe-abd6f74540b9",
+            "id": "86b15da8-7165-4425-a5f3-16fbcbd1d6f3",
             "name": "False",
             "type_name": "ulong",
             "show_as": "INPUT_PIN",
@@ -129,10 +129,10 @@
             "data": 0,
             "def": 0,
             "contents_type": "PortalPin",
-            "contents": { "source_id": "8aa3a26e-78d8-48a8-9678-d1a58afe240f" }
+            "contents": { "source_id": "05407658-6858-4950-bb0e-6da704ad42d7" }
           },
           {
-            "id": "96cd6d51-6f9c-47b2-8cf2-bece26ed70e4",
+            "id": "8cf922ac-b819-419a-a692-922d82587c12",
             "name": "Case",
             "type_name": "bool",
             "show_as": "PROPERTY",
@@ -142,60 +142,63 @@
             "data": true,
             "def": false,
             "contents_type": "PortalPin",
-            "contents": { "source_id": "44e9ff03-5b36-411f-b561-fa0037510ada" }
+            "contents": { "source_id": "62d2a3fa-3917-45c0-a03e-fe63d1cec794" }
+          },
+          {
+            "id": "64394664-08e3-473b-a57e-25390097e2f7",
+            "name": "Size",
+            "type_name": "uint",
+            "show_as": "PROPERTY",
+            "can_show_as": "PROPERTY_ONLY",
+            "visualizer": {
+            },
+            "data": 2,
+            "min": 1,
+            "max": 120,
+            "def": 2,
+            "step": 1.19,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "f2607bcd-4e42-476c-8107-193aae9869da" },
+            "display_name": "Output Queue Size"
+          },
+          {
+            "id": "064f9be3-c314-4b53-813b-81932d09bdb3",
+            "name": "PrefetchAhead",
+            "type_name": "ulong",
+            "show_as": "PROPERTY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizer": {
+            },
+            "data": 32,
+            "def": 0,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "ddbf251b-eb9a-453c-8e18-e12ac4c92df2" }
+          },
+          {
+            "id": "96b7f1f3-1772-4e4d-a3c8-99d18f16ddf6",
+            "name": "UploadAhead",
+            "type_name": "ulong",
+            "show_as": "PROPERTY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizer": {
+            },
+            "data": 4,
+            "def": 0,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "8a310843-337d-41a8-b532-e88c0ba22434" }
           }
         ],
         "pos": { "x": 0.0, "y": 0.0 },
         "contents_type": "Graph",
         "contents": { "nodes": [
             {
-              "id": "72046386-c628-415e-9938-2dbf7f9b1724",
-              "name": "Counter",
-              "class_name": "nos.utilities.Counter",
+              "id": "ae41cfdb-e32c-479a-9f6b-be7eb64d7979",
+              "name": "False",
+              "class_name": "nos.internal.GraphInput",
               "pins": [
                 {
-                  "id": "6f05c9ea-b9af-4348-8247-0cb8ab655121",
-                  "name": "InExe",
-                  "type_name": "nos.exe",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": { },
-                  "def": { },
-                  "contents_type": "JobPin",
-                  "contents": { }
-                },
-                {
-                  "id": "a044ecee-654c-40db-b14c-ceea8c534bc0",
-                  "name": "OutExe",
-                  "type_name": "nos.exe",
-                  "show_as": "OUTPUT_PIN",
-                  "can_show_as": "OUTPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": { },
-                  "def": { },
-                  "contents_type": "JobPin",
-                  "contents": { }
-                },
-                {
-                  "id": "43aaf6f0-7cbe-4f41-b0bb-b5288c06defd",
-                  "name": "Step",
-                  "type_name": "int",
-                  "show_as": "PROPERTY",
-                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "visualizer": {
-                  },
-                  "data": 1,
-                  "def": 1,
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "Amount added to the count on each run. Use a negative value to count down."
-                },
-                {
-                  "id": "46bebb14-2705-44b3-bfc2-32d97df16b6a",
-                  "name": "Count",
+                  "id": "d7b0848a-99f6-4325-9c8c-9efed698f782",
+                  "name": "Output",
                   "type_name": "ulong",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
@@ -204,74 +207,126 @@
                   "data": 0,
                   "def": 0,
                   "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "The current count. Advances by Step on each run; zeroed by Reset."
+                  "contents": { }
+                },
+                {
+                  "id": "05407658-6858-4950-bb0e-6da704ad42d7",
+                  "name": "Input",
+                  "type_name": "ulong",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": 0,
+                  "referred_by": [
+                    "86b15da8-7165-4425-a5f3-16fbcbd1d6f3"
+                  ],
+                  "def": 0,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { }
                 }
               ],
-              "pos": { "x": -842.0, "y": -212.0 },
+              "pos": { "x": -530.0, "y": 143.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
-              "functions": [
-                {
-                  "id": "6d774cb4-a37f-4f8e-a7f6-6aea1bcb5b96",
-                  "name": "Reset",
-                  "class_name": "Reset",
-                  "pins": [
-                    {
-                      "id": "8f90a760-e019-4b39-a5d7-fecd69a38f70",
-                      "name": "InExe",
-                      "type_name": "nos.exe",
-                      "show_as": "PROPERTY",
-                      "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                      "visualizer": {
-                      },
-                      "data": { },
-                      "def": { },
-                      "contents_type": "JobPin",
-                      "contents": { }
-                    },
-                    {
-                      "id": "d0894991-02c7-48c9-b3e4-e16019b1f6e5",
-                      "name": "OutExe",
-                      "type_name": "nos.exe",
-                      "show_as": "PROPERTY",
-                      "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
-                      "visualizer": {
-                      },
-                      "data": { },
-                      "def": { },
-                      "contents_type": "JobPin",
-                      "contents": { }
-                    }
-                  ],
-                  "pos": { "x": 0.0, "y": 0.0 },
-                  "contents_type": "Job",
-                  "contents": { "type": "" },
-                  "function_category": "Default Node",
-                  "description": "Zeroes the count.",
-                  "plugin_version": { "major": 0, "minor": 0, "patch": 0 },
-                  "scheduling_type": "Function"
-                }
-              ],
               "function_category": "Default Node",
-              "description": "Outputs a running count that advances by Step every time the node runs.\nDrive it through the In/Out exe pins to schedule it, and call Reset to zero the count.",
-              "display_name": "Counter",
-              "plugin_version": { "major": 3, "minor": 16, "patch": 0 }
+              "display_name": "Index",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "d65bd2f7-a52d-4972-af09-d975e8238f00",
+              "id": "6d6bf940-9003-4729-9a2f-2083a40cabca",
+              "name": "Output_A",
+              "class_name": "nos.internal.GraphOutput",
+              "pins": [
+                {
+                  "id": "e5b70f92-2fc1-4985-a88b-466331831a4a",
+                  "name": "Input",
+                  "type_name": "nos.sys.vulkan.Texture",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": {
+                    "width": 2880,
+                    "height": 2880,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
+                    "unscaled": true
+                  },
+                  "def": {
+                    "resolution": "HD",
+                    "width": 1920,
+                    "height": 1080,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
+                  },
+                  "advanced_property": true,
+                  "meta_data_map": [
+                    { "key": "AdvancedProperty", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "display_name": "Texture"
+                },
+                {
+                  "id": "fd4f8054-c54a-4626-9483-f3d18e5b3184",
+                  "name": "Output",
+                  "type_name": "nos.sys.vulkan.Texture",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": {
+                    "width": 2880,
+                    "height": 2880,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
+                    "unscaled": true
+                  },
+                  "referred_by": [
+                    "b948f863-af82-4b27-95ff-f60b44270f71"
+                  ],
+                  "def": {
+                    "resolution": "HD",
+                    "width": 1920,
+                    "height": 1080,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
+                  },
+                  "advanced_property": true,
+                  "meta_data_map": [
+                    { "key": "AdvancedProperty", "value": "true" },
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "display_name": "Texture"
+                }
+              ],
+              "pos": { "x": 504.0, "y": -266.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Texture",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "a4666adc-b27d-4731-8513-f71c5f9b9f24",
               "name": "ReadEXRSequence",
               "class_name": "nos.mediaio.ReadEXRSequence",
               "pins": [
                 {
-                  "id": "32555509-f0e8-4e9d-908d-3da4e342e1a1",
+                  "id": "b32344be-9134-4f46-905a-a8f68d986b23",
                   "name": "Index",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
-                  "data": 0,
+                  "data": 9223372036854775808,
                   "def": 0,
                   "contents_type": "JobPin",
                   "contents": { },
@@ -279,10 +334,10 @@
                   "display_name": "Index"
                 },
                 {
-                  "id": "d53fbd1e-2d1e-4bcf-afd8-35db699915aa",
+                  "id": "a065bcdd-807b-43f7-a1ec-29404afd71a7",
                   "name": "PrefetchAhead",
                   "type_name": "ulong",
-                  "show_as": "PROPERTY",
+                  "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
@@ -297,7 +352,7 @@
                   "display_name": "Prefetch Ahead"
                 },
                 {
-                  "id": "71fd492d-fa80-4da0-be9d-16e1362888d0",
+                  "id": "2e98b4b6-9f6d-4c57-abd5-1f5b8973877e",
                   "name": "Texture",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "OUTPUT_PIN",
@@ -327,7 +382,7 @@
                   "display_name": "Texture"
                 },
                 {
-                  "id": "4cac7440-f695-4dab-b4b5-9dbb73d33ed4",
+                  "id": "7bd32e32-bfeb-49ff-a3a2-9656e3a3730b",
                   "name": "Depth",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "OUTPUT_PIN",
@@ -357,7 +412,7 @@
                   "display_name": "Depth"
                 },
                 {
-                  "id": "970a0e07-d2ec-4ceb-ad5e-2b5843898ba6",
+                  "id": "ad190a31-62b5-4cec-b997-3a1eeba1545d",
                   "name": "Metadata",
                   "type_name": "nos.mediaio.EXRMetadata",
                   "show_as": "OUTPUT_PIN",
@@ -382,6 +437,18 @@
                     "num_parts": 1,
                     "loaded_layer": ""
                   },
+                  "min": {
+                    "data_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
+                    "display_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
+                    "compression": "",
+                    "loaded_layer": ""
+                  },
+                  "max": {
+                    "data_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
+                    "display_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
+                    "compression": "",
+                    "loaded_layer": ""
+                  },
                   "def": {
                     "data_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
                     "display_window": { "min_x": 0, "min_y": 0, "max_x": 0, "max_y": 0 },
@@ -394,7 +461,7 @@
                   "display_name": "Metadata"
                 },
                 {
-                  "id": "2ff29c0a-090f-4b53-b2f0-b54e3535246f",
+                  "id": "20232bf0-3bb1-4cbf-8f2f-13d595676dff",
                   "name": "Files",
                   "type_name": "[string]",
                   "show_as": "INPUT_PIN",
@@ -407,23 +474,255 @@
                   "contents": { },
                   "description": "Ordered list of .exr file paths, one per frame. Frame Index plays Files[Index].\nUsually driven by a node that lists a directory.",
                   "display_name": "Files"
+                },
+                {
+                  "id": "14feb409-14a3-4e34-a555-c9e9fc25f74a",
+                  "name": "UploadAhead",
+                  "type_name": "ulong",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": 4,
+                  "min": 1,
+                  "max": 128,
+                  "def": 8,
+                  "step": 1.27,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "How many decoded frames ahead of Index the uploader threads copy to the GPU early, so\nshowing a frame never waits on its transfer. A larger runway banks uploads during easy\nstretches and rides out single uploads running longer than a frame interval, at the cost\nof that many frames of extra VRAM and CPU memory held in flight.",
+                  "display_name": "Upload Ahead"
                 }
               ],
               "pos": { "x": -70.0, "y": -99.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
+              "status_messages": [
+                { "text": "Set Files list", "type": "WARNING" }
+              ],
               "description": "Plays an OpenEXR image sequence from a list of files in real time. A pool of worker\nthreads reads and decodes frames ahead of the current Index - in parallel across frames -\ninto a bounded GPU cache; each execution just hands out the already-decoded frame for\nIndex. Because the slow per-frame read+decode happens ahead of the playhead, playback\ndoes not stall on it as long as the workers stay ahead. Index wraps modulo the file count\nand the prefetch window wraps with it, so a free-running counter loops the clip without a\nstutter at the seam. Drive Index from a frame counter to play, or set it directly to\nscrub. Outputs the frame's Texture, its Z as Depth, and its header on Metadata; holds the\nlast frame while the current one is still buffering.",
               "display_name": "Read EXR Sequence",
-              "plugin_version": { "major": 2, "minor": 10, "patch": 0 }
+              "plugin_version": { "major": 2, "minor": 11, "patch": 0 }
             },
             {
-              "id": "9ea12047-4199-41f0-9c99-b7f57baac65b",
+              "id": "877a1de3-153b-4037-9fc1-7584f7a19ba3",
+              "name": "Counter",
+              "class_name": "nos.utilities.Counter",
+              "pins": [
+                {
+                  "id": "19a1c2d3-4196-44b6-b202-c09ceb30fbfe",
+                  "name": "InExe",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { }
+                },
+                {
+                  "id": "65918215-07ed-4c71-af60-93d3873a1fcc",
+                  "name": "OutExe",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { }
+                },
+                {
+                  "id": "87c9916e-dae4-4325-94ae-a13e188105a6",
+                  "name": "Step",
+                  "type_name": "int",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": 1,
+                  "def": 1,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Amount added to the count on each run. Use a negative value to count down."
+                },
+                {
+                  "id": "25388c0a-116f-4345-ba33-1ef1b809e085",
+                  "name": "Count",
+                  "type_name": "ulong",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": 3408,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "The current count. Advances by Step on each run; zeroed by Reset."
+                }
+              ],
+              "pos": { "x": -1031.0, "y": -269.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "functions": [
+                {
+                  "id": "627acfbf-45e1-4698-9bac-133b0752aad2",
+                  "name": "Reset",
+                  "class_name": "Reset",
+                  "pins": [
+                    {
+                      "id": "34e28c9f-8f89-4b46-a50d-bf8fcb6a22c1",
+                      "name": "InExe",
+                      "type_name": "nos.exe",
+                      "show_as": "PROPERTY",
+                      "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                      "visualizer": {
+                      },
+                      "data": { },
+                      "def": { },
+                      "contents_type": "JobPin",
+                      "contents": { }
+                    },
+                    {
+                      "id": "379af6ba-aabf-4e69-9730-e5c94421d6c6",
+                      "name": "OutExe",
+                      "type_name": "nos.exe",
+                      "show_as": "PROPERTY",
+                      "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                      "visualizer": {
+                      },
+                      "data": { },
+                      "def": { },
+                      "contents_type": "JobPin",
+                      "contents": { }
+                    }
+                  ],
+                  "pos": { "x": 0.0, "y": 0.0 },
+                  "contents_type": "Job",
+                  "contents": { "type": "" },
+                  "function_category": "Default Node",
+                  "description": "Zeroes the count.",
+                  "plugin_version": { "major": 0, "minor": 0, "patch": 0 },
+                  "scheduling_type": "Function"
+                }
+              ],
+              "function_category": "Default Node",
+              "description": "Outputs a running count that advances by Step every time the node runs.\nDrive it through the In/Out exe pins to schedule it, and call Reset to zero the count.",
+              "display_name": "Counter",
+              "plugin_version": { "major": 3, "minor": 16, "patch": 0 }
+            },
+            {
+              "id": "ef514a29-e2e4-46dd-84e3-af68ab7b5b6f",
+              "name": "ListDirectory",
+              "class_name": "nos.utilities.ListDirectory",
+              "pins": [
+                {
+                  "id": "c6f33bcc-2da4-432b-a856-729141992904",
+                  "name": "Directory",
+                  "type_name": "string",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                    "type": "FOLDER_PICKER"
+                  },
+                  "data": "",
+                  "def": "",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Directory to list the files of."
+                },
+                {
+                  "id": "ae26ece1-3ea4-4bd7-80ac-439be05d028b",
+                  "name": "Pattern",
+                  "type_name": "string",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": "*.exr",
+                  "def": "",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "ECMAScript regex matched against each file's name. Files that don't match are\nexcluded from Paths and Count. Empty matches everything."
+                },
+                {
+                  "id": "99ffdcaf-3506-4080-b9ae-186a761c0eb7",
+                  "name": "SortBy",
+                  "type_name": "nos.utilities.ListDirectorySortBy",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_OUTPUT_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": "Name",
+                  "min": 1835093538,
+                  "max": 1835093538,
+                  "def": 1835093538,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Field the output Paths are sorted by."
+                },
+                {
+                  "id": "20b50ce2-c89e-4095-ad76-de079c31414a",
+                  "name": "SortDescending",
+                  "type_name": "bool",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": false,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Reverses the sort order of Paths."
+                },
+                {
+                  "id": "5dd49709-dff4-4f94-92ae-52c06a77bfc2",
+                  "name": "Count",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Number of files found directly inside Directory."
+                },
+                {
+                  "id": "d198778f-a00b-4256-9818-d190e1fee4cb",
+                  "name": "Paths",
+                  "type_name": "[string]",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": [],
+                  "def": [],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "description": "Full paths of the files found directly inside Directory."
+                }
+              ],
+              "pos": { "x": -942.0, "y": 25.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Lists the files directly inside a directory.\nOutputs their full paths and how many there are, sorted by SortBy. Subdirectories\nare not listed and not recursed into.",
+              "display_name": "List Directory",
+              "plugin_version": { "major": 3, "minor": 16, "patch": 0 }
+            },
+            {
+              "id": "e16ffab1-a5b6-443b-b7f3-b99e2a8ae54d",
               "name": "double to ulong",
               "class_name": "cast.double-ulong",
               "pins": [
                 {
-                  "id": "6de323bd-0f8e-4656-b8c1-be9bd247ecd2",
+                  "id": "bc7a4e5d-5b5b-4131-a6b6-593f2dd60681",
                   "name": "double",
                   "type_name": "double",
                   "show_as": "INPUT_PIN",
@@ -439,14 +738,14 @@
                   "contents": { }
                 },
                 {
-                  "id": "6bbb77a7-633b-42e4-a26a-5600642e0b1d",
+                  "id": "5bcd2cb4-cb96-4df0-8d6a-0001c41d9c11",
                   "name": "ulong",
                   "type_name": "ulong",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": 0,
+                  "data": 9223372036854775808,
                   "def": 0,
                   "meta_data_map": [
                     { "key": "Category", "value": "" }
@@ -455,19 +754,19 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -318.0, "y": -116.0 },
+              "pos": { "x": -529.0, "y": 18.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "71db69a7-1318-4e33-9965-a7667b5a7170",
+              "id": "44c44e0e-514b-4d45-8b16-1d8a120f74d2",
               "name": "uint to double",
               "class_name": "cast.uint-double",
               "pins": [
                 {
-                  "id": "9e2003bc-50b3-4122-85b3-52b1eac40105",
+                  "id": "87d5a829-0734-40ec-9a67-7e7f83b10b47",
                   "name": "uint",
                   "type_name": "uint",
                   "show_as": "INPUT_PIN",
@@ -483,7 +782,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "78d2fee8-3963-41af-95df-6aa33af472cb",
+                  "id": "3eb617f9-0f72-4657-8dc6-8603105ae9a1",
                   "name": "double",
                   "type_name": "double",
                   "show_as": "OUTPUT_PIN",
@@ -499,127 +798,103 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -656.0, "y": -57.0 },
+              "pos": { "x": -778.0, "y": -57.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "618015f3-2c4d-4808-8265-e5ed8c08e0d1",
-              "name": "ListDirectory",
-              "class_name": "nos.utilities.ListDirectory",
+              "id": "cd08326a-7914-4186-94e8-f3bce988ea2d",
+              "name": "Output_B",
+              "class_name": "nos.internal.GraphOutput",
               "pins": [
                 {
-                  "id": "e085ca97-aedd-438a-a5a5-604b69fe6f4b",
-                  "name": "Directory",
-                  "type_name": "string",
+                  "id": "b2c91e67-4a78-4f6d-ba1f-15add36711a8",
+                  "name": "Input",
+                  "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "visualizer": {
-                    "type": "FOLDER_PICKER"
-                  },
-                  "data": "",
-                  "def": "",
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "Directory to list the files of."
-                },
-                {
-                  "id": "e86031ee-fc01-4d54-aa19-c81cb50fe8b9",
-                  "name": "Pattern",
-                  "type_name": "string",
-                  "show_as": "PROPERTY",
-                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "can_show_as": "INPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": "*.exr",
-                  "def": "",
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "ECMAScript regex matched against each file's name. Files that don't match are\nexcluded from Paths and Count. Empty matches everything."
-                },
-                {
-                  "id": "9837601f-5202-4762-801a-4309d2756e72",
-                  "name": "SortBy",
-                  "type_name": "nos.utilities.ListDirectorySortBy",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_OUTPUT_PROPERTY",
-                  "visualizer": {
+                  "data": {
+                    "width": 2880,
+                    "height": 2880,
+                    "format": "R32_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
+                    "unscaled": true
                   },
-                  "data": "Name",
-                  "min": "Name",
-                  "max": "Name",
-                  "def": "Name",
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "Field the output Paths are sorted by."
-                },
-                {
-                  "id": "c4e2f650-73c3-424e-83a8-1a8ce5b405d4",
-                  "name": "SortDescending",
-                  "type_name": "bool",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "visualizer": {
+                  "def": {
+                    "resolution": "HD",
+                    "width": 1920,
+                    "height": 1080,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
                   },
-                  "data": false,
-                  "def": false,
+                  "advanced_property": true,
+                  "meta_data_map": [
+                    { "key": "AdvancedProperty", "value": "true" }
+                  ],
                   "contents_type": "JobPin",
                   "contents": { },
-                  "description": "Reverses the sort order of Paths."
+                  "display_name": "Depth"
                 },
                 {
-                  "id": "5e5cd888-e267-4f6f-b4a8-daed06b93789",
-                  "name": "Count",
-                  "type_name": "uint",
+                  "id": "12e5b61d-8c71-400f-8f56-643e47f1398a",
+                  "name": "Output",
+                  "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": 0,
-                  "def": 0,
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "description": "Number of files found directly inside Directory."
-                },
-                {
-                  "id": "63a0090a-00eb-4dae-a81b-033af517b1d2",
-                  "name": "Paths",
-                  "type_name": "[string]",
-                  "show_as": "OUTPUT_PIN",
-                  "can_show_as": "OUTPUT_PIN_ONLY",
-                  "visualizer": {
+                  "data": {
+                    "width": 2880,
+                    "height": 2880,
+                    "format": "R32_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
+                    "unscaled": true
                   },
-                  "data": [],
-                  "def": [],
+                  "referred_by": [
+                    "51bf30f3-c74f-4f71-8211-60a078de8b32"
+                  ],
+                  "def": {
+                    "resolution": "HD",
+                    "width": 1920,
+                    "height": 1080,
+                    "format": "R16G16B16A16_SFLOAT",
+                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
+                  },
+                  "advanced_property": true,
+                  "meta_data_map": [
+                    { "key": "AdvancedProperty", "value": "true" },
+                    { "key": "PinHidden", "value": "true" }
+                  ],
                   "contents_type": "JobPin",
                   "contents": { },
-                  "description": "Full paths of the files found directly inside Directory."
+                  "display_name": "Depth"
                 }
               ],
-              "pos": { "x": -870.0, "y": -9.0 },
+              "pos": { "x": 508.0, "y": -192.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
-              "description": "Lists the files directly inside a directory.\nOutputs their full paths and how many there are, sorted by SortBy. Subdirectories\nare not listed and not recursed into.",
-              "display_name": "List Directory",
-              "plugin_version": { "major": 3, "minor": 16, "patch": 0 }
+              "display_name": "Depth",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "45d5a0e1-61bb-49be-83a4-513500e5a28f",
+              "id": "17c5b7b7-6777-49a9-b39f-c27153e166a9",
               "name": "ulong to double",
               "class_name": "cast.ulong-double",
               "pins": [
                 {
-                  "id": "5566d22c-ac72-4539-9c0c-798c685347fe",
+                  "id": "f4de6298-4d96-40f5-b9e2-fed8d363521c",
                   "name": "ulong",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
-                  "data": 0,
+                  "data": 3408,
                   "def": 0,
                   "meta_data_map": [
                     { "key": "Category", "value": "" }
@@ -628,14 +903,14 @@
                   "contents": { }
                 },
                 {
-                  "id": "d3470b53-c17b-4814-9fa5-dfc2252c6e04",
+                  "id": "6d92b351-5c39-42bb-a769-4486c5f036e0",
                   "name": "double",
                   "type_name": "double",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": 0.0,
+                  "data": 3408.0,
                   "def": 0.0,
                   "meta_data_map": [
                     { "key": "Category", "value": "" }
@@ -644,19 +919,19 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -633.0, "y": -124.0 },
+              "pos": { "x": -796.0, "y": -130.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "46fb9447-2b15-4d1d-ac35-5910e606294a",
+              "id": "93a87cb0-4544-4eb5-9445-66376614cc9d",
               "name": "Case",
               "class_name": "nos.internal.GraphInput",
               "pins": [
                 {
-                  "id": "af9258f6-da0f-4c7e-b7c3-bba8a10e3899",
+                  "id": "81eddb71-ed9f-4d1d-b9d7-fe6df72633a5",
                   "name": "Output",
                   "type_name": "bool",
                   "show_as": "OUTPUT_PIN",
@@ -669,7 +944,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "44e9ff03-5b36-411f-b561-fa0037510ada",
+                  "id": "62d2a3fa-3917-45c0-a03e-fe63d1cec794",
                   "name": "Input",
                   "type_name": "bool",
                   "show_as": "INPUT_PIN",
@@ -678,7 +953,7 @@
                   },
                   "data": true,
                   "referred_by": [
-                    "96cd6d51-6f9c-47b2-8cf2-bece26ed70e4"
+                    "8cf922ac-b819-419a-a692-922d82587c12"
                   ],
                   "def": false,
                   "meta_data_map": [
@@ -688,7 +963,7 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -476.0, "y": 14.0 },
+              "pos": { "x": -539.0, "y": 70.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
@@ -696,12 +971,57 @@
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "da978af6-43b9-4868-87c0-3f5a83080b7f",
+              "id": "55620d73-870f-490e-ac31-301113d3c3d3",
+              "name": "PrefetchAhead",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "57aa1936-ffa0-4142-b4af-87b8adec58bb",
+                  "name": "Output",
+                  "type_name": "ulong",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                  },
+                  "data": 32,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { }
+                },
+                {
+                  "id": "ddbf251b-eb9a-453c-8e18-e12ac4c92df2",
+                  "name": "Input",
+                  "type_name": "ulong",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                  },
+                  "data": 32,
+                  "referred_by": [
+                    "064f9be3-c314-4b53-813b-81932d09bdb3"
+                  ],
+                  "def": 0,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { }
+                }
+              ],
+              "pos": { "x": -387.0, "y": -96.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Prefetch Ahead",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "85b3d5dd-5c7d-466b-9169-1afc7755e736",
               "name": "MultiBoundedQueue",
               "class_name": "nos.utilities.MultiBoundedQueue",
               "pins": [
                 {
-                  "id": "c7b0dcd0-fda7-4b80-8009-7e1625dc4e10",
+                  "id": "28e33353-c223-497c-be57-a3481efde84c",
                   "name": "Thread",
                   "type_name": "nos.exe",
                   "show_as": "INPUT_PIN",
@@ -714,7 +1034,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "ad75dd27-7d0a-48a8-b766-97e1f5564358",
+                  "id": "f2607bcd-4e42-476c-8107-193aae9869da",
                   "name": "Size",
                   "type_name": "uint",
                   "show_as": "PROPERTY",
@@ -722,6 +1042,9 @@
                   "visualizer": {
                   },
                   "data": 2,
+                  "referred_by": [
+                    "64394664-08e3-473b-a57e-25390097e2f7"
+                  ],
                   "min": 1,
                   "max": 120,
                   "def": 2,
@@ -730,7 +1053,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "ad11c3bf-1ba3-450a-9df2-6b436804f736",
+                  "id": "37c027a1-3356-4355-a501-2d4fe9b19173",
                   "name": "Alignment",
                   "type_name": "uint",
                   "show_as": "PROPERTY",
@@ -744,7 +1067,7 @@
                   "description": "Used for creating memory-aligned buffers in memory"
                 },
                 {
-                  "id": "5bb9eeb2-b628-4062-9514-2ee87d3a2bff",
+                  "id": "b5ba82ea-d96f-4d04-a7ef-f8d0c036dd89",
                   "name": "Input_A",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "INPUT_PIN",
@@ -772,7 +1095,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "6cf51535-fffb-4081-8fcb-03936870d1c0",
+                  "id": "7ba52a1f-9fec-41df-a625-6dfcf52ef48f",
                   "name": "Output_A",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "OUTPUT_PIN",
@@ -803,7 +1126,7 @@
                   "display_name": "Texture"
                 },
                 {
-                  "id": "932f8e5d-d702-4b17-9267-f8a502a52b7b",
+                  "id": "afa672b5-0d72-4924-b6ea-839401219e65",
                   "name": "Input_B",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "INPUT_PIN",
@@ -831,7 +1154,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "9f8ff780-e6f9-4e5f-9239-b416aa868e9f",
+                  "id": "a39956a3-c5d5-43a7-9c7d-8352a714ad91",
                   "name": "Output_B",
                   "type_name": "nos.sys.vulkan.Texture",
                   "show_as": "OUTPUT_PIN",
@@ -871,13 +1194,13 @@
               "plugin_version": { "major": 3, "minor": 16, "patch": 0 }
             },
             {
-              "id": "bb4f95e0-f76a-4b7f-8fd5-43fd03fd33f2",
+              "id": "001ca20a-89ac-49a8-8b13-e1cd3cda727b",
               "name": "Thread",
               "class_name": "nos.Thread",
               "always_execute": true,
               "pins": [
                 {
-                  "id": "8234b7b6-eac6-4c2a-ad1c-cc97faa3bb74",
+                  "id": "322a235e-ddf4-4989-9c01-9682cf446f08",
                   "name": "Run",
                   "type_name": "nos.exe",
                   "show_as": "OUTPUT_PIN",
@@ -891,7 +1214,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "1a9fab39-6dfe-4fcd-a860-e8d390b8e381",
+                  "id": "eeccc2b6-7cc2-45ce-b715-18e60aa00070",
                   "name": "Importance",
                   "type_name": "ulong",
                   "show_as": "PROPERTY",
@@ -904,19 +1227,19 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -1048.0, "y": -226.0 },
+              "pos": { "x": -1211.0, "y": -279.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "e1d20e0c-d64a-49ac-b35b-91066cb063d0",
+              "id": "89a668e9-5b45-4930-ae91-5cf975f43b8c",
               "name": "Eval",
               "class_name": "nos.math.Eval",
               "pins": [
                 {
-                  "id": "db387dcc-5155-4f75-91ca-22874e148c6d",
+                  "id": "129072fd-2881-4eaf-92b5-ddceb62b2b69",
                   "name": "Expression",
                   "type_name": "string",
                   "show_as": "PROPERTY",
@@ -929,7 +1252,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "d602a80e-8789-4d0c-87da-e8929e7f50ae",
+                  "id": "82093bba-1716-4f72-896e-48922b18dc7b",
                   "name": "Result",
                   "type_name": "double",
                   "show_as": "OUTPUT_PIN",
@@ -942,7 +1265,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "97dd5766-5a39-4366-9411-b9e96adaa5a6",
+                  "id": "4ba7ea82-d3a0-4581-8fd7-62c9fcaadb71",
                   "name": "Show_Expression",
                   "type_name": "bool",
                   "show_as": "PROPERTY",
@@ -956,20 +1279,20 @@
                   "display_name": "Show Expression In Node"
                 },
                 {
-                  "id": "10d109e2-e30f-4cce-af99-ba712623b001",
+                  "id": "ee1b5d52-8f9c-4b72-8427-3246a7bc454b",
                   "name": "A",
                   "type_name": "double",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
-                  "data": 0.0,
+                  "data": 3408.0,
                   "def": 0.0,
                   "contents_type": "JobPin",
                   "contents": { }
                 },
                 {
-                  "id": "484d0a26-44ac-4677-9c2a-56d8a56541ad",
+                  "id": "b339bf0a-7c49-4ae2-847a-9b4f718c7a00",
                   "name": "B",
                   "type_name": "double",
                   "show_as": "INPUT_PIN",
@@ -982,220 +1305,23 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -474.0, "y": -90.0 },
+              "pos": { "x": -637.0, "y": -96.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
+              "status_messages": [
+                { "text": "A % B" }
+              ],
               "description": "Evaluates a string expression",
               "plugin_version": { "major": 1, "minor": 11, "patch": 0 }
             },
             {
-              "id": "02169d7a-2083-44b6-b5f7-020f8bc9d0e2",
-              "name": "Output_A",
-              "class_name": "nos.internal.GraphOutput",
-              "pins": [
-                {
-                  "id": "5cd5ed08-697c-41dd-8074-64f7d2609ee0",
-                  "name": "Input",
-                  "type_name": "nos.sys.vulkan.Texture",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": {
-                    "width": 2880,
-                    "height": 2880,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
-                    "unscaled": true
-                  },
-                  "def": {
-                    "resolution": "HD",
-                    "width": 1920,
-                    "height": 1080,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
-                  },
-                  "advanced_property": true,
-                  "meta_data_map": [
-                    { "key": "AdvancedProperty", "value": "true" }
-                  ],
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "display_name": "Texture"
-                },
-                {
-                  "id": "923cc8bd-9e9c-44e1-ab12-c67775ad65c2",
-                  "name": "Output",
-                  "type_name": "nos.sys.vulkan.Texture",
-                  "show_as": "OUTPUT_PIN",
-                  "can_show_as": "OUTPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": {
-                    "width": 2880,
-                    "height": 2880,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
-                    "unscaled": true
-                  },
-                  "referred_by": [
-                    "cd33520a-4c62-426e-a09b-1c6317281c53"
-                  ],
-                  "def": {
-                    "resolution": "HD",
-                    "width": 1920,
-                    "height": 1080,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
-                  },
-                  "advanced_property": true,
-                  "meta_data_map": [
-                    { "key": "AdvancedProperty", "value": "true" },
-                    { "key": "PinHidden", "value": "true" }
-                  ],
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "display_name": "Texture"
-                }
-              ],
-              "pos": { "x": 504.0, "y": -266.0 },
-              "contents_type": "Job",
-              "contents": { "type": "" },
-              "function_category": "Default Node",
-              "display_name": "Texture",
-              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
-            },
-            {
-              "id": "977ae9e5-8d24-4678-bb10-6e46553f2418",
-              "name": "Output_B",
-              "class_name": "nos.internal.GraphOutput",
-              "pins": [
-                {
-                  "id": "af67cf38-3e44-4d3e-b479-7dda13784ed6",
-                  "name": "Input",
-                  "type_name": "nos.sys.vulkan.Texture",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": {
-                    "width": 2880,
-                    "height": 2880,
-                    "format": "R32_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
-                    "unscaled": true
-                  },
-                  "def": {
-                    "resolution": "HD",
-                    "width": 1920,
-                    "height": 1080,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
-                  },
-                  "advanced_property": true,
-                  "meta_data_map": [
-                    { "key": "AdvancedProperty", "value": "true" }
-                  ],
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "display_name": "Depth"
-                },
-                {
-                  "id": "a09bd893-4158-40e7-8993-46496e59466a",
-                  "name": "Output",
-                  "type_name": "nos.sys.vulkan.Texture",
-                  "show_as": "OUTPUT_PIN",
-                  "can_show_as": "OUTPUT_PIN_ONLY",
-                  "visualizer": {
-                  },
-                  "data": {
-                    "width": 2880,
-                    "height": 2880,
-                    "format": "R32_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED",
-                    "unscaled": true
-                  },
-                  "referred_by": [
-                    "c831cbb6-501f-4d35-ad1d-6b126bdccb41"
-                  ],
-                  "def": {
-                    "resolution": "HD",
-                    "width": 1920,
-                    "height": 1080,
-                    "format": "R16G16B16A16_SFLOAT",
-                    "usage": "TRANSFER_SRC TRANSFER_DST SAMPLED STORAGE RENDER_TARGET"
-                  },
-                  "advanced_property": true,
-                  "meta_data_map": [
-                    { "key": "AdvancedProperty", "value": "true" },
-                    { "key": "PinHidden", "value": "true" }
-                  ],
-                  "contents_type": "JobPin",
-                  "contents": { },
-                  "display_name": "Depth"
-                }
-              ],
-              "pos": { "x": 508.0, "y": -192.0 },
-              "contents_type": "Job",
-              "contents": { "type": "" },
-              "function_category": "Default Node",
-              "display_name": "Depth",
-              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
-            },
-            {
-              "id": "0c67d3fa-794e-478f-9ac8-834cb1749e5a",
-              "name": "Directory",
-              "class_name": "nos.internal.GraphInput",
-              "pins": [
-                {
-                  "id": "0486371a-86c0-475c-9396-690ff977959c",
-                  "name": "Output",
-                  "type_name": "string",
-                  "show_as": "OUTPUT_PIN",
-                  "can_show_as": "OUTPUT_PIN_ONLY",
-                  "visualizer": {
-                    "type": "FOLDER_PICKER"
-                  },
-                  "data": "",
-                  "def": "",
-                  "contents_type": "JobPin",
-                  "contents": { }
-                },
-                {
-                  "id": "b4c9d444-cd55-48a3-89f6-5ce25bdd7af6",
-                  "name": "Input",
-                  "type_name": "string",
-                  "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                  "visualizer": {
-                    "type": "FOLDER_PICKER"
-                  },
-                  "data": "",
-                  "referred_by": [
-                    "38888a06-1cac-4394-99cf-a33a60237a2b"
-                  ],
-                  "def": "",
-                  "meta_data_map": [
-                    { "key": "PinHidden", "value": "true" }
-                  ],
-                  "contents_type": "JobPin",
-                  "contents": { }
-                }
-              ],
-              "pos": { "x": -1197.849365, "y": -121.682793 },
-              "contents_type": "Job",
-              "contents": { "type": "" },
-              "function_category": "Default Node",
-              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
-            },
-            {
-              "id": "c73fae87-1e10-42fa-969e-ceab17536fec",
+              "id": "3dc93a78-5cb3-4c23-86b6-4b122c48eb45",
               "name": "SortBy",
               "class_name": "nos.internal.GraphInput",
               "pins": [
                 {
-                  "id": "d69fd746-28c1-4aa9-8f34-2e7530c829f8",
+                  "id": "7d951825-34cc-4093-a38e-70a048b65c29",
                   "name": "Output",
                   "type_name": "nos.utilities.ListDirectorySortBy",
                   "show_as": "OUTPUT_PIN",
@@ -1203,14 +1329,14 @@
                   "visualizer": {
                   },
                   "data": "Name",
-                  "min": "Name",
-                  "max": "Name",
-                  "def": "Name",
+                  "min": 1835093538,
+                  "max": 1835093538,
+                  "def": 1835093538,
                   "contents_type": "JobPin",
                   "contents": { }
                 },
                 {
-                  "id": "1647165d-5745-4700-bacc-15af466496b0",
+                  "id": "db63e7c1-a11d-4432-a7c8-2b7c8119bfbd",
                   "name": "Input",
                   "type_name": "nos.utilities.ListDirectorySortBy",
                   "show_as": "INPUT_PIN",
@@ -1219,10 +1345,10 @@
                   },
                   "data": "Name",
                   "referred_by": [
-                    "1958326a-c1df-4d0f-8bdf-7f996dd16894"
+                    "75f6d43d-b0b2-4c4f-a624-77b5d2bb68dc"
                   ],
-                  "min": "Name",
-                  "max": "Name",
+                  "min": 1835093538,
+                  "max": 1835093538,
                   "def": "Name",
                   "meta_data_map": [
                     { "key": "PinHidden", "value": "true" }
@@ -1231,19 +1357,65 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -1197.849365, "y": -46.682793 },
+              "pos": { "x": -1193.0, "y": 25.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "c6f096bc-753b-4cf9-a813-5d20049070e7",
+              "id": "2151e6dc-53c7-4942-a9a2-cfabd322d527",
+              "name": "Directory",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "7f5be557-6665-43ce-ae69-1681c35d78d4",
+                  "name": "Output",
+                  "type_name": "string",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizer": {
+                    "type": "FOLDER_PICKER"
+                  },
+                  "data": "",
+                  "def": "",
+                  "contents_type": "JobPin",
+                  "contents": { }
+                },
+                {
+                  "id": "358e109d-943a-4445-aed2-4248eb10e957",
+                  "name": "Input",
+                  "type_name": "string",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizer": {
+                    "type": "FOLDER_PICKER"
+                  },
+                  "data": "",
+                  "referred_by": [
+                    "75e9ab5c-89e2-4dc1-853a-edfcb16e53c0"
+                  ],
+                  "def": "",
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { }
+                }
+              ],
+              "pos": { "x": -1193.0, "y": -50.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "97ec514b-0449-4daf-b204-50e8adc54008",
               "name": "SortDescending",
               "class_name": "nos.internal.GraphInput",
               "pins": [
                 {
-                  "id": "039a1ffe-cc16-4e9f-a41d-3dbfb69de9c6",
+                  "id": "ae643794-a0c5-4c6f-a9cc-896a82a86696",
                   "name": "Output",
                   "type_name": "bool",
                   "show_as": "OUTPUT_PIN",
@@ -1256,7 +1428,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "fdf3a43d-e511-40d1-b515-a480c69cb19c",
+                  "id": "418d1788-4896-4dcc-99c4-689e77bd75df",
                   "name": "Input",
                   "type_name": "bool",
                   "show_as": "INPUT_PIN",
@@ -1265,7 +1437,7 @@
                   },
                   "data": false,
                   "referred_by": [
-                    "83287253-4840-44fa-a191-f868fb1b5e88"
+                    "62f453f4-4a41-47b1-8e57-684fdad6c092"
                   ],
                   "def": false,
                   "meta_data_map": [
@@ -1275,19 +1447,19 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -1197.849365, "y": 28.317207 },
+              "pos": { "x": -1193.0, "y": 100.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "ab643ec2-7d8f-4188-9d2f-06e2a61319c9",
+              "id": "7b0d7adb-4451-4aea-a188-c74680430250",
               "name": "Switch",
               "class_name": "nos.engine.Switch",
               "pins": [
                 {
-                  "id": "2196e01f-5efd-41c1-b897-9d346562b544",
+                  "id": "8a081d78-8694-4d33-93f8-63df9f68e796",
                   "name": "Case",
                   "type_name": "bool",
                   "show_as": "INPUT_PIN",
@@ -1300,20 +1472,20 @@
                   "contents": { }
                 },
                 {
-                  "id": "c4bc30ee-c0b6-4d28-afd3-c1503af03b65",
+                  "id": "2512f6eb-c0fc-41d1-94fd-b0430c8b153a",
                   "name": "True",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": 128,
+                  "data": 9223372036854775808,
                   "def": 0,
                   "contents_type": "JobPin",
                   "contents": { }
                 },
                 {
-                  "id": "5a517766-67ad-41f3-885c-c2f158c0a2d4",
+                  "id": "8ce19c09-85dc-4cb0-8e5f-8eae4b9dfd76",
                   "name": "False",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
@@ -1326,7 +1498,7 @@
                   "contents": { }
                 },
                 {
-                  "id": "17e84265-8bd3-4e36-ab86-dd8df5675edc",
+                  "id": "6e05b4a9-5073-4b84-9fa0-88d45884e687",
                   "name": "Output",
                   "type_name": "ulong",
                   "show_as": "OUTPUT_PIN",
@@ -1339,41 +1511,41 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -236.0, "y": 2.0 },
+              "pos": { "x": -310.0, "y": 94.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             },
             {
-              "id": "8ab72e75-f2f2-4c20-921a-4b024f328de9",
-              "name": "False",
+              "id": "157e81cb-a762-44bc-b8e9-36c4929b7fd6",
+              "name": "UploadAhead",
               "class_name": "nos.internal.GraphInput",
               "pins": [
                 {
-                  "id": "d472e8f0-fea0-4cce-9f84-6d4a42d8e641",
+                  "id": "95f9327e-48f6-4dcd-ba5f-f2815af51f5d",
                   "name": "Output",
                   "type_name": "ulong",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
                   "visualizer": {
                   },
-                  "data": 0,
+                  "data": 4,
                   "def": 0,
                   "contents_type": "JobPin",
                   "contents": { }
                 },
                 {
-                  "id": "8aa3a26e-78d8-48a8-9678-d1a58afe240f",
+                  "id": "8a310843-337d-41a8-b532-e88c0ba22434",
                   "name": "Input",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_ONLY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
-                  "data": 0,
+                  "data": 4,
                   "referred_by": [
-                    "a329e43e-043e-444d-b5fe-abd6f74540b9"
+                    "96b7f1f3-1772-4e4d-a3c8-99d18f16ddf6"
                   ],
                   "def": 0,
                   "meta_data_map": [
@@ -1383,39 +1555,41 @@
                   "contents": { }
                 }
               ],
-              "pos": { "x": -467.0, "y": 87.0 },
+              "pos": { "x": -391.0, "y": -52.0 },
               "contents_type": "Job",
               "contents": { "type": "" },
               "function_category": "Default Node",
-              "display_name": "Index",
+              "display_name": "Upload Ahead",
               "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
             }
           ], "connections": [
-            { "from": "46bebb14-2705-44b3-bfc2-32d97df16b6a", "to": "5566d22c-ac72-4539-9c0c-798c685347fe", "id": "a8a84456-f0a6-47a2-8653-9b51523c88cc" },
-            { "from": "a044ecee-654c-40db-b14c-ceea8c534bc0", "to": "c7b0dcd0-fda7-4b80-8009-7e1625dc4e10", "id": "2ecac636-6496-4558-915e-274316de6f62" },
-            { "from": "5e5cd888-e267-4f6f-b4a8-daed06b93789", "to": "9e2003bc-50b3-4122-85b3-52b1eac40105", "id": "484a5bc2-3e2f-4ed3-ac1b-2a243852639a" },
-            { "from": "71fd492d-fa80-4da0-be9d-16e1362888d0", "to": "5bb9eeb2-b628-4062-9514-2ee87d3a2bff", "id": "b9744219-f9c5-41d6-b9bd-5427d9e37237" },
-            { "from": "8234b7b6-eac6-4c2a-ad1c-cc97faa3bb74", "to": "6f05c9ea-b9af-4348-8247-0cb8ab655121", "id": "c6f8cee4-9456-4cba-9858-678f95512de9" },
-            { "from": "63a0090a-00eb-4dae-a81b-033af517b1d2", "to": "2ff29c0a-090f-4b53-b2f0-b54e3535246f", "id": "952bbf35-50fa-4718-a754-25ac1dd59a2f" },
-            { "from": "4cac7440-f695-4dab-b4b5-9dbb73d33ed4", "to": "932f8e5d-d702-4b17-9267-f8a502a52b7b", "id": "97f5cfc6-c53a-436b-b7a6-ae1e510964c4" },
-            { "from": "78d2fee8-3963-41af-95df-6aa33af472cb", "to": "484d0a26-44ac-4677-9c2a-56d8a56541ad", "id": "af45c1e3-87c1-4e03-aa98-a84ae0ee761d" },
-            { "from": "9f8ff780-e6f9-4e5f-9239-b416aa868e9f", "to": "af67cf38-3e44-4d3e-b479-7dda13784ed6", "id": "aba811df-af36-40e4-9281-fa84d1f7dbc8" },
-            { "from": "d602a80e-8789-4d0c-87da-e8929e7f50ae", "to": "6de323bd-0f8e-4656-b8c1-be9bd247ecd2", "id": "9a18dd48-efae-40b8-8c66-0f70e647ea14" },
-            { "from": "d3470b53-c17b-4814-9fa5-dfc2252c6e04", "to": "10d109e2-e30f-4cce-af99-ba712623b001", "id": "95d7f5b9-c956-4e92-b29a-5be0a74762c9" },
-            { "from": "d472e8f0-fea0-4cce-9f84-6d4a42d8e641", "to": "5a517766-67ad-41f3-885c-c2f158c0a2d4", "id": "30754cc7-d764-438b-a994-d58feee2a283" },
-            { "from": "6cf51535-fffb-4081-8fcb-03936870d1c0", "to": "5cd5ed08-697c-41dd-8074-64f7d2609ee0", "id": "3aea843f-9a7f-4e56-b8ca-b06d9c66eade" },
-            { "from": "0486371a-86c0-475c-9396-690ff977959c", "to": "e085ca97-aedd-438a-a5a5-604b69fe6f4b", "id": "f0629d3b-6144-4fd3-a68a-482fe310fb5d" },
-            { "from": "d69fd746-28c1-4aa9-8f34-2e7530c829f8", "to": "9837601f-5202-4762-801a-4309d2756e72", "id": "47ab6b4b-3606-41d6-a58b-f0a6da0643f3" },
-            { "from": "039a1ffe-cc16-4e9f-a41d-3dbfb69de9c6", "to": "c4e2f650-73c3-424e-83a8-1a8ce5b405d4", "id": "3d1d8362-f027-4436-96cd-efd5b37dd7b4" },
-            { "from": "17e84265-8bd3-4e36-ab86-dd8df5675edc", "to": "32555509-f0e8-4e9d-908d-3da4e342e1a1", "id": "452f67db-c7fc-44d2-87ab-a0f22e83096c" },
-            { "from": "6bbb77a7-633b-42e4-a26a-5600642e0b1d", "to": "c4bc30ee-c0b6-4d28-afd3-c1503af03b65", "id": "fd8a1308-1296-4b05-8645-f0aabef0c100" },
-            { "from": "af9258f6-da0f-4c7e-b7c3-bba8a10e3899", "to": "2196e01f-5efd-41c1-b897-9d346562b544", "id": "5b89253e-75e5-4280-81d7-795b082c9f23" }
+            { "from": "7f5be557-6665-43ce-ae69-1681c35d78d4", "to": "c6f33bcc-2da4-432b-a856-729141992904", "id": "14ed7d9c-80c0-4176-98f3-fdbd7bce764d" },
+            { "from": "6e05b4a9-5073-4b84-9fa0-88d45884e687", "to": "b32344be-9134-4f46-905a-a8f68d986b23", "id": "474353be-0c5e-4bb3-8bfb-598db5dd24c8" },
+            { "from": "ae643794-a0c5-4c6f-a9cc-896a82a86696", "to": "20b50ce2-c89e-4095-ad76-de079c31414a", "id": "182fa28e-a832-44ed-903b-a7e30df60e56" },
+            { "from": "7bd32e32-bfeb-49ff-a3a2-9656e3a3730b", "to": "afa672b5-0d72-4924-b6ea-839401219e65", "id": "d0a12987-4b83-4fc2-8c1c-b18a285505f8" },
+            { "from": "d198778f-a00b-4256-9818-d190e1fee4cb", "to": "20232bf0-3bb1-4cbf-8f2f-13d595676dff", "id": "2f45d696-2a41-4f5e-8217-d4caaba02f1c" },
+            { "from": "7ba52a1f-9fec-41df-a625-6dfcf52ef48f", "to": "e5b70f92-2fc1-4985-a88b-466331831a4a", "id": "9394e5a5-2308-44a5-a415-1264142a0673" },
+            { "from": "25388c0a-116f-4345-ba33-1ef1b809e085", "to": "f4de6298-4d96-40f5-b9e2-fed8d363521c", "id": "f446fe44-51c6-4918-9d1a-ac425449d9c0" },
+            { "from": "3eb617f9-0f72-4657-8dc6-8603105ae9a1", "to": "b339bf0a-7c49-4ae2-847a-9b4f718c7a00", "id": "1a6fb42e-6d95-4e2f-873a-7ed4d36cc077" },
+            { "from": "322a235e-ddf4-4989-9c01-9682cf446f08", "to": "19a1c2d3-4196-44b6-b202-c09ceb30fbfe", "id": "4fb5c2ba-4a9e-48df-b607-180f763108aa" },
+            { "from": "57aa1936-ffa0-4142-b4af-87b8adec58bb", "to": "a065bcdd-807b-43f7-a1ec-29404afd71a7", "id": "dfd68ed7-3c35-4653-819e-3fe4bc1d5a26" },
+            { "from": "5dd49709-dff4-4f94-92ae-52c06a77bfc2", "to": "87d5a829-0734-40ec-9a67-7e7f83b10b47", "id": "e3624b87-5408-4887-88b0-d719f9242634" },
+            { "from": "65918215-07ed-4c71-af60-93d3873a1fcc", "to": "28e33353-c223-497c-be57-a3481efde84c", "id": "8418604b-ccb1-47c1-adcd-71a97851fc00" },
+            { "from": "81eddb71-ed9f-4d1d-b9d7-fe6df72633a5", "to": "8a081d78-8694-4d33-93f8-63df9f68e796", "id": "c0af0bf5-daad-4e6d-8a3b-84749b377b3e" },
+            { "from": "2e98b4b6-9f6d-4c57-abd5-1f5b8973877e", "to": "b5ba82ea-d96f-4d04-a7ef-f8d0c036dd89", "id": "b9a59998-fe27-4a3a-962b-4e030aa979c3" },
+            { "from": "82093bba-1716-4f72-896e-48922b18dc7b", "to": "bc7a4e5d-5b5b-4131-a6b6-593f2dd60681", "id": "e9d84475-280e-49b5-9e2c-996b0899c8a1" },
+            { "from": "a39956a3-c5d5-43a7-9c7d-8352a714ad91", "to": "b2c91e67-4a78-4f6d-ba1f-15add36711a8", "id": "e8927c05-23d1-419c-8648-939f3b023f90" },
+            { "from": "6d92b351-5c39-42bb-a769-4486c5f036e0", "to": "ee1b5d52-8f9c-4b72-8427-3246a7bc454b", "id": "8ef3112b-b323-48ef-a4a1-b9000e8fbaf8" },
+            { "from": "d7b0848a-99f6-4325-9c8c-9efed698f782", "to": "8ce19c09-85dc-4cb0-8e5f-8eae4b9dfd76", "id": "8121c3e9-02c8-4129-a9c6-cac87793fab2" },
+            { "from": "5bcd2cb4-cb96-4df0-8d6a-0001c41d9c11", "to": "2512f6eb-c0fc-41d1-94fd-b0430c8b153a", "id": "d889f5c5-1041-4ac0-8d52-225d6a1a8ac4" },
+            { "from": "7d951825-34cc-4093-a38e-70a048b65c29", "to": "99ffdcaf-3506-4080-b9ae-186a761c0eb7", "id": "4221c773-b8f6-4c88-a6af-ae43da84975a" },
+            { "from": "95f9327e-48f6-4dcd-ba5f-f2815af51f5d", "to": "14feb409-14a3-4e34-a555-c9e9fc25f74a", "id": "068e04ca-78c6-42cb-a775-bb0d2dba27d4" }
           ] },
         "function_category": "Default Node",
         "meta_data_map": [
           { "key": "NodeStatusPortal", "value": "/ListDirectory;/ReadEXRSequence" }
         ],
-        "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+        "plugin_version": { "major": 2, "minor": 13, "patch": 1 }
       }
     }
   ] }
