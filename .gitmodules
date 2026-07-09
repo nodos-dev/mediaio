@@ -1,0 +1,4 @@
+[submodule "nosMediaIO/External/tinyexr"]
+	path = nosMediaIO/External/tinyexr
+	url = https://github.com/syoyo/tinyexr.git
+	branch = release

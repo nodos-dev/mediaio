@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.10.0"
+			"version": "2.11.0"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -34,13 +34,17 @@
 		"Config/TimecodePlayer.nosdef",
 		"Config/WriteDPX.nosdef",
 		"Config/RecordDPXClip.nosdef",
-		"Config/PlaybackClip.nosdef"
+		"Config/PlaybackClip.nosdef",
+		"Config/ReadEXR.nosdef",
+		"Config/ReadEXRSequence.nosdef",
+		"Config/PlayEXR.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
 		"Config/SensorInfo.fbs",
 		"Config/ANC.fbs",
-		"Config/TimecodePlayer.fbs"
+		"Config/TimecodePlayer.fbs",
+		"Config/ReadEXR.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"
