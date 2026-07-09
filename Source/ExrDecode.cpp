@@ -429,7 +429,7 @@ bool DecodeExr(const std::string& path, const std::string& layerArg, ExrFrame& o
 	return DecodeExrFromMemory(bytes.data(), bytes.size(), layerArg, out, err);
 }
 
-TypedObjectRef<sys::vulkan::Texture> UploadColor(const ExrFrame& frame, nos::uuid nodeId)
+TypedObjectRef<sys::vulkan::Texture> UploadColor(const ExrFrame& frame, nos::uuid nodeId, nosGPUEvent* outEvent)
 {
 	if (frame.Color.empty() || frame.ColorFormat == NOS_FORMAT_NONE)
 		return {};
@@ -451,11 +451,14 @@ TypedObjectRef<sys::vulkan::Texture> UploadColor(const ExrFrame& frame, nos::uui
 	nosGPUEvent event = 0;
 	nosCmdEndParams endParams{ .ForceSubmit = true, .OutGPUEventHandle = &event };
 	nosVulkan->End(cmd, &endParams);
-	nosVulkan->WaitGpuEvent(&event, UINT64_MAX); // upload must finish before the texture is used
+	if (outEvent)
+		*outEvent = event; // caller waits before the texture is used
+	else
+		nosVulkan->WaitGpuEvent(&event, UINT64_MAX); // upload must finish before the texture is used
 	return texture;
 }
 
-TypedObjectRef<sys::vulkan::Texture> UploadDepth(const ExrFrame& frame, nos::uuid nodeId)
+TypedObjectRef<sys::vulkan::Texture> UploadDepth(const ExrFrame& frame, nos::uuid nodeId, nosGPUEvent* outEvent)
 {
 	if (!frame.HasDepth || frame.Depth.empty())
 		return {};
@@ -477,7 +480,10 @@ TypedObjectRef<sys::vulkan::Texture> UploadDepth(const ExrFrame& frame, nos::uui
 	nosGPUEvent event = 0;
 	nosCmdEndParams endParams{ .ForceSubmit = true, .OutGPUEventHandle = &event };
 	nosVulkan->End(cmd, &endParams);
-	nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
+	if (outEvent)
+		*outEvent = event;
+	else
+		nosVulkan->WaitGpuEvent(&event, UINT64_MAX);
 	return texture;
 }
 

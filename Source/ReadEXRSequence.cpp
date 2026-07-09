@@ -30,9 +30,21 @@ static constexpr int MAX_AHEAD = 128;
 // A frame whose decode failed is retried this long after the failure, so transient errors
 // (file still being written, momentary I/O hiccup) self-heal without hammering a bad file.
 static constexpr auto FAILED_RETRY_DELAY = std::chrono::milliseconds(500);
+// Default for the UploadAhead pin: how many Ready frames ahead of the playhead the uploader
+// threads copy to the GPU early, so by the time they are shown the transfer has already
+// finished and publishing costs nothing. The runway lets the uploaders bank frames ahead and
+// absorb single uploads running longer than a frame interval; it costs up to that many frames
+// of extra VRAM + CPU pixels held in flight. Both uploaders busy plus two banked covers
+// ordinary jitter; raise the pin for graphs with longer transfer stalls.
+static constexpr int DEFAULT_UPLOAD_AHEAD = 4;
+// Two uploader threads overlap staging copies so upload throughput is not bounded by one
+// contended memcpy per frame interval.
+static constexpr int UPLOADER_THREADS = 2;
 
-// A cached frame. Workers fill Frame (CPU pixels) in parallel; the execute thread uploads it to
-// the GPU the first time it is shown, then drops the CPU copy. Workers never touch Vulkan.
+// A cached frame. Workers fill Frame (CPU pixels) in parallel; the uploader thread copies it to
+// the GPU ahead of being shown; the execute thread only waits the (normally long signalled)
+// transfer events and publishes. The CPU copy is dropped once the transfer completes. Always
+// Sync() before the textures are used or the entry is destroyed.
 struct CacheEntry
 {
 	enum class State { Decoding, Ready, Failed };
@@ -41,15 +53,20 @@ struct CacheEntry
 	TypedObjectRef<sys::vulkan::Texture> Color, Depth;
 	std::optional<nos::Buffer> Metadata;
 	bool HasDepth = false, Uploaded = false;
+	bool Uploading = false;                         // claimed by the uploader thread; its CPU
+	                                                // pixels are moved out until the upload lands
+	nosGPUEvent ColorEvent = 0, DepthEvent = 0;     // pending upload transfers (0 = none)
 	std::string Error;                              // last decode error (State::Failed)
 	std::chrono::steady_clock::time_point FailedAt; // when it failed, for retry pacing
 };
 
 // Plays an OpenEXR image sequence from a list of files. A pool of worker threads - one per
 // physical core, decode throughput flattens beyond that (memory-bandwidth bound) - reads and
-// decodes whole frames ahead of Index in parallel; the execute thread uploads and hands out the
-// frame for Index. The slow per-frame decode is done ahead of the playhead, so playback stays
-// smooth as long as the workers keep up. Each frame is decoded and uploaded once.
+// decodes whole frames ahead of Index in parallel; uploader threads copy them to the GPU just
+// ahead of the playhead; the execute thread only hands out the frame for Index, blocking until
+// it is deliverable so the path paces on real throughput and never repeats a stale frame.
+// Both the slow per-frame decode and the ~100 MB upload happen ahead of and off the playhead
+// path, so that wait is normally zero. Each frame is decoded and uploaded once.
 //
 // Index is taken modulo the file count and the prefetch window wraps around the end of the
 // sequence, so a free-running upstream counter loops the clip without a stutter at the seam:
@@ -83,11 +100,12 @@ struct ReadEXRSequenceNode : NodeContext
 	uint64_t Gen = 0;                  // guarded by Mtx; bumped when Files changes, so workers
 	                                   // still decoding the previous list discard their result
 
-	std::atomic<int> Frame{ 0 }, Dir{ 1 }, AheadN{ 8 };
+	std::atomic<int> Frame{ 0 }, Dir{ 1 }, AheadN{ 8 }, UploadAheadN{ DEFAULT_UPLOAD_AHEAD };
 	std::atomic<bool> Stop{ false };
 
 	int PrevFrame = 0;
 	std::vector<std::thread> Workers;
+	std::vector<std::thread> Uploaders;
 
 	// Playback telemetry, published as engine watch logs every execution: exposes whether Index
 	// outruns the decoders and whether the prefetch window is actually filling. Rates are
@@ -96,12 +114,15 @@ struct ReadEXRSequenceNode : NodeContext
 	std::chrono::steady_clock::time_point LastExecTime{};
 	uint64_t LastDecodes = 0, LastDecodeUs = 0;
 	double EmaIndexRate = 0, EmaExecRate = 0, EmaDecodeRate = 0, EmaDecodeMs = 0;
+	std::string LastConfigWarning; // last misconfiguration reported, to log each change once
 
 	nosResult OnCreate(nosFbNodePtr node) override
 	{
 		unsigned n = std::clamp(std::thread::hardware_concurrency() / 2, 4u, 16u);
 		for (unsigned i = 0; i < n; ++i)
 			Workers.emplace_back([this] { WorkerLoop(); });
+		for (int i = 0; i < UPLOADER_THREADS; ++i)
+			Uploaders.emplace_back([this] { UploaderLoop(); });
 		return NOS_RESULT_SUCCESS;
 	}
 
@@ -111,6 +132,44 @@ struct ReadEXRSequenceNode : NodeContext
 		Cv.notify_all();
 		for (auto& w : Workers)
 			w.join();
+		for (auto& u : Uploaders)
+			u.join();
+		for (auto& [f, e] : Cache)
+			Sync(e); // in-flight transfers must finish before the textures are destroyed
+	}
+
+	// Holds the path start until the prefetch window around the playhead is populated - frames
+	// decoded and the imminent ones landed on the GPU - so playback begins without a buffering
+	// stutter. Failed frames count as populated (they only ever resolve via the retry cycle) and
+	// a timeout backstops empty/broken file lists; the very first start, before any execution
+	// snapshots the Files pin, has nothing to prefetch and returns immediately.
+	void OnPathStart() override
+	{
+		constexpr auto PATH_START_TIMEOUT = std::chrono::seconds(10);
+		auto deadline = std::chrono::steady_clock::now() + PATH_START_TIMEOUT;
+		std::unique_lock<std::mutex> lk(Mtx);
+		Cv.notify_all(); // nudge workers/uploaders to re-scan the window
+		auto filled = [this]
+		{
+			int count = int(Paths.size());
+			if (count <= 0)
+				return true;
+			int frame = Frame, dir = Dir;
+			int ahead = std::min(AheadN.load(), count - 1);
+			int uploadAhead = UploadAheadN;
+			for (int k = 0; k <= ahead; ++k)
+			{
+				auto it = Cache.find(((frame + dir * k) % count + count) % count);
+				if (it == Cache.end() || it->second.St == CacheEntry::State::Decoding)
+					return false;
+				if (k <= uploadAhead && it->second.St == CacheEntry::State::Ready && !it->second.Uploaded)
+					return false;
+			}
+			return true;
+		};
+		while (!Stop && !filled())
+			if (Cv.wait_until(lk, deadline) == std::cv_status::timeout)
+				break;
 	}
 
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
@@ -126,8 +185,12 @@ struct ReadEXRSequenceNode : NodeContext
 		// Index wraps modulo the file count so a free-running counter loops the sequence.
 		auto* indexPin = params.GetPinValue<uint64_t>(NOS_NAME_STATIC("Index"));
 		auto* aheadPin = params.GetPinValue<uint64_t>(NOS_NAME_STATIC("PrefetchAhead"));
+		auto* uploadAheadPin = params.GetPinValue<uint64_t>(NOS_NAME_STATIC("UploadAhead"));
 		int frame = int((indexPin ? *indexPin : 0) % uint64_t(count));
 		int ahead = aheadPin ? int(std::clamp<uint64_t>(*aheadPin, 1, MAX_AHEAD)) : 32;
+		int uploadAhead = uploadAheadPin
+			? int(std::clamp<uint64_t>(*uploadAheadPin, 1, MAX_AHEAD)) : DEFAULT_UPLOAD_AHEAD;
+		UploadAheadN = uploadAhead;
 		// Signed ring distance from the previous playhead: +1 across the loop seam stays +1, so
 		// direction detection and the frame-rate telemetry survive wraps.
 		int prev = PrevFrame < count ? PrevFrame : 0;
@@ -136,11 +199,12 @@ struct ReadEXRSequenceNode : NodeContext
 		PrevFrame = frame;
 
 		CacheEntry* entry = nullptr;
+		std::vector<CacheEntry> evicted; // destroyed outside the lock (may hold GPU waits)
 		std::string frameError;
 		int readyAhead = 0;
 		size_t cacheSize = 0;
 		{
-			std::lock_guard<std::mutex> lk(Mtx);
+			std::unique_lock<std::mutex> lk(Mtx);
 			// Any change to the file list stops the prefetch and restarts it on the new list:
 			// the cache is dropped and the generation bump makes in-flight decodes discard
 			// their (old-list) results when they complete.
@@ -152,19 +216,38 @@ struct ReadEXRSequenceNode : NodeContext
 				Paths.resize(count);
 				for (int i = 0; i < count; ++i)
 					Paths[i] = files->Get(i)->str();
+				for (auto& [f, e] : Cache)
+					evicted.push_back(std::move(e));
 				Cache.clear();
 				++Gen;
 			}
 			Frame = frame; AheadN = ahead; Dir = dir;
-			Evict(frame, ahead, dir);
+			Evict(frame, ahead, dir, evicted);
 
-			auto it = Cache.find(frame);
-			if (it != Cache.end())
+			// Never return with nothing to give: block until the playhead frame is deliverable
+			// (decoded and its upload landed), so real-time paths pace on actual throughput and
+			// downstream drop reporting stays truthful, instead of tearing ahead over repeats of
+			// a stale frame. The wait releases the lock, so workers and uploaders keep filling;
+			// a Failed frame breaks out (it only resolves through the retry cycle) so a bad file
+			// slows the path down but cannot deadlock it.
+			Cv.notify_all(); // point workers/uploaders at the new playhead before sleeping
+			while (!Stop)
 			{
-				if (it->second.St == CacheEntry::State::Ready)
-					entry = &it->second; // map nodes are stable; only this thread erases
-				else if (it->second.St == CacheEntry::State::Failed)
-					frameError = it->second.Error;
+				auto it = Cache.find(frame);
+				if (it != Cache.end())
+				{
+					if (it->second.St == CacheEntry::State::Ready && it->second.Uploaded)
+					{
+						entry = &it->second; // map nodes are stable; only this thread erases
+						break;
+					}
+					if (it->second.St == CacheEntry::State::Failed)
+					{
+						frameError = it->second.Error;
+						break;
+					}
+				}
+				Cv.wait(lk);
 			}
 
 			for (int k = 1; k <= ahead && k < count; ++k)
@@ -177,53 +260,181 @@ struct ReadEXRSequenceNode : NodeContext
 		}
 		Cv.notify_all();
 
-		// Upload and publish outside the lock: the GPU-event wait must not stall the workers.
-		if (entry)
+		// Surface silently-degraded configurations: each of these still plays, but not the way
+		// the pin values suggest. Logged once per change, shown on the node status below.
+		std::string configWarning;
+		auto warn = [&configWarning](std::string msg)
+			{ configWarning += (configWarning.empty() ? "" : "; ") + std::move(msg); };
+		if (uploadAhead > ahead)
+			warn("UploadAhead (" + std::to_string(uploadAhead) + ") exceeds PrefetchAhead ("
+				+ std::to_string(ahead) + "), which caps the upload runway - frames beyond the prefetch window are never decoded");
+		if (ahead < int(Workers.size()))
+			warn("PrefetchAhead (" + std::to_string(ahead) + ") is below the decode worker count ("
+				+ std::to_string(Workers.size()) + "), leaving workers idle");
+		if (configWarning != LastConfigWarning)
 		{
-			if (!entry->Uploaded)
-				Upload(*entry);
-			if (entry->Color.IsValid())
-				Publish(*entry);
-			else
-				frameError = "GPU upload failed";
+			if (!configWarning.empty())
+				nosEngine.LogW("ReadEXRSequence: %s", configWarning.c_str());
+			LastConfigWarning = configWarning;
 		}
 
+		// Per-stage timing, published as watch logs below: breaks the execution cost into the
+		// GPU-event wait, eviction teardown and pin publish. Uploads happen on the uploader
+		// thread and never cost the execute thread anything.
+		using Clk = std::chrono::steady_clock;
+		auto ms = [](Clk::time_point a, Clk::time_point b)
+			{ return std::chrono::duration<double, std::milli>(b - a).count(); };
+		double evictMs = 0, syncMs = 0, publishMs = 0;
+
+		// GPU work happens outside the lock so it never stalls the workers. Evicted entries may
+		// still have transfers in flight; wait them before their textures are destroyed.
+		auto t0 = Clk::now();
+		for (auto& e : evicted)
+			Sync(e);
+		evicted.clear();
+		auto t1 = Clk::now();
+		evictMs = ms(t0, t1);
+
+		if (entry)
+		{
+			Sync(*entry); // upload was issued by the uploader thread; the wait is normally ~free
+			auto t2 = Clk::now();
+			syncMs = ms(t1, t2);
+			Publish(*entry);
+			publishMs = ms(t2, Clk::now());
+		}
+
+		char buf[64];
+		snprintf(buf, sizeof(buf), "%.1f", syncMs);
+		nosEngine.WatchLog("ReadEXRSequence exec sync-wait (ms)", buf);
+		snprintf(buf, sizeof(buf), "%.1f", evictMs);
+		nosEngine.WatchLog("ReadEXRSequence exec evict (ms)", buf);
+		snprintf(buf, sizeof(buf), "%.1f", publishMs);
+		nosEngine.WatchLog("ReadEXRSequence exec publish (ms)", buf);
+
 		const std::string position = std::to_string(frame) + "/" + std::to_string(count);
-		if (entry && entry->Color.IsValid())
-			SetNodeStatusMessage("Frame " + position + " - " + std::to_string(readyAhead) + "/"
-				+ std::to_string(ahead) + " ahead", fb::NodeStatusMessageType::INFO);
-		else if (!frameError.empty())
+		if (!frameError.empty())
 			SetNodeStatusMessage("Frame " + position + ": " + frameError + " - retrying",
 				fb::NodeStatusMessageType::FAILURE);
+		else if (entry)
+		{
+			std::string msg = "Frame " + position + " - " + std::to_string(readyAhead) + "/"
+				+ std::to_string(ahead) + " ahead";
+			if (configWarning.empty())
+				SetNodeStatusMessage(msg, fb::NodeStatusMessageType::INFO);
+			else
+				SetNodeStatusMessage(msg + " | " + configWarning, fb::NodeStatusMessageType::WARNING);
+		}
 		else
 		{
 			char rate[32];
 			snprintf(rate, sizeof(rate), "%.1f", EmaDecodeRate);
-			SetNodeStatusMessage("Buffering " + position + " - " + std::to_string(readyAhead) + "/"
-				+ std::to_string(ahead) + " ahead, decoding " + rate + " fps",
-				fb::NodeStatusMessageType::WARNING);
+			std::string msg = "Buffering " + position + " - " + std::to_string(readyAhead) + "/"
+				+ std::to_string(ahead) + " ahead, decoding " + rate + " fps";
+			if (!configWarning.empty())
+				msg += " | " + configWarning;
+			SetNodeStatusMessage(msg, fb::NodeStatusMessageType::WARNING);
 		}
 
 		LogStats(step, ahead, readyAhead, cacheSize);
 		return NOS_RESULT_SUCCESS;
 	}
 
-	// Uploads a decoded frame to the GPU and frees its CPU pixels (back to the buffer pool).
-	// Execute thread only; the entry is Ready, so no worker touches it.
-	void Upload(CacheEntry& e)
+	// The uploader thread: claims the nearest Ready-but-not-uploaded frame around the playhead
+	// (moving its CPU pixels out under the lock), submits the GPU uploads outside the lock, then
+	// lands the textures back into the entry. If the entry was evicted or the file list changed
+	// while uploading, the result is settled (events waited) and discarded - eviction never has
+	// to coordinate with an upload in flight. This keeps the ~100 MB staging copy and the
+	// submission entirely off the execute thread.
+	void UploaderLoop()
 	{
-		e.Color = UploadColor(e.Frame, NodeId);
-		if (e.Frame.HasDepth) e.Depth = UploadDepth(e.Frame, NodeId);
-		e.Metadata = BuildExrMetadata(e.Frame);
-		e.HasDepth = e.Frame.HasDepth && e.Depth.IsValid();
-		e.Uploaded = true;
-		if (!e.Color.IsValid())
+		std::unique_lock<std::mutex> lk(Mtx);
+		while (!Stop)
 		{
-			e.St = CacheEntry::State::Failed;
-			e.FailedAt = std::chrono::steady_clock::now();
+			CacheEntry* target = nullptr;
+			int idx = -1;
+			int frame = Frame, dir = Dir, count = int(Paths.size());
+			int uploadAhead = UploadAheadN;
+			for (int k = 0; k <= uploadAhead && k < count && !target; ++k)
+			{
+				int f = ((frame + dir * k) % count + count) % count;
+				auto it = Cache.find(f);
+				if (it != Cache.end() && it->second.St == CacheEntry::State::Ready
+					&& !it->second.Uploaded && !it->second.Uploading)
+				{
+					target = &it->second;
+					idx = f;
+				}
+			}
+			if (!target) { Cv.wait(lk); continue; }
+			target->Uploading = true;
+			uint64_t gen = Gen;
+			ExrFrame f = std::move(target->Frame);
+			lk.unlock();
+
+			auto t0 = std::chrono::steady_clock::now();
+			nosGPUEvent colorEvent = 0, depthEvent = 0;
+			auto color = UploadColor(f, NodeId, &colorEvent);
+			TypedObjectRef<sys::vulkan::Texture> depth;
+			if (color && f.HasDepth)
+				depth = UploadDepth(f, NodeId, &depthEvent);
+			auto metadata = BuildExrMetadata(f);
+			char buf[32];
+			snprintf(buf, sizeof(buf), "%.1f", std::chrono::duration<double, std::milli>(
+				std::chrono::steady_clock::now() - t0).count());
+			nosEngine.WatchLog("ReadEXRSequence upload issue (ms)", buf);
+
+			lk.lock();
+			auto it = Cache.find(idx);
+			if (gen == Gen && it != Cache.end() && it->second.Uploading)
+			{
+				CacheEntry& e = it->second;
+				e.Uploading = false;
+				if (color)
+				{
+					e.Frame = std::move(f); // pixels stay until Sync: the transfer may be in flight
+					e.Color = std::move(color);
+					e.Depth = std::move(depth);
+					e.ColorEvent = colorEvent;
+					e.DepthEvent = depthEvent;
+					e.Metadata = std::move(metadata);
+					e.HasDepth = e.Frame.HasDepth && e.Depth.IsValid();
+					e.Uploaded = true;
+					colorEvent = depthEvent = 0;
+				}
+				else
+				{
+					e.St = CacheEntry::State::Failed;
+					e.Error = "GPU texture allocation failed";
+					e.FailedAt = std::chrono::steady_clock::now();
+				}
+				Cv.notify_all();
+			}
+			if (colorEvent || depthEvent || color || depth)
+			{
+				// The frame was evicted (or the upload failed) while we worked: settle the
+				// transfers and drop the textures without touching the cache.
+				lk.unlock();
+				if (colorEvent) nosVulkan->WaitGpuEvent(&colorEvent, UINT64_MAX);
+				if (depthEvent) nosVulkan->WaitGpuEvent(&depthEvent, UINT64_MAX);
+				color = {};
+				depth = {};
+				lk.lock();
+			}
 		}
-		e.Frame.Color = {};
-		e.Frame.Depth = {};
+	}
+
+	// Waits any pending upload transfers and releases the CPU pixels back to the buffer pool.
+	// Idempotent; must run before the entry's textures are used or destroyed.
+	void Sync(CacheEntry& e)
+	{
+		if (e.ColorEvent) { nosVulkan->WaitGpuEvent(&e.ColorEvent, UINT64_MAX); e.ColorEvent = 0; }
+		if (e.DepthEvent) { nosVulkan->WaitGpuEvent(&e.DepthEvent, UINT64_MAX); e.DepthEvent = 0; }
+		if (e.Uploaded)
+		{
+			e.Frame.Color = {};
+			e.Frame.Depth = {};
+		}
 	}
 
 	// Hands a decoded + uploaded frame to the output pins. Execute thread only.
@@ -314,8 +525,10 @@ struct ReadEXRSequenceNode : NodeContext
 	}
 
 	// Drop frames outside the keep window, measured as ring distance in the play direction
-	// (so the window wraps with the loop); leave Decoding ones (a worker owns them). Holds Mtx.
-	void Evict(int frame, int ahead, int dir)
+	// (so the window wraps with the loop); leave Decoding ones (a worker owns them). Evicted
+	// entries are moved to `out` so their GPU waits and destruction happen outside the lock.
+	// Holds Mtx.
+	void Evict(int frame, int ahead, int dir, std::vector<CacheEntry>& out)
 	{
 		int count = int(Paths.size());
 		if (count <= 0)
@@ -323,11 +536,13 @@ struct ReadEXRSequenceNode : NodeContext
 		for (auto it = Cache.begin(); it != Cache.end();)
 		{
 			int fwd = ((it->first - frame) * dir % count + count) % count;
-			bool keep = fwd <= ahead || fwd >= count - KEEP_BEHIND;
-			if (!keep && it->second.St != CacheEntry::State::Decoding)
-				it = Cache.erase(it);
-			else
+			if (fwd <= ahead || fwd >= count - KEEP_BEHIND || it->second.St == CacheEntry::State::Decoding)
 				++it;
+			else
+			{
+				out.push_back(std::move(it->second));
+				it = Cache.erase(it);
+			}
 		}
 	}
 

@@ -67,9 +67,14 @@ bool DecodeExr(const std::string& path, const std::string& layerArg,
 	ExrFrame& out, std::string& err);
 
 // GPU uploads. Safe to call off the execute thread (the Vulkan subsystem is thread-safe for
-// these). Return an invalid ref on allocation failure.
-TypedObjectRef<sys::vulkan::Texture> UploadColor(const ExrFrame& frame, nos::uuid nodeId);
-TypedObjectRef<sys::vulkan::Texture> UploadDepth(const ExrFrame& frame, nos::uuid nodeId);
+// these). Return an invalid ref on allocation failure. When outEvent is null the upload is
+// waited on before returning; when non-null the call returns immediately after submission and
+// stores the GPU event, which the caller must WaitGpuEvent exactly once before using or
+// destroying the texture (this lets the wait overlap other work, e.g. the next graph execution).
+TypedObjectRef<sys::vulkan::Texture> UploadColor(const ExrFrame& frame, nos::uuid nodeId,
+	nosGPUEvent* outEvent = nullptr);
+TypedObjectRef<sys::vulkan::Texture> UploadDepth(const ExrFrame& frame, nos::uuid nodeId,
+	nosGPUEvent* outEvent = nullptr);
 
 // Builds the nos.mediaio.EXRMetadata flatbuffer for the Metadata pin.
 nos::Buffer BuildExrMetadata(const ExrFrame& frame);
