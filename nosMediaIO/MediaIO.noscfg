@@ -35,7 +35,8 @@
 		"Config/WriteDPX.nosdef",
 		"Config/RecordDPXClip.nosdef",
 		"Config/PlaybackClip.nosdef",
-		"Config/ReadEXR.nosdef"
+		"Config/ReadEXR.nosdef",
+		"Config/PlayEXR.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",

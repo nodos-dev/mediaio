@@ -1,0 +1,73 @@
+{
+    "nodes": [
+        {
+            "class_name": "PlayEXR",
+            "menu_info": {
+                "category": "Media IO|File",
+                "display_name": "Play EXR",
+                "name_aliases": [ "exr player", "play exr", "exr sequence", "read exr sequence", "play exr sequence" ]
+            },
+            "node": {
+                "class_name": "PlayEXR",
+                "display_name": "Play EXR",
+                "contents_type": "Job",
+                "always_execute": true,
+                "description": "Plays an OpenEXR image sequence from a list of files in real time. A pool of worker\nthreads reads and decodes frames ahead of the current Index - in parallel across frames -\ninto a bounded GPU cache; each execution just hands out the already-decoded frame for\nIndex. Because the slow per-frame read+decode happens ahead of the playhead, playback\ndoes not stall on it as long as the workers stay ahead. Index wraps modulo the file count\nand the prefetch window wraps with it, so a free-running counter loops the clip without a\nstutter at the seam. Drive Index from a frame counter to play, or set it directly to\nscrub. Outputs the frame's Texture, its Z as Depth, and its header on Metadata; holds the\nlast frame while the current one is still buffering.",
+                "pins": [
+                    {
+                        "name": "Index",
+                        "display_name": "Index",
+                        "description": "Index of the file in Files to display, typically incremented by 1 each frame. Wrapped\nmodulo the list length, so a free-running counter loops the sequence seamlessly - the\nprefetch window wraps with it, decoding the first frames again while the last ones play.\nA frame is decoded once, so repeating or holding an index costs nothing.",
+                        "type_name": "ulong",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 0
+                    },
+                    {
+                        "name": "PrefetchAhead",
+                        "display_name": "Prefetch Ahead",
+                        "description": "How many frames the workers read and decode ahead of Index. Must exceed the worker\ncount (up to 16) for all of them to stay busy; higher also buffers against decode\njitter but holds more CPU + GPU memory (a 4K RGBA16F frame is ~66 MB, plus depth).",
+                        "type_name": "ulong",
+                        "show_as": "INPUT_PIN_OR_PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 32,
+                        "min": 1,
+                        "max": 128
+                    },
+                    {
+                        "name": "Texture",
+                        "display_name": "Texture",
+                        "description": "Current frame. RGBA16F for HALF files, RGBA32F for FLOAT / UINT files. Holds the\nprevious frame while the current one is still being read/decoded.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Depth",
+                        "display_name": "Depth",
+                        "description": "Single-channel R32F depth from the frame's 'Z' channel, when present.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Metadata",
+                        "display_name": "Metadata",
+                        "description": "Header of the current frame: resolution, windows, pixel type, compression, channels\nand layers.",
+                        "type_name": "nos.mediaio.EXRMetadata",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Files",
+                        "display_name": "Files",
+                        "description": "Ordered list of .exr file paths, one per frame. Frame Index plays Files[Index].\nUsually driven by a node that lists a directory.",
+                        "type_name": "[string]",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        }
+    ]
+}
