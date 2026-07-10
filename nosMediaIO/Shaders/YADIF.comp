@@ -1,0 +1,146 @@
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+layout(binding = 0) uniform sampler2D Previous;
+layout(binding = 1) uniform sampler2D Current;
+layout(binding = 2) uniform sampler2D Next;
+layout(binding = 3, rgba32f) writeonly uniform image2D Output;
+
+layout(binding = 4) uniform YADIFParams {
+    bool Parity;
+    bool Tff;
+    bool SkipSpatialCheck;
+} Params;
+
+// Load full RGB
+vec3 load(sampler2D tex, ivec2 coord) {
+    return texelFetch(tex, coord, 0).rgb;
+}
+
+float spatial_predictor(float a, float b, float c, float d, float e, float f, float g,
+                               float h, float i, float j, float k, float l, float m, float n) {
+    float spatial_pred = (d + k) * 0.5;
+    float spatial_score = abs(c - j) + abs(d - k) + abs(e - l);
+
+    float score = abs(b - k) + abs(c - l) + abs(d - m);
+    if (score < spatial_score) {
+        spatial_pred = (c + l) * 0.5;
+        spatial_score = score;
+        score = abs(a - l) + abs(b - m) + abs(c - n);
+        if (score < spatial_score) {
+            spatial_pred = (b + m) * 0.5;
+            spatial_score = score;
+        }
+    }
+    score = abs(d - i) + abs(e - j) + abs(f - k);
+    if (score < spatial_score) {
+        spatial_pred = (e + j) * 0.5;
+        spatial_score = score;
+        score = abs(e - h) + abs(f - i) + abs(g - j);
+        if (score < spatial_score) {
+            spatial_pred = (f + i) * 0.5;
+            spatial_score = score;
+        }
+    }
+    return spatial_pred;
+}
+
+float customMax3(float a, float b, float c) {
+    return max(max(a, b), c);
+}
+
+float customMin3(float a, float b, float c) {
+    return min(min(a, b), c);
+}
+
+float temporal_predictor(float A, float B, float C, float D, float E, float F,
+                               float G, float H, float I, float J, float K, float L,
+                               float spatial_pred, bool skip_check) {
+    float p0 = (C + H) * 0.5;
+    float p1 = F;
+    float p2 = (D + I) * 0.5;
+    float p3 = G;
+    float p4 = (E + J) * 0.5;
+
+    float tdiff0 = abs(D - I);
+    float tdiff1 = (abs(A - F) + abs(B - G)) * 0.5;
+    float tdiff2 = (abs(K - F) + abs(G - L)) * 0.5;
+
+    float diff = customMax3(tdiff0, tdiff1, tdiff2);
+
+    if (!skip_check) {
+        float maxi = customMax3(p2 - p3, p2 - p1, min(p0 - p1, p4 - p3));
+        float mini = customMin3(p2 - p3, p2 - p1, max(p0 - p1, p4 - p3));
+        diff = customMax3(diff, mini, -maxi);
+    }
+
+    return clamp(spatial_pred, p2 - diff, p2 + diff);
+}
+
+void main() {
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= imageSize(Output).x || pos.y >= imageSize(Output).y) return;
+
+    int parity = Params.Parity ? 1 : 0;
+    if ((pos.y % 2) == parity) {
+        vec3 cur_val = load(Current, pos);
+        imageStore(Output, pos, vec4(cur_val, 1.0));
+        return;
+    }
+
+    vec3 spatial_pred;
+
+    for (int ch = 0; ch < 3; ++ch) {
+        float a = load(Current, pos + ivec2(-3, -1))[ch];
+        float b = load(Current, pos + ivec2(-2, -1))[ch];
+        float c = load(Current, pos + ivec2(-1, -1))[ch];
+        float d = load(Current, pos + ivec2( 0, -1))[ch];
+        float e = load(Current, pos + ivec2(+1, -1))[ch];
+        float f = load(Current, pos + ivec2(+2, -1))[ch];
+        float g = load(Current, pos + ivec2(+3, -1))[ch];
+
+        float h = load(Current, pos + ivec2(-3, +1))[ch];
+        float i = load(Current, pos + ivec2(-2, +1))[ch];
+        float j = load(Current, pos + ivec2(-1, +1))[ch];
+        float k = load(Current, pos + ivec2( 0, +1))[ch];
+        float l = load(Current, pos + ivec2(+1, +1))[ch];
+        float m = load(Current, pos + ivec2(+2, +1))[ch];
+        float n = load(Current, pos + ivec2(+3, +1))[ch];
+
+        float pred = spatial_predictor(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
+
+        int parity = Params.Parity ? 1 : 0;
+        int tff = Params.Tff ? 1 : 0;
+        bool is_second_field = ((parity ^ tff) == 0);
+        float A = load(Previous, pos + ivec2(0, -1))[ch];
+        float B = load(Previous, pos + ivec2(0, +1))[ch];
+        float C, D, E, H, I, J;
+
+        if (is_second_field) {
+            C = load(Current,  pos + ivec2(0, -2))[ch];
+            D = load(Current,  pos + ivec2(0,  0))[ch];
+            E = load(Current,  pos + ivec2(0, +2))[ch];
+            H = load(Next, pos + ivec2(0, -2))[ch];
+            I = load(Next, pos + ivec2(0,  0))[ch];
+            J = load(Next, pos + ivec2(0, +2))[ch];
+        } else {
+            C = load(Previous, pos + ivec2(0, -2))[ch];
+            D = load(Previous, pos + ivec2(0,  0))[ch];
+            E = load(Previous, pos + ivec2(0, +2))[ch];
+            H = load(Current,  pos + ivec2(0, -2))[ch];
+            I = load(Current,  pos + ivec2(0,  0))[ch];
+            J = load(Current,  pos + ivec2(0, +2))[ch];
+        }
+
+        float F = load(Current,  pos + ivec2(0, -1))[ch];
+        float G = load(Current,  pos + ivec2(0, +1))[ch];
+        float K = load(Next, pos + ivec2(0, -1))[ch];
+        float L = load(Next, pos + ivec2(0, +1))[ch];
+
+        spatial_pred[ch] = temporal_predictor(A, B, C, D, E, F, G, H, I, J, K, L, pred, Params.SkipSpatialCheck);
+    }
+
+    imageStore(Output, pos, vec4(spatial_pred, 1.0));
+}
+

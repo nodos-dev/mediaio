@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.mediaio",
-			"version": "2.11.0"
+			"version": "2.12.0"
 		},
 		"description": "Media I/O nodes.",
 		"display_name": "Media I/O",
@@ -10,6 +10,14 @@
 			{
 				"name": "nos.sys.vulkan",
 				"version": "6.0"
+			},
+			{
+				"name": "nos.utilities",
+				"version": "3.17"
+			},
+			{
+				"name": "nos.filesystem",
+				"version": "0.1"
 			}
 		],
 		"category": "Media I/O"
@@ -37,14 +45,18 @@
 		"Config/PlaybackClip.nosdef",
 		"Config/ReadEXR.nosdef",
 		"Config/ReadEXRSequence.nosdef",
-		"Config/PlayEXR.nosdef"
+		"Config/PlayEXR.nosdef",
+		"Config/ChannelViewer.nosdef",
+		"Config/YADIF.nosdef",
+		"Config/YADIFWithAutoDispatchSize.nosdef"
 	],
 	"custom_types": [
 		"Config/Conversion.fbs",
 		"Config/SensorInfo.fbs",
 		"Config/ANC.fbs",
 		"Config/TimecodePlayer.fbs",
-		"Config/ReadEXR.fbs"
+		"Config/ReadEXR.fbs",
+		"Config/ChannelViewer.fbs"
 	],
 	"named_values": [
 		"Config/ResolutionNames.json"

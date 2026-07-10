@@ -1,0 +1,50 @@
+{
+	"nodes": [
+		{
+			"class_name": "ChannelViewer",
+			"menu_info": {
+				"category": "Channels",
+				"display_name": "Channel Viewer",
+				"name_aliases": [ "display" ]
+			},
+			"node": {
+				"class_name": "ChannelViewer",
+				"contents_type": "Job",
+				"description": "Outputs the selected channel of a texture.\nRed, Green, Blue, Alpha or Y, Cb, Cr channels are supported",
+				"pins": [
+					{
+						"name": "Input",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY",
+						"data": {
+							"filtering": "LINEAR"
+						}
+					},
+					{
+						"name": "Channel",
+						"type_name": "nos.mediaio.ChannelViewerChannels",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": "A",
+						"description": "Sets the channel to output"
+					},
+					{
+						"name": "Format",
+						"type_name": "nos.mediaio.ColorSpace",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": "REC709",
+						"description": "Sets the input texture color space,\nRequired for correct YCbCr conversion"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		}
+	]
+}

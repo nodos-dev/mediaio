@@ -1,0 +1,11 @@
+namespace nos.mediaio;
+
+enum ChannelViewerChannels : uint {
+  R = 0,
+  G = 1,
+  B = 2,
+  A = 3,
+  Y = 4,
+  Cb = 5,
+  Cr = 6
+}

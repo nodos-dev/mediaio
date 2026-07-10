@@ -48,6 +48,7 @@ enum Nodes : int
 	PlaybackClip,
 	ReadEXR,
 	ReadEXRSequence,
+	ChannelViewer,
 	Count
 };
 
@@ -80,6 +81,7 @@ nosResult RegisterWriteDPX(nosNodeFunctions*);
 nosResult RegisterPlaybackClip(nosNodeFunctions*);
 nosResult RegisterReadEXR(nosNodeFunctions*);
 nosResult RegisterReadEXRSequence(nosNodeFunctions*);
+nosResult RegisterChannelViewer(nosNodeFunctions*);
 
 struct MediaIOPluginFunctions : nos::PluginFunctions
 {
@@ -132,10 +134,69 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(PlaybackClip)
 				GEN_CASE_NODE(ReadEXR)
 				GEN_CASE_NODE(ReadEXRSequence)
+				GEN_CASE_NODE(ChannelViewer)
 			}
 		}
 		return NOS_RESULT_SUCCESS;
 	}
 };
-NOS_EXPORT_PLUGIN_FUNCTIONS(MediaIOPluginFunctions)
+
+// Migrate graphs saved when these nodes/types lived in nos.utilities.
+void GetRenamedNodeClasses(nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize)
+{
+	static std::vector<std::pair<nos::Name, nos::Name>> renames = {
+		{NOS_NAME("nos.utilities.ChannelViewer"), NOS_NAME("nos.mediaio.ChannelViewer")},
+		{NOS_NAME("nos.utilities.YADIF"), NOS_NAME("nos.mediaio.YADIF")},
+		{NOS_NAME("nos.utilities.YADIFWithAutoDispatchSize"), NOS_NAME("nos.mediaio.YADIFWithAutoDispatchSize")},
+	};
+
+	if (!outRenamedFrom)
+	{
+		*outSize = renames.size();
+		return;
+	}
+
+	for (size_t i = 0; i < renames.size(); ++i)
+	{
+		outRenamedFrom[i] = renames[i].first;
+		outRenamedTo[i] = renames[i].second;
+	}
+}
+
+void GetRenamedTypes(nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize)
+{
+	static std::vector<std::pair<nos::Name, nos::Name>> renames = {
+		{NOS_NAME("nos.utilities.ChannelViewerChannels"), NOS_NAME("nos.mediaio.ChannelViewerChannels")},
+		{NOS_NAME("nos.fb.ChannelViewerChannels"), NOS_NAME("nos.mediaio.ChannelViewerChannels")},
+		{NOS_NAME("nos.fb.ChannelViewerFormats"), NOS_NAME("nos.mediaio.ColorSpace")},
+	};
+
+	if (!outRenamedFrom)
+	{
+		*outSize = renames.size();
+		return;
+	}
+
+	for (size_t i = 0; i < renames.size(); ++i)
+	{
+		outRenamedFrom[i] = renames[i].first;
+		outRenamedTo[i] = renames[i].second;
+	}
+}
+
+extern "C"
+{
+NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions* outFunctions)
+{
+	static MediaIOPluginFunctions pluginFunctions{};
+	outFunctions->Initialize = []() -> nosResult { return pluginFunctions.Initialize(); };
+	outFunctions->ExportNodeFunctions = [](size_t* outSize, nosNodeFunctions** outList) -> nosResult {
+		return pluginFunctions.ExportNodeFunctions(*outSize, outList);
+	};
+	outFunctions->OnPreUnloadPlugin = []() -> nosResult { return pluginFunctions.OnPreUnloadPlugin(); };
+	outFunctions->GetRenamedNodeClasses = GetRenamedNodeClasses;
+	outFunctions->GetRenamedTypes = GetRenamedTypes;
+	return NOS_RESULT_SUCCESS;
+}
+}
 }

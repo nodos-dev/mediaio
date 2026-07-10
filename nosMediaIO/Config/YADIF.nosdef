@@ -1,0 +1,82 @@
+{
+	"nodes": [
+		{
+			"class_name": "YADIF",
+			"menu_info": {
+				"category": "Media IO",
+				"display_name": "YADIF (Raw)",
+				"name_aliases": [ "deinterlace", "filter" ]
+			},
+			"node": {
+				"class_name": "YADIF",
+				"contents_type": "Job",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/YADIF.comp"
+					}
+				},
+				"description": "Yet Another Deinterlacing Filter",
+				"pins": [
+					{
+						"name": "Previous",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "'t-2'th texture"
+					},
+					{
+						"name": "Current",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "'t-1'th texture"
+					},
+					{
+						"name": "Next",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "'t'th texture"
+					},
+					{
+						"name": "Parity",
+						"type_name": "bool",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "Is texture fields same"
+					},
+					{
+						"name": "Tff",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "SkipSpatialCheck",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"description": "Enabling this mode will save some encoding time at the cost of some visual quality"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": {
+							"x": 120,
+							"y": 120
+						}
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+					}
+				]
+			}
+		}
+	]
+}
