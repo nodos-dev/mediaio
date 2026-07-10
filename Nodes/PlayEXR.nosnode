@@ -121,7 +121,7 @@
             "name": "False",
             "type_name": "ulong",
             "show_as": "INPUT_PIN",
-            "can_show_as": "INPUT_PIN_ONLY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
             "visualizer": {
             },
             "data": 0,
@@ -212,7 +212,7 @@
                   "name": "Input",
                   "type_name": "ulong",
                   "show_as": "INPUT_PIN",
-                  "can_show_as": "INPUT_PIN_ONLY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizer": {
                   },
                   "data": 0,
