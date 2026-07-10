@@ -97,8 +97,6 @@
             "visualizer": {
             },
             "data": "Name",
-            "min": 1835093538,
-            "max": 1835093538,
             "def": "Name",
             "contents_type": "PortalPin",
             "contents": { "source_id": "db63e7c1-a11d-4432-a7c8-2b7c8119bfbd" },
@@ -658,9 +656,6 @@
                   "visualizer": {
                   },
                   "data": "Name",
-                  "min": 1835093538,
-                  "max": 1835093538,
-                  "def": 1835093538,
                   "contents_type": "JobPin",
                   "contents": { },
                   "description": "Field the output Paths are sorted by."
@@ -1329,9 +1324,6 @@
                   "visualizer": {
                   },
                   "data": "Name",
-                  "min": 1835093538,
-                  "max": 1835093538,
-                  "def": 1835093538,
                   "contents_type": "JobPin",
                   "contents": { }
                 },
@@ -1347,8 +1339,6 @@
                   "referred_by": [
                     "75f6d43d-b0b2-4c4f-a624-77b5d2bb68dc"
                   ],
-                  "min": 1835093538,
-                  "max": 1835093538,
                   "def": "Name",
                   "meta_data_map": [
                     { "key": "PinHidden", "value": "true" }
