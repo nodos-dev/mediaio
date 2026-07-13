@@ -1,0 +1,97 @@
+{
+    "nodes": [
+        {
+            "class_name": "EncodeHDRMetadata",
+            "menu_info": {
+                "category": "Media IO|HDR",
+                "display_name": "Encode HDR Metadata"
+            },
+            "node": {
+                "class_name": "EncodeHDRMetadata",
+                "display_name": "Encode HDR Metadata",
+                "contents_type": "Job",
+                "description": "Assembles HDR10 static metadata (HDRMetadata) from a colour space and gamma curve. The\ncolour space selects the mastering-display primaries and white point (exact, standard values).\nFeed the output into Inject HDR Metadata.\n\nMode = Auto derives the luminance from the gamma curve (SDR ~100-nit, HDR ~1000-nit) and\nleaves MaxCLL/MaxFALL at 0 (CTA-861.3 'unknown', the honest value for a live signal); the\nvalue pins are read-only and show what will be sent. Mode = Custom unlocks them so you can\nenter your real mastering-display luminance and measured content light levels. Never invent\nMaxCLL/MaxFALL — a display tone-maps against whatever you claim.",
+              "pins": [
+                {
+                  "name": "Mode",
+                  "display_name": "Mode",
+                  "description": "Auto: luminance is derived from the gamma curve and the value pins below are read-only.\nCustom: the value pins become editable for real mastering / measured values.",
+                  "type_name": "nos.mediaio.HDRMetadataMode",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "Auto"
+                },
+                {
+                  "name": "ColorSpace",
+                  "display_name": "Color Space",
+                  "description": "Selects the mastering-display primaries and white point (D65). REC2020 for wide-gamut HDR.",
+                  "type_name": "nos.mediaio.ColorSpace",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "REC2020"
+                },
+                {
+                  "name": "GammaCurve",
+                  "display_name": "Gamma Curve",
+                  "description": "In Auto mode, selects the luminance defaults (REC709/SRGB = SDR 100-nit, else HDR 1000-nit).\nHas no field in ST 2086 itself and is ignored in Custom mode. Signal the actual curve via the\nAJA Out node's Gamma Curve (VPID) pin.",
+                  "type_name": "nos.mediaio.GammaCurve",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": "ST2084"
+                },
+                {
+                  "name": "MaxLuminance",
+                  "display_name": "Max Luminance (nits)",
+                  "description": "Mastering-display peak luminance in cd/m^2. Read-only in Auto (derived from the gamma curve);\nset it to your actual grading display's peak in Custom mode.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 1000.0,
+                  "min": "0",
+                  "readonly": true
+                },
+                {
+                  "name": "MinLuminance",
+                  "display_name": "Min Luminance (nits)",
+                  "description": "Mastering-display black level in cd/m^2. Read-only in Auto (derived from the gamma curve);\nset it to your actual grading display's black level in Custom mode.",
+                  "type_name": "float",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0.0001,
+                  "min": "0",
+                  "readonly": true
+                },
+                {
+                  "name": "MaxCLL",
+                  "display_name": "MaxCLL (nits)",
+                  "description": "Maximum Content Light Level: the brightest pixel in the content. A MEASURED value — 0 means\n'unknown' per CTA-861.3 (the honest default for live). Editable only in Custom mode.",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0,
+                  "readonly": true
+                },
+                {
+                  "name": "MaxFALL",
+                  "display_name": "MaxFALL (nits)",
+                  "description": "Maximum Frame-Average Light Level: the brightest frame-average in the content. A MEASURED\nvalue — 0 means 'unknown' per CTA-861.3. Editable only in Custom mode.",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "data": 0,
+                  "readonly": true
+                },
+                {
+                  "name": "Out",
+                  "display_name": "Out",
+                  "description": "HDR10 static metadata assembled from the inputs. Wire into Inject HDR Metadata's Metadata pin.",
+                  "type_name": "nos.mediaio.HDRMetadata",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY"
+                }
+              ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}

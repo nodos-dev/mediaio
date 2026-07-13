@@ -283,12 +283,12 @@
 						"can_show_as": "INPUT_PIN_OR_PROPERTY"
 					},
 					{
-						"name": "NarrowRange",
-						"display_name": "Use Narrow Range Encoding",
-						"type_name": "bool",
+						"name": "SignalRange",
+						"display_name": "Signal Range",
+						"type_name": "nos.mediaio.SignalRange",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": true
+						"data": "Narrow"
 					}
 				]
 			}

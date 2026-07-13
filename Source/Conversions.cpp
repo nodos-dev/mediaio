@@ -398,12 +398,42 @@ struct ColorSpaceMatrixNodeContext : NodeContext
 												glm::vec<4, T>(0, 0, 0, 1)));
 	}
 
+	// The pin used to be a bool named "NarrowRange"; rename it to "SignalRange"
+	// and retype it to the enum (true -> Narrow, false -> Full) so older graphs
+	// keep loading. Gate on the old pin's shape rather than the plugin version:
+	// the name+type check only matches the pre-change pin, so it cannot misfire.
+	static nosResult MigrateNode(nosFbNodePtr node, nosBuffer* outBuffer)
+	{
+		if (!node || !outBuffer)
+			return NOS_RESULT_SUCCESS;
+		fb::TNode cur;
+		node->UnPackTo(&cur);
+		bool changed = false;
+		for (auto& pin : cur.pins)
+		{
+			if (!pin || pin->name != "NarrowRange" || pin->type_name != "bool")
+				continue;
+			const bool narrow = pin->data.empty() ? true : (pin->data[0] != 0);
+			const uint32_t range = narrow ? 0u /*SignalRange::Narrow*/ : 1u /*SignalRange::Full*/;
+			pin->name = "SignalRange";
+			pin->type_name = "nos.mediaio.SignalRange";
+			pin->data.assign(reinterpret_cast<const uint8_t*>(&range),
+			                 reinterpret_cast<const uint8_t*>(&range) + sizeof(range));
+			changed = true;
+		}
+		if (!changed)
+			return NOS_RESULT_SUCCESS;
+		auto nodeBuffer = nos::EngineBuffer::CopyFrom(cur);
+		*outBuffer = nodeBuffer.Release();
+		return NOS_RESULT_SUCCESS;
+	}
+
 	nosResult ExecuteNode(NodeExecuteParams const& params) override
 	{
 		const auto& colorSpace = *params.GetPinValue<ColorSpace>(NOS_NAME_STATIC("ColorSpace"));
 		auto fmt = *params.GetPinValue<YCbCrPixelFormat>(NOS_NAME_STATIC("PixelFormat"));
 		const auto& dir = *params.GetPinValue<GammaConversionType>(NOS_NAME_STATIC("Type"));
-		auto narrowRange = *params.GetPinValue<bool>(NOS_NAME_STATIC("NarrowRange"));
+		auto narrowRange = *params.GetPinValue<SignalRange>(NOS_NAME_STATIC("SignalRange")) == SignalRange::Narrow;
 		glm::mat4 matrix = GetMatrix<double>(colorSpace, fmt == YCbCrPixelFormat::V210 ? 10 : 8, narrowRange);
 		if (dir == GammaConversionType::DECODE)
 			matrix = glm::inverse(matrix);

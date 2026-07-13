@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "nosMediaio/ANC_generated.h"
+#include "ANCUtils.hpp"
 #include "Timing.hpp"
 
 namespace nos::mediaio
@@ -164,22 +165,7 @@ struct InjectTimecodeNode : NodeContext
 							continue;
 					}
 				}
-				const auto* p = src->payload();
-				const uint8_t* pdata = p ? p->data() : nullptr;
-				const size_t psize = p ? p->size() : 0;
-				auto payloadOffset = fbb.CreateVector(pdata, psize);
-				ANCPacketBuilder pb(fbb);
-				pb.add_did(src->did());
-				pb.add_sdid(src->sdid());
-				pb.add_line_number(src->line_number());
-				pb.add_horiz_offset(src->horiz_offset());
-				pb.add_space(src->space());
-				pb.add_channel(src->channel());
-				pb.add_link(src->link());
-				pb.add_stream(src->stream());
-				pb.add_is_field2(src->is_field2());
-				pb.add_payload(payloadOffset);
-				packets.push_back(pb.Finish());
+				packets.push_back(CloneANCPacket(fbb, src));
 			}
 		}
 		else
