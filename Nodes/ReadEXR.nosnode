@@ -1,0 +1,70 @@
+{
+    "nodes": [
+        {
+            "class_name": "ReadEXR",
+            "menu_info": {
+                "category": "Media IO|File",
+                "display_name": "Read EXR",
+                "name_aliases": [ "exr reader", "load exr", "open exr", "read openexr" ]
+            },
+            "node": {
+                "class_name": "ReadEXR",
+                "display_name": "Read EXR",
+                "contents_type": "Job",
+                "description": "Reads an OpenEXR image from Path and emits it on the Texture output, with the file's\nheader on the Metadata output. Decodes only when Path or Layer changes. The output\ntexture keeps the file's precision: HALF files load as RGBA16F, FLOAT/UINT files as\nRGBA32F. Leave Layer empty for the file's default RGBA channels, or name a layer /\nmultipart part (e.g. 'depth', 'diffuse') listed in Metadata.layers to load it instead.",
+                "pins": [
+                    {
+                        "name": "Path",
+                        "display_name": "Path",
+                        "description": "Path to the .exr file to read.",
+                        "type_name": "string",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "visualizer": {
+                            "type": "FILE_PICKER",
+                            "file_extensions": [ "exr" ]
+                        }
+                    },
+                    {
+                        "name": "Layer",
+                        "display_name": "Layer",
+                        "description": "Layer or multipart part to load, chosen from the file's layers. '(default)' loads the\ndefault RGBA channels. The list is populated from Path; the same names appear in\nMetadata.layers.",
+                        "type_name": "string",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": "(default)",
+                        "visualizer": {
+                            "type": "COMBO_BOX",
+                            "name": ""
+                        }
+                    },
+                    {
+                        "name": "Texture",
+                        "display_name": "Texture",
+                        "description": "Decoded image. RGBA16F for HALF files, RGBA32F for FLOAT / UINT files. Missing\nchannels are filled (RGB 0, A 1). Holds the previous frame when a load fails.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Depth",
+                        "display_name": "Depth",
+                        "description": "Single-channel R32F depth from the file's 'Z' channel (in the selected layer), when\npresent. Files without a Z channel leave this output untouched.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    },
+                    {
+                        "name": "Metadata",
+                        "display_name": "Metadata",
+                        "description": "Header of the loaded file: resolution, data / display windows, pixel type,\ncompression, and the channel and layer names the file contains.",
+                        "type_name": "nos.mediaio.EXRMetadata",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        }
+    ],
+    "schema_version": "1.4-v1"
+}

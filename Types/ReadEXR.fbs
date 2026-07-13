@@ -1,0 +1,40 @@
+namespace nos.mediaio;
+
+// Pixel value type of an EXR channel / image, mirroring OpenEXR's Imf::PixelType.
+// MIXED marks a file whose channels do not all share one type.
+enum EXRPixelType : uint
+{
+    UINT = 0,
+    HALF = 1,
+    FLOAT = 2,
+    MIXED = 3,
+}
+
+// Integer bounding box (inclusive max), matching OpenEXR's Imath::Box2i. Used for
+// the data and display windows an EXR header carries.
+struct Box2i
+{
+    min_x: int;
+    min_y: int;
+    max_x: int;
+    max_y: int;
+}
+
+// Header metadata of the EXR file ReadEXR decoded, emitted alongside the Texture.
+// Windows follow the EXR convention (inclusive max); resolution is derived from the
+// data window. Channels and layers list what the file contains so a downstream graph
+// can pick a Layer to load.
+table EXRMetadata
+{
+    width: uint;                 // data window width in pixels
+    height: uint;                // data window height in pixels
+    data_window: Box2i;          // region with stored pixels
+    display_window: Box2i;       // full-image frame the data window sits in
+    pixel_aspect_ratio: float;   // header pixelAspectRatio (0 if absent)
+    pixel_type: EXRPixelType;    // pixel type of the loaded layer
+    compression: string;         // e.g. "none", "zip", "piz", "dwaa"
+    channels: [string];          // channel names in the file header, e.g. "R","G","B","diffuse.R"
+    layers: [string];            // selectable layer / multipart names in the file
+    num_parts: uint;             // number of parts (1 for single-part EXR)
+    loaded_layer: string;        // name of the layer actually loaded ("" = default)
+}

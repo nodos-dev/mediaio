@@ -1,3 +1,7 @@
 [submodule "External/stb"]
 	path = External/stb
 	url = https://github.com/nothings/stb.git
+[submodule "External/tinyexr"]
+	path = External/tinyexr
+	url = https://github.com/syoyo/tinyexr.git
+	branch = release

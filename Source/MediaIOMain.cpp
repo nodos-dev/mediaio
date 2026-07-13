@@ -44,6 +44,8 @@ enum Nodes : int
 	LinearToSLog3,
 	WriteDPX,
 	PlaybackClip,
+	ReadEXR,
+	ReadEXRSequence,
 	StbiLoad,
 	WriteImage,
 	LoadCubeLUT,
@@ -75,6 +77,8 @@ nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
 nosResult RegisterWriteDPX(nosNodeFunctions*);
 nosResult RegisterPlaybackClip(nosNodeFunctions*);
+nosResult RegisterReadEXR(nosNodeFunctions*);
+nosResult RegisterReadEXRSequence(nosNodeFunctions*);
 
 } // namespace nos::mediaio
 
@@ -134,6 +138,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(LinearToSLog3)
 				GEN_CASE_NODE(WriteDPX)
 				GEN_CASE_NODE(PlaybackClip)
+				GEN_CASE_NODE(ReadEXR)
+				GEN_CASE_NODE(ReadEXRSequence)
 				GEN_CASE_NODE(StbiLoad)
 				GEN_CASE_NODE(WriteImage)
 				GEN_CASE_NODE(LoadCubeLUT)
