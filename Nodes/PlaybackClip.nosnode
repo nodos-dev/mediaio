@@ -29,7 +29,9 @@
                         "type_name": "string",
                         "show_as": "PROPERTY",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "visualizer": { "type": "FOLDER_PICKER" }
+                        "visualizers": [
+                            { "type": "FOLDER_PICKER" }
+                        ]
                     },
                     {
                         "name": "Texture",

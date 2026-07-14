@@ -20,10 +20,12 @@
                         "type_name": "string",
                         "show_as": "INPUT_PIN",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "visualizer": {
-                            "type": "FILE_PICKER",
-                            "file_extensions": [ "exr" ]
-                        }
+                        "visualizers": [
+                            {
+                                                        "type": "FILE_PICKER",
+                                                        "file_extensions": [ "exr" ]
+                                                    }
+                        ]
                     },
                     {
                         "name": "Layer",
@@ -33,10 +35,12 @@
                         "show_as": "PROPERTY",
                         "can_show_as": "INPUT_PIN_OR_PROPERTY",
                         "data": "(default)",
-                        "visualizer": {
-                            "type": "COMBO_BOX",
-                            "name": ""
-                        }
+                        "visualizers": [
+                            {
+                                                        "type": "COMBO_BOX",
+                                                        "name": ""
+                                                    }
+                        ]
                     },
                     {
                         "name": "Texture",
