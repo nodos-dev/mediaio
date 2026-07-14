@@ -24,10 +24,22 @@ target_include_directories(${NOS_PLUGIN_TARGET} PRIVATE
 target_compile_definitions(${NOS_PLUGIN_TARGET} PRIVATE EXR_USE_LIBDEFLATE EXR_ZLIB_DEFAULT_LIBDEFLATE=1)
 # The v3 sources use C11 _Atomic; MSVC needs the experimental switch for it. Third-party
 # code, so warnings are silenced.
+#
+# This is a sibling CMakeLists.txt, add_subdirectory'd into a target created
+# in a different directory scope (the auto-generated plugin target), so a
+# plain set_source_files_properties() call here wouldn't be visible where the
+# target actually compiles these sources. TARGET_DIRECTORY (CMake >=3.18)
+# sets the property as if called from the target's own directory. Kept as
+# per-source COMPILE_OPTIONS rather than target_compile_options with a
+# COMPILE_LANGUAGE generator expression: the VS generator silently drops
+# flags it doesn't recognize (like /experimental:c11atomics) when they're
+# gated by COMPILE_LANGUAGE, instead of preserving them in AdditionalOptions.
 if(MSVC)
     set_source_files_properties(${TINYEXR3_SOURCES} ${LIBDEFLATE_SOURCES} ${TINYEXR_ZSTD_SOURCE}
+        TARGET_DIRECTORY ${NOS_PLUGIN_TARGET}
         PROPERTIES COMPILE_OPTIONS "/std:c11;/experimental:c11atomics;/w")
 else()
     set_source_files_properties(${TINYEXR3_SOURCES} ${LIBDEFLATE_SOURCES} ${TINYEXR_ZSTD_SOURCE}
+        TARGET_DIRECTORY ${NOS_PLUGIN_TARGET}
         PROPERTIES COMPILE_OPTIONS "-std=c11;-w")
 endif()
