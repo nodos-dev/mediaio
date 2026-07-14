@@ -91,7 +91,7 @@
           {
             "id": "75f6d43d-b0b2-4c4f-a624-77b5d2bb68dc",
             "name": "SortBy",
-            "type_name": "nos.utilities.ListDirectorySortBy",
+            "type_name": "nos.filesystem.ListDirectorySortBy",
             "show_as": "PROPERTY",
             "can_show_as": "INPUT_OUTPUT_PROPERTY",
             "visualizer": {
@@ -616,7 +616,7 @@
             {
               "id": "ef514a29-e2e4-46dd-84e3-af68ab7b5b6f",
               "name": "ListDirectory",
-              "class_name": "nos.utilities.ListDirectory",
+              "class_name": "nos.filesystem.ListDirectory",
               "pins": [
                 {
                   "id": "c6f33bcc-2da4-432b-a856-729141992904",
@@ -650,7 +650,7 @@
                 {
                   "id": "99ffdcaf-3506-4080-b9ae-186a761c0eb7",
                   "name": "SortBy",
-                  "type_name": "nos.utilities.ListDirectorySortBy",
+                  "type_name": "nos.filesystem.ListDirectorySortBy",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_OUTPUT_PROPERTY",
                   "visualizer": {
@@ -1318,7 +1318,7 @@
                 {
                   "id": "7d951825-34cc-4093-a38e-70a048b65c29",
                   "name": "Output",
-                  "type_name": "nos.utilities.ListDirectorySortBy",
+                  "type_name": "nos.filesystem.ListDirectorySortBy",
                   "show_as": "OUTPUT_PIN",
                   "can_show_as": "OUTPUT_PIN_ONLY",
                   "visualizer": {
@@ -1330,7 +1330,7 @@
                 {
                   "id": "db63e7c1-a11d-4432-a7c8-2b7c8119bfbd",
                   "name": "Input",
-                  "type_name": "nos.utilities.ListDirectorySortBy",
+                  "type_name": "nos.filesystem.ListDirectorySortBy",
                   "show_as": "INPUT_PIN",
                   "can_show_as": "INPUT_OUTPUT_PROPERTY",
                   "visualizer": {

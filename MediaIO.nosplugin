@@ -30,6 +30,10 @@
 			{
 				"name": "nos.sync",
 				"version": "11.1"
+			},
+			{
+				"name": "nos.filesystem",
+				"version": "1.0"
 			}
 		],
 		"category": "Media I/O"
