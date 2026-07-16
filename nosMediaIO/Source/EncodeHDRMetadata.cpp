@@ -67,6 +67,34 @@ struct EncodeHDRMetadataNode : NodeContext
 	HDRMetadataMode Mode = HDRMetadataMode::Auto;
 	GammaCurve Gamma = GammaCurve::ST2084;
 
+	enum class Status
+	{
+		Ok,
+		UnencodablePrimaries,
+	} CurrentStatus = Status::Ok;
+
+	// Status calls are engine events processed by the Task Manager; sending
+	// one every execute wakes it at frame rate, so only send on transitions.
+	void SetStatus(Status newStatus)
+	{
+		if (CurrentStatus == newStatus)
+			return;
+		CurrentStatus = newStatus;
+		switch (CurrentStatus)
+		{
+		case Status::Ok:
+			ClearNodeStatusMessages();
+			return;
+		case Status::UnencodablePrimaries:
+			SetNodeStatusMessage(
+				"Selected Color Space is not a valid mastering-display gamut: its primaries fall "
+				"outside the SMPTE ST 2086 range (0..1.3107). This is a scene-referred camera gamut "
+				"(e.g. S-Gamut3), not a display. Falling back to Rec.2020 — pick REC709 or REC2020.",
+				fb::NodeStatusMessageType::FAILURE);
+			return;
+		}
+	}
+
 	EncodeHDRMetadataNode(nosFbNodePtr node) : NodeContext(node) {}
 
 	// Fill the value pins with the Auto-derived values. Luminance follows the
@@ -137,15 +165,11 @@ struct EncodeHDRMetadataNode : NodeContext
 			// Camera gamuts (S-Gamut3 / S-Gamut3.Cine) have virtual primaries
 			// that ST 2086 can't carry. Flag it loudly and fall back to a valid
 			// Rec.2020 container rather than emit clamped, meaningless primaries.
-			SetNodeStatusMessage(
-				"Selected Color Space is not a valid mastering-display gamut: its primaries fall "
-				"outside the SMPTE ST 2086 range (0..1.3107). This is a scene-referred camera gamut "
-				"(e.g. S-Gamut3), not a display. Falling back to Rec.2020 — pick REC709 or REC2020.",
-				fb::NodeStatusMessageType::FAILURE);
+			SetStatus(Status::UnencodablePrimaries);
 			pr = PrimariesFor(ColorSpace::REC2020);
 		}
 		else
-			ClearNodeStatusMessages();
+			SetStatus(Status::Ok);
 
 		HDRMetadata out(pr.rx, pr.ry, pr.gx, pr.gy, pr.bx, pr.by, pr.wx, pr.wy,
 		                maxLuminance, minLuminance, maxCLL, maxFALL);
