@@ -47,7 +47,7 @@ enum Nodes : int
 	SRGBToLinear,
 	LinearToSRGB,
 	WriteDPX,
-	PlaybackClip,
+	ReadDPX,
 	ReadEXR,
 	ReadEXRSequence,
 	ChannelViewer,
@@ -82,7 +82,7 @@ nosResult RegisterLinearToSLog3(nosNodeFunctions*);
 nosResult RegisterSRGBToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSRGB(nosNodeFunctions*);
 nosResult RegisterWriteDPX(nosNodeFunctions*);
-nosResult RegisterPlaybackClip(nosNodeFunctions*);
+nosResult RegisterReadDPX(nosNodeFunctions*);
 nosResult RegisterReadEXR(nosNodeFunctions*);
 nosResult RegisterReadEXRSequence(nosNodeFunctions*);
 nosResult RegisterChannelViewer(nosNodeFunctions*);
@@ -137,7 +137,7 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(SRGBToLinear)
 				GEN_CASE_NODE(LinearToSRGB)
 				GEN_CASE_NODE(WriteDPX)
-				GEN_CASE_NODE(PlaybackClip)
+				GEN_CASE_NODE(ReadDPX)
 				GEN_CASE_NODE(ReadEXR)
 				GEN_CASE_NODE(ReadEXRSequence)
 				GEN_CASE_NODE(ChannelViewer)

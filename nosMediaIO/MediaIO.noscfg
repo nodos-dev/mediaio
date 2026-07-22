@@ -42,7 +42,7 @@
 		"Config/TimecodePlayer.nosdef",
 		"Config/WriteDPX.nosdef",
 		"Config/RecordDPXClip.nosdef",
-		"Config/PlaybackClip.nosdef",
+		"Config/ReadDPX.nosdef",
 		"Config/ReadEXR.nosdef",
 		"Config/ReadEXRSequence.nosdef",
 		"Config/PlayEXR.nosdef",

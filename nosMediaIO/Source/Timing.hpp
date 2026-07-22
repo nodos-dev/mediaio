@@ -8,7 +8,7 @@
 #include <Nodos/PluginHelpers.hpp>
 
 // Shared frame-rate helpers for nodes that derive a rate from the executing path's
-// timing (Record/Playback Clip and the timecode nodes).
+// timing (Write DPX and the timecode nodes).
 namespace nos::mediaio
 {
 

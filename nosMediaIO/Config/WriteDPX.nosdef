@@ -11,7 +11,7 @@
                 "class_name": "WriteDPX",
                 "display_name": "Write DPX",
                 "contents_type": "Job",
-                "description": "Writes the input Buffer to disk as an uncompressed DPX sequence while Write is true.\nEach execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE timecode\nembedded in its header - under Path. The pixels are produced upstream by a Texture To\nBuffer node (encoding + packing) and made host-visible by a download ring, so this node\ndoes no GPU work: it maps the buffer and writes the bytes. Resolution, Output Format and\nTransfer describe the buffer for the DPX header and must match the Texture To Buffer node.\nDrive it through the In/Out exe pins to schedule it. Play the result back with the\nPlayback Clip node.",
+                "description": "Writes the input Buffer to disk as an uncompressed DPX sequence while Write is true.\nEach execution writes a 'HH-MM-SS-FF.dpx' file - named from and with the SMPTE timecode\nembedded in its header - under Path. The pixels are produced upstream by a Texture To\nBuffer node (encoding + packing) and made host-visible by a download ring, so this node\ndoes no GPU work: it maps the buffer and writes the bytes. Resolution, Output Format and\nTransfer describe the buffer for the DPX header and must match the Texture To Buffer node.\nDrive it through the In/Out exe pins to schedule it. Read individual frames back with\nthe Read DPX node.",
                 "pins": [
                     {
                         "name": "InExe",

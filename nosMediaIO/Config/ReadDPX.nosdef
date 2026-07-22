@@ -1,0 +1,40 @@
+{
+    "nodes": [
+        {
+            "class_name": "ReadDPX",
+            "menu_info": {
+                "category": "Media IO|File",
+                "display_name": "Read DPX",
+                "name_aliases": [ "dpx reader", "load dpx", "open dpx" ]
+            },
+            "node": {
+                "class_name": "ReadDPX",
+                "display_name": "Read DPX",
+                "contents_type": "Job",
+                "description": "Reads a DPX image from Path and emits it on the Texture output. Loads only when Path\nchanges. The output texture format follows the DPX transfer tag - an sRGB-encoded file\nbecomes an _SRGB texture so the graph's sampler decodes it back to linear automatically.",
+                "pins": [
+                    {
+                        "name": "Path",
+                        "display_name": "Path",
+                        "description": "Path to the .dpx file to read.",
+                        "type_name": "string",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "visualizer": {
+                            "type": "FILE_PICKER",
+                            "file_extensions": [ "dpx" ]
+                        }
+                    },
+                    {
+                        "name": "Texture",
+                        "display_name": "Texture",
+                        "description": "Decoded image. Holds the previous frame when the file is missing or fails to load.",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY"
+                    }
+                ]
+            }
+        }
+    ]
+}

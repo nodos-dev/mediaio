@@ -50,7 +50,7 @@ constexpr uint8_t TRANSFER_LINEAR       = CHARACTERISTIC_LINEAR;
 constexpr uint32_t FILM_FRAME_RATE_OFFSET = 1724; // film header R32 frame rate (FPS), canonical
 constexpr uint32_t TV_FRAME_RATE_OFFSET = 1940;   // television header R32 frame rate (FPS)
 
-// Pixel layout of the DPX image element that Record/Playback Clip handle.
+// Pixel layout of the DPX image element that Write/Read DPX handle.
 struct ImageDesc
 {
 	uint32_t Width = 0;
