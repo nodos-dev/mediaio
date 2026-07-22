@@ -457,7 +457,7 @@ nosResult RegisterColorSpaceMatrix(nosNodeFunctions* funcs)
 	return NOS_RESULT_SUCCESS;
 }
 
-struct SLog3GammaPassNodeContext : NodeContext
+struct GammaPassNodeContext : NodeContext
 {
 	using NodeContext::NodeContext;
 
@@ -490,13 +490,25 @@ struct SLog3GammaPassNodeContext : NodeContext
 
 nosResult RegisterSLog3ToLinear(nosNodeFunctions* funcs)
 {
-	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.SLog3ToLinear"), SLog3GammaPassNodeContext, funcs);
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.SLog3ToLinear"), GammaPassNodeContext, funcs);
 	return NOS_RESULT_SUCCESS;
 }
 
 nosResult RegisterLinearToSLog3(nosNodeFunctions* funcs)
 {
-	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.LinearToSLog3"), SLog3GammaPassNodeContext, funcs);
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.LinearToSLog3"), GammaPassNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+nosResult RegisterSRGBToLinear(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.SRGBToLinear"), GammaPassNodeContext, funcs);
+	return NOS_RESULT_SUCCESS;
+}
+
+nosResult RegisterLinearToSRGB(nosNodeFunctions* funcs)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME_STATIC("nos.mediaio.LinearToSRGB"), GammaPassNodeContext, funcs);
 	return NOS_RESULT_SUCCESS;
 }
 

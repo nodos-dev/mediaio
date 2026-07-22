@@ -44,6 +44,8 @@ enum Nodes : int
 	TimecodePlayer,
 	SLog3ToLinear,
 	LinearToSLog3,
+	SRGBToLinear,
+	LinearToSRGB,
 	WriteDPX,
 	PlaybackClip,
 	ReadEXR,
@@ -77,6 +79,8 @@ nosResult RegisterTimecodeToString(nosNodeFunctions*);
 nosResult RegisterTimecodePlayer(nosNodeFunctions*);
 nosResult RegisterSLog3ToLinear(nosNodeFunctions*);
 nosResult RegisterLinearToSLog3(nosNodeFunctions*);
+nosResult RegisterSRGBToLinear(nosNodeFunctions*);
+nosResult RegisterLinearToSRGB(nosNodeFunctions*);
 nosResult RegisterWriteDPX(nosNodeFunctions*);
 nosResult RegisterPlaybackClip(nosNodeFunctions*);
 nosResult RegisterReadEXR(nosNodeFunctions*);
@@ -130,6 +134,8 @@ struct MediaIOPluginFunctions : nos::PluginFunctions
 				GEN_CASE_NODE(TimecodePlayer)
 				GEN_CASE_NODE(SLog3ToLinear)
 				GEN_CASE_NODE(LinearToSLog3)
+				GEN_CASE_NODE(SRGBToLinear)
+				GEN_CASE_NODE(LinearToSRGB)
 				GEN_CASE_NODE(WriteDPX)
 				GEN_CASE_NODE(PlaybackClip)
 				GEN_CASE_NODE(ReadEXR)

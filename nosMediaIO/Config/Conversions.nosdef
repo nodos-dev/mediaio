@@ -427,6 +427,94 @@
 			}
 		},
 		{
+			"class_name": "SRGBToLinear",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "sRGB to Linear",
+				"name_aliases": [ "srgb", "gamma to linear", "decode gamma", "degamma" ]
+			},
+			"node": {
+				"class_name": "SRGBToLinear",
+				"contents_type": "Job",
+				"description": "Decodes sRGB-encoded RGB to linear RGB. Output is R16G16B16A16_SFLOAT.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/SRGBToLinear.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 68
+						}
+					}
+				]
+			}
+		},
+		{
+			"class_name": "LinearToSRGB",
+			"menu_info": {
+				"category": "Media IO|Conversions",
+				"display_name": "Linear to sRGB",
+				"name_aliases": [ "srgb", "linear to gamma", "encode gamma" ]
+			},
+			"node": {
+				"class_name": "LinearToSRGB",
+				"contents_type": "Job",
+				"description": "Encodes linear RGB to sRGB. Output is R16G16B16A16_SFLOAT.",
+				"contents": {
+					"type": "nos.sys.vulkan.GPUNode",
+					"options": {
+						"shader": "Shaders/LinearToSRGB.comp",
+						"stage": "COMPUTE"
+					}
+				},
+				"pins": [
+					{
+						"name": "Source",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Texture",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "DispatchSize",
+						"type_name": "nos.fb.vec2u",
+						"show_as": "PROPERTY",
+						"can_show_as": "PROPERTY_ONLY",
+						"data": {
+							"x": 120,
+							"y": 68
+						}
+					}
+				]
+			}
+		},
+		{
 			"class_name": "YUY2ToRGBA",
 			"menu_info": {
 				"category": "Media IO",
