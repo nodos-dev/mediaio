@@ -3,6 +3,7 @@
 #include <Nodos/PluginHelpers.hpp>
 #include <nosVulkanSubsystem/Helpers.hpp>
 
+#include "ColorSpaceCoeffs.hpp"
 #include "Conversion_generated.h"
 
 #include <glm/glm.hpp>
@@ -341,32 +342,11 @@ nosResult RegisterGammaLUT(nosNodeFunctions* funcs)
 
 struct ColorSpaceMatrixNodeContext : NodeContext
 {
-	static std::array<double, 2> GetCoeffs(ColorSpace colorSpace)
-	{
-		switch (colorSpace)
-		{
-		case ColorSpace::REC601:
-			return { .299, .114 };
-		case ColorSpace::REC2020:
-			return { .2627, .0593 };
-		// Sony S-Gamut3 / S-Gamut3.Cine luma (R, B) coefficients, derived from the
-		// published primaries against D65 white. Blue is negative because the blue
-		// primary lies outside the spectral locus.
-		case ColorSpace::SGAMUT3:
-			return { 0.2709805, -0.0575869 };
-		case ColorSpace::SGAMUT3CINE:
-			return { 0.2150825, -0.1001485 };
-		case ColorSpace::REC709:
-		default:
-			return { .2126, .0722 };
-		}
-	}
-
 	template<class T>
 	static glm::mat<4, 4, T> GetMatrix(ColorSpace colorSpace, uint32_t bitWidth, bool narrowRange)
 	{
 		// https://registry.khronos.org/DataFormat/specs/1.3/dataformat.1.3.html#MODEL_CONVERSION
-		const auto [R, B] = GetCoeffs(colorSpace);
+		const auto [R, B] = LumaCoeffs(colorSpace);
 		const T G = T(1) - R - B; // Colorspace
 
 		/*
