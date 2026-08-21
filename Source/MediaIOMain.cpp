@@ -162,6 +162,22 @@ extern "C" NOSAPI_ATTR nosResult NOSAPI_CALL nosExportPlugin(nosPluginFunctions*
 	outFunctions->OnPreUnloadPlugin = []() -> nosResult { return pluginFunctions.OnPreUnloadPlugin(); };
 	outFunctions->OnRequestAPI = Export;
 
+	outFunctions->GetRenamedTypes = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
+		static std::vector<std::pair<nos::Name, nos::Name>> renames = {
+			{NOS_NAME("nos.utilities.TextureSyncTuple"), NOS_NAME("nos.mediaio.TextureSyncTuple")},
+		};
+		if (!outRenamedFrom)
+		{
+			*outSize = renames.size();
+			return;
+		}
+		for (size_t i = 0; i < renames.size(); ++i)
+		{
+			outRenamedFrom[i] = renames[i].first;
+			outRenamedTo[i] = renames[i].second;
+		}
+	};
+
 	outFunctions->GetRenamedNodeClasses = [](nosName* outRenamedFrom, nosName* outRenamedTo, size_t* outSize) {
 		static std::vector<std::pair<nos::Name, nos::Name>> renames = {
 			{NOS_NAME("nos.utilities.StbiLoad"), NOS_NAME("nos.mediaio.StbiLoad")},

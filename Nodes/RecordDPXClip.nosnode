@@ -496,7 +496,7 @@
                 {
                   "id": "c6ec871a-c4a3-4fcc-a9db-bb87327a7451",
                   "name": "Mode",
-                  "type_name": "nos.utilities.ScheduleRequestMode",
+                  "type_name": "nos.flow.ScheduleRequestMode",
                   "show_as": "PROPERTY",
                   "can_show_as": "INPUT_PIN_OR_PROPERTY",
                   "visualizers": [],
