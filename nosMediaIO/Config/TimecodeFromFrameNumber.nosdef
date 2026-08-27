@@ -2,6 +2,7 @@
     "nodes": [
         {
             "class_name": "TimecodeFromFrameNumber",
+            "hide_in_context_menu": true,
             "menu_info": {
                 "category": "Media IO|Timecode",
                 "display_name": "Timecode From Frame Number"

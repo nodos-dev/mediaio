@@ -2,6 +2,7 @@
     "nodes": [
         {
             "class_name": "WriteDPX",
+            "hide_in_context_menu": true,
             "menu_info": {
                 "category": "Media IO|Recording",
                 "display_name": "Write DPX",
